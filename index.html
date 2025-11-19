@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>마음 어항</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+    
+    // Firebase 설정 - 여기에 본인의 Firebase 설정을 넣으세요
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    // Firebase 초기화
+    const app = initializeApp(firebaseConfig);
+    window.database = getDatabase(app);
+    window.dbRef = ref;
+    window.dbSet = set;
+    window.dbOnValue = onValue;
+  </script>
+  
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+        sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    @keyframes bounce {
+      0%, 100% {
+        transform: translateY(-5%);
+        animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+      }
+      50% {
+        transform: translateY(0);
+        animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+      }
+    }
+    
+    .animate-bounce {
+      animation: bounce 1s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: .5;
+      }
+    }
+    
+    .animate-pulse {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // Lucide React 아이콘 대체 (간단한 SVG 아이콘)
+    const Fish = () => <span>🐠</span>;
+    const Heart = () => <span>❤️</span>;
+    const Lock = () => <span>🔒</span>;
+    const Mail = () => <span>📧</span>;
+    const Crown = () => <span>👑</span>;
+    const Loader = () => <div className="animate-spin">⏳</div>;
+
+    function MindAquarium() {
+      const [mode, setMode] = useState('intro');
+      const [selectedFish, setSelectedFish] = useState(null);
+      const [letterContent, setLetterContent] = useState('');
+      const [password, setPassword] = useState('');
+      const [feedingHistory, setFeedingHistory] = useState({});
+      const [messages, setMessages] = useState([]);
+      const [parentLetter, setParentLetter] = useState('');
+      const [kingLetterContent, setKingLetterContent] = useState('');
+      const [hasReadKingLetter, setHasReadKingLetter] = useState(false);
+      const [loading, setLoading] = useState(false);
+
+      const fishes = [
+        { id: 'worry', name: '걱정', color: 'bg-blue-400', emoji: '😟' },
+        { id: 'fear', name: '무서움', color: 'bg-purple-400', emoji: '😨' },
+        { id: 'anger', name: '화남', color: 'bg-red-400', emoji: '😠' },
+        { id: 'secret', name: '비밀', color: 'bg-yellow-400', emoji: '🤫' }
+      ];
+
+      // Firebase 또는 localStorage에서 데이터 불러오기
+      useEffect(() => {
+        // Firebase를 사용할 수 있다면 Firebase에서 불러오기
+        if (window.database) {
+          const messagesRef = window.dbRef(window.database, 'messages');
+          const historyRef = window.dbRef(window.database, 'feedingHistory');
+          const kingLetterRef = window.dbRef(window.database, 'kingLetter');
+          const readStatusRef = window.dbRef(window.database, 'hasReadKingLetter');
+
+          window.dbOnValue(messagesRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+              const messagesArray = Array.isArray(data) ? data : Object.values(data);
+              setMessages(messagesArray.filter(m => m));
+            }
+          });
+
+          window.dbOnValue(historyRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) setFeedingHistory(data);
+          });
+
+          window.dbOnValue(kingLetterRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) setKingLetterContent(data);
+          });
+
+          window.dbOnValue(readStatusRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) setHasReadKingLetter(data);
+          });
+        } else {
+          // Firebase가 없으면 localStorage 사용
+          const savedHistory = localStorage.getItem('feedingHistory');
+          const savedMessages = localStorage.getItem('messages');
+          const savedKingLetter = localStorage.getItem('kingLetter');
+          const savedHasRead = localStorage.getItem('hasReadKingLetter');
+          
+          if (savedHistory) setFeedingHistory(JSON.parse(savedHistory));
+          if (savedMessages) setMessages(JSON.parse(savedMessages));
+          if (savedKingLetter) setKingLetterContent(savedKingLetter);
+          if (savedHasRead) setHasReadKingLetter(JSON.parse(savedHasRead));
+        }
+      }, []);
+
+      const saveToStorage = async (path, data) => {
+        setLoading(true);
+        try {
+          if (window.database) {
+            const dataRef = window.dbRef(window.database, path);
+            await window.dbSet(dataRef, data);
+          } else {
+            localStorage.setItem(path, JSON.stringify(data));
+          }
+          await new Promise(resolve => setTimeout(resolve, 500));
+        } catch (error) {
+          console.error('저장 실패:', error);
+          alert('저장에 실패했습니다. 다시 시도해주세요.');
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      const getTodayString = () => new Date().toISOString().split('T')[0];
+
+      const getConsecutiveDays = () => {
+        const dates = Object.keys(feedingHistory).sort().reverse();
+        let count = 0;
+        let checkDate = new Date();
+        
+        for (let i = 0; i < 30; i++) {
+          const dateString = checkDate.toISOString().split('T')[0];
+          if (dates.includes(dateString)) {
+            count++;
+            checkDate.setDate(checkDate.getDate() - 1);
+          } else {
+            break;
+          }
+        }
+        return count;
+      };
+
+      const feedFish = async () => {
+        if (!letterContent.trim()) {
+          alert('편지를 써주세요!');
+          return;
+        }
+
+        const today = getTodayString();
+        const newMessage = {
+          id: Date.now(),
+          fish: selectedFish.name,
+          content: letterContent,
+          date: new Date().toLocaleString('ko-KR')
+        };
+
+        const updatedMessages = [...messages, newMessage];
+        const updatedHistory = { ...feedingHistory, [today]: true };
+
+        await saveToStorage('messages', updatedMessages);
+        await saveToStorage('feedingHistory', updatedHistory);
+
+        setMessages(updatedMessages);
+        setFeedingHistory(updatedHistory);
+        setLetterContent('');
+        setMode('aquarium');
+        
+        const consecutiveDays = Object.keys(updatedHistory).length;
+        if (consecutiveDays >= 30 && kingLetterContent && !hasReadKingLetter) {
+          setTimeout(() => alert('🎉 물고기 왕이 편지를 보냈어요!'), 500);
+        }
+      };
+
+      const handleAdminLogin = () => {
+        if (password === '1234') {
+          setMode('admin');
+          setPassword('');
+        } else {
+          alert('비밀번호가 틀렸습니다.');
+          setPassword('');
+        }
+      };
+
+      const saveKingLetter = async () => {
+        if (!parentLetter.trim()) {
+          alert('편지 내용을 입력해주세요.');
+          return;
+        }
+        await saveToStorage('kingLetter', parentLetter);
+        setKingLetterContent(parentLetter);
+        alert('물고기 왕의 편지가 저장되었습니다!');
+        setParentLetter('');
+      };
+
+      const readKingLetter = async () => {
+        setMode('kingLetter');
+        setHasReadKingLetter(true);
+        await saveToStorage('hasReadKingLetter', true);
+      };
+
+      if (loading) {
+        return (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 flex flex-col items-center">
+              <Loader />
+              <p className="text-lg font-bold mt-3">저장하는 중...</p>
+            </div>
+          </div>
+        );
+      }
+
+      if (mode === 'intro') {
+        return (
+          <div className="min-h-screen bg-gradient-to-b from-blue-200 to-blue-400 flex flex-col items-center justify-center p-6">
+            <div className="text-center mb-12">
+              <h1 className="text-5xl font-bold text-white mb-4">🐠 마음 어항 🐠</h1>
+              <p className="text-xl text-white">물고기들에게 마음을 나눠주세요</p>
+            </div>
+            
+            <button
+              onClick={() => setMode('aquarium')}
+              className="bg-white text-blue-600 px-12 py-6 rounded-full text-2xl font-bold shadow-lg hover:bg-blue-50 transition mb-6"
+            >
+              어항 들어가기
+            </button>
+            
+            <button
+              onClick={() => setMode('adminLogin')}
+              className="text-white opacity-50 hover:opacity-100 transition flex items-center gap-2"
+            >
+              <Lock />
+              <span className="text-sm">관리자 모드</span>
+            </button>
+          </div>
+        );
+      }
+
+      if (mode === 'adminLogin') {
+        return (
+          <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
+            <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
+              <h2 className="text-2xl font-bold mb-6 text-center">관리자 모드</h2>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleAdminLogin()}
+                placeholder="비밀번호 입력"
+                className="w-full border-2 border-gray-300 rounded-lg p-3 mb-4"
+              />
+              <button
+                onClick={handleAdminLogin}
+                className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition mb-3"
+              >
+                로그인
+              </button>
+              <button
+                onClick={() => setMode('intro')}
+                className="w-full bg-gray-300 text-gray-700 py-3 rounded-lg font-bold hover:bg-gray-400 transition"
+              >
+                돌아가기
+              </button>
+            </div>
+          </div>
+        );
+      }
+
+      if (mode === 'admin') {
+        return (
+          <div className="min-h-screen bg-gray-100 p-6">
+            <div className="max-w-4xl mx-auto">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-3xl font-bold">관리자 모드</h2>
+                <button
+                  onClick={() => setMode('intro')}
+                  className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+                >
+                  나가기
+                </button>
+              </div>
+
+              <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-6 mb-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <Crown />
+                  <h3 className="text-xl font-bold">물고기 왕의 편지 (30일 달성 시 표시)</h3>
+                </div>
+                <textarea
+                  value={parentLetter}
+                  onChange={(e) => setParentLetter(e.target.value)}
+                  placeholder="아이에게 보낼 격려의 편지를 작성하세요..."
+                  className="w-full border-2 border-gray-300 rounded-lg p-3 mb-3 h-32"
+                  maxLength={300}
+                />
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">{parentLetter.length}/300자</span>
+                  <button
+                    onClick={saveKingLetter}
+                    className="bg-yellow-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-yellow-600"
+                  >
+                    편지 저장
+                  </button>
+                </div>
+                {kingLetterContent && (
+                  <div className="mt-4 p-4 bg-white rounded-lg border border-yellow-300">
+                    <p className="text-sm font-bold mb-2">현재 저장된 편지:</p>
+                    <p className="text-gray-700">{kingLetterContent}</p>
+                  </div>
+                )}
+              </div>
+
+              <div className="bg-white rounded-lg shadow-lg p-6">
+                <h3 className="text-2xl font-bold mb-4 flex items-center gap-2">
+                  <Mail />
+                  수신 편지함 ({messages.length}개)
+                </h3>
+                
+                {messages.length === 0 ? (
+                  <p className="text-gray-500 text-center py-8">아직 받은 편지가 없습니다.</p>
+                ) : (
+                  <div className="space-y-4">
+                    {messages.slice().reverse().map((msg) => (
+                      <div key={msg.id} className="border-2 border-gray-200 rounded-lg p-4">
+                        <div className="flex justify-between items-start mb-2">
+                          <span className="font-bold text-lg">{msg.fish} 물고기</span>
+                          <span className="text-sm text-gray-500">{msg.date}</span>
+                        </div>
+                        <p className="text-gray-700 whitespace-pre-wrap">{msg.content}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      if (mode === 'letter' && selectedFish) {
+        return (
+          <div className="min-h-screen bg-gradient-to-b from-blue-200 to-blue-400 p-6">
+            <div className="max-w-2xl mx-auto">
+              <div className="bg-white rounded-lg shadow-xl p-8">
+                <h2 className="text-3xl font-bold mb-4 text-center">
+                  {selectedFish.emoji} {selectedFish.name} 물고기에게 먹이 주기
+                </h2>
+                <p className="text-gray-600 text-center mb-6">
+                  오늘의 마음을 편지로 써보세요
+                </p>
+                
+                <textarea
+                  value={letterContent}
+                  onChange={(e) => setLetterContent(e.target.value)}
+                  placeholder={`${selectedFish.name} 물고기에게 하고 싶은 이야기를 써주세요...`}
+                  className="w-full border-2 border-gray-300 rounded-lg p-4 mb-4 h-48 text-lg"
+                  maxLength={100}
+                />
+                
+                <div className="text-right text-sm text-gray-600 mb-4">
+                  {letterContent.length}/100자
+                </div>
+                
+                <div className="flex gap-4">
+                  <button
+                    onClick={() => {
+                      setMode('aquarium');
+                      setLetterContent('');
+                    }}
+                    className="flex-1 bg-gray-300 text-gray-700 py-4 rounded-lg font-bold hover:bg-gray-400 transition"
+                  >
+                    취소
+                  </button>
+                  <button
+                    onClick={feedFish}
+                    className="flex-1 bg-blue-600 text-white py-4 rounded-lg font-bold hover:bg-blue-700 transition flex items-center justify-center gap-2"
+                  >
+                    <Heart />
+                    먹이 주기
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      if (mode === 'kingLetter') {
+        return (
+          <div className="min-h-screen bg-gradient-to-b from-yellow-200 to-yellow-400 p-6">
+            <div className="max-w-2xl mx-auto">
+              <div className="bg-white rounded-lg shadow-xl p-8">
+                <div className="text-center mb-6">
+                  <div className="text-6xl mb-4"><Crown /></div>
+                  <h2 className="text-3xl font-bold mb-2">물고기 왕의 편지</h2>
+                  <p className="text-gray-600">30일 동안 물고기들을 돌봐줘서 고마워요!</p>
+                </div>
+                
+                <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-6 mb-6">
+                  <p className="text-lg whitespace-pre-wrap leading-relaxed">
+                    {kingLetterContent}
+                  </p>
+                </div>
+                
+                <button
+                  onClick={() => setMode('aquarium')}
+                  className="w-full bg-blue-600 text-white py-4 rounded-lg font-bold hover:bg-blue-700 transition"
+                >
+                  어항으로 돌아가기
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      const consecutiveDays = getConsecutiveDays();
+      const canShowKingLetter = consecutiveDays >= 30 && kingLetterContent && !hasReadKingLetter;
+
+      return (
+        <div className="min-h-screen bg-gradient-to-b from-blue-300 to-blue-500 p-6">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-8">
+              <h1 className="text-4xl font-bold text-white mb-4">🐠 마음 어항 🐠</h1>
+              
+              <div className="bg-white/90 rounded-lg p-4 inline-block">
+                <p className="text-sm text-gray-600 mb-2">연속으로 물고기 돌본 날</p>
+                <div className="flex gap-1 justify-center mb-2">
+                  {Array.from({ length: 30 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className={`w-3 h-3 rounded-full ${
+                        i < consecutiveDays ? 'bg-blue-500' : 'bg-gray-300'
+                      }`}
+                    />
+                  ))}
+                </div>
+                <p className="text-2xl font-bold text-blue-600">{consecutiveDays} / 30일</p>
+              </div>
+            </div>
+
+            {canShowKingLetter && (
+              <div className="mb-6">
+                <button
+                  onClick={readKingLetter}
+                  className="w-full bg-yellow-400 text-gray-800 py-6 rounded-lg font-bold text-xl hover:bg-yellow-500 transition flex items-center justify-center gap-3 animate-pulse shadow-xl"
+                >
+                  <Crown />
+                  <span>물고기 왕이 편지를 보냈어요! 📬</span>
+                </button>
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 gap-6">
+              {fishes.map((fish) => (
+                <button
+                  key={fish.id}
+                  onClick={() => {
+                    setSelectedFish(fish);
+                    setMode('letter');
+                  }}
+                  className={`${fish.color} rounded-2xl p-8 shadow-xl hover:scale-105 transition transform`}
+                >
+                  <div className="text-center">
+                    <div className="text-6xl mb-4 animate-bounce">{fish.emoji}</div>
+                    <h3 className="text-2xl font-bold text-white mb-2">{fish.name}</h3>
+                    <Fish />
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            <div className="mt-8 text-center">
+              <button
+                onClick={() => setMode('intro')}
+                className="bg-white/80 text-blue-600 px-6 py-3 rounded-full font-bold hover:bg-white transition"
+              >
+                처음으로 돌아가기
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<MindAquarium />);
+  </script>
+</body>
+</html>
