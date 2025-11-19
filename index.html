@@ -3,35 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="마음 어항">
   <title>마음 어항</title>
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- Firebase SDK -->
-  <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-    import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-    
-    // Firebase 설정 - 여기에 본인의 Firebase 설정을 넣으세요
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-      databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT_ID.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
-    };
-
-    // Firebase 초기화
-    const app = initializeApp(firebaseConfig);
-    window.database = getDatabase(app);
-    window.dbRef = ref;
-    window.dbSet = set;
-    window.dbOnValue = onValue;
-  </script>
   
   <style>
     body {
@@ -70,21 +49,60 @@
     .animate-pulse {
       animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     }
+
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    
+    .animate-spin {
+      animation: spin 1s linear infinite;
+    }
   </style>
 </head>
 <body>
   <div id="root"></div>
 
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getDatabase, ref, set, onValue, push } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+    
+    // Firebase 설정
+    const firebaseConfig = {
+      apiKey: "AIzaSyCQLxHoTcKvS1X7ausB1slF27tZoFvh99o",
+      authDomain: "mind-aquarium.firebaseapp.com",
+      databaseURL: "https://mind-aquarium-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "mind-aquarium",
+      storageBucket: "mind-aquarium.firebasestorage.app",
+      messagingSenderId: "812802606438",
+      appId: "1:812802606438:web:07fef3f1b4f89e78b3f4a7"
+    };
+
+    // Firebase 초기화
+    const app = initializeApp(firebaseConfig);
+    window.database = getDatabase(app);
+    window.dbRef = ref;
+    window.dbSet = set;
+    window.dbOnValue = onValue;
+    window.dbPush = push;
+
+    console.log('🔥 Firebase 연결 완료!');
+  </script>
+
   <script type="text/babel">
     const { useState, useEffect } = React;
 
-    // Lucide React 아이콘 대체 (간단한 SVG 아이콘)
+    // 간단한 아이콘 컴포넌트들
     const Fish = () => <span>🐠</span>;
     const Heart = () => <span>❤️</span>;
     const Lock = () => <span>🔒</span>;
     const Mail = () => <span>📧</span>;
     const Crown = () => <span>👑</span>;
-    const Loader = () => <div className="animate-spin">⏳</div>;
+    const Loader = () => <div className="animate-spin text-4xl">⏳</div>;
 
     function MindAquarium() {
       const [mode, setMode] = useState('intro');
@@ -97,6 +115,7 @@
       const [kingLetterContent, setKingLetterContent] = useState('');
       const [hasReadKingLetter, setHasReadKingLetter] = useState(false);
       const [loading, setLoading] = useState(false);
+      const [firebaseConnected, setFirebaseConnected] = useState(false);
 
       const fishes = [
         { id: 'worry', name: '걱정', color: 'bg-blue-400', emoji: '😟' },
@@ -105,64 +124,73 @@
         { id: 'secret', name: '비밀', color: 'bg-yellow-400', emoji: '🤫' }
       ];
 
-      // Firebase 또는 localStorage에서 데이터 불러오기
+      // Firebase에서 데이터 실시간 동기화
       useEffect(() => {
-        // Firebase를 사용할 수 있다면 Firebase에서 불러오기
-        if (window.database) {
-          const messagesRef = window.dbRef(window.database, 'messages');
-          const historyRef = window.dbRef(window.database, 'feedingHistory');
-          const kingLetterRef = window.dbRef(window.database, 'kingLetter');
-          const readStatusRef = window.dbRef(window.database, 'hasReadKingLetter');
+        if (!window.database) {
+          console.error('Firebase가 초기화되지 않았습니다.');
+          return;
+        }
 
+        setFirebaseConnected(true);
+        console.log('📡 Firebase 데이터 동기화 시작...');
+
+        try {
+          // 메시지 실시간 동기화
+          const messagesRef = window.dbRef(window.database, 'messages');
           window.dbOnValue(messagesRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
               const messagesArray = Array.isArray(data) ? data : Object.values(data);
-              setMessages(messagesArray.filter(m => m));
+              setMessages(messagesArray.filter(m => m && m.id));
+              console.log('📬 메시지 로드:', messagesArray.length, '개');
+            } else {
+              setMessages([]);
             }
           });
 
+          // 먹이 주기 기록 동기화
+          const historyRef = window.dbRef(window.database, 'feedingHistory');
           window.dbOnValue(historyRef, (snapshot) => {
             const data = snapshot.val();
-            if (data) setFeedingHistory(data);
+            if (data) {
+              setFeedingHistory(data);
+              console.log('📅 먹이 주기 기록 로드');
+            }
           });
 
+          // 왕 편지 동기화
+          const kingLetterRef = window.dbRef(window.database, 'kingLetter');
           window.dbOnValue(kingLetterRef, (snapshot) => {
             const data = snapshot.val();
-            if (data) setKingLetterContent(data);
+            if (data) {
+              setKingLetterContent(data);
+              console.log('👑 왕 편지 로드');
+            }
           });
 
+          // 읽음 상태 동기화
+          const readStatusRef = window.dbRef(window.database, 'hasReadKingLetter');
           window.dbOnValue(readStatusRef, (snapshot) => {
             const data = snapshot.val();
             if (data) setHasReadKingLetter(data);
           });
-        } else {
-          // Firebase가 없으면 localStorage 사용
-          const savedHistory = localStorage.getItem('feedingHistory');
-          const savedMessages = localStorage.getItem('messages');
-          const savedKingLetter = localStorage.getItem('kingLetter');
-          const savedHasRead = localStorage.getItem('hasReadKingLetter');
-          
-          if (savedHistory) setFeedingHistory(JSON.parse(savedHistory));
-          if (savedMessages) setMessages(JSON.parse(savedMessages));
-          if (savedKingLetter) setKingLetterContent(savedKingLetter);
-          if (savedHasRead) setHasReadKingLetter(JSON.parse(savedHasRead));
+
+        } catch (error) {
+          console.error('Firebase 연결 오류:', error);
         }
       }, []);
 
-      const saveToStorage = async (path, data) => {
+      // Firebase에 데이터 저장
+      const saveToFirebase = async (path, data) => {
         setLoading(true);
         try {
-          if (window.database) {
-            const dataRef = window.dbRef(window.database, path);
-            await window.dbSet(dataRef, data);
-          } else {
-            localStorage.setItem(path, JSON.stringify(data));
-          }
-          await new Promise(resolve => setTimeout(resolve, 500));
+          const dataRef = window.dbRef(window.database, path);
+          await window.dbSet(dataRef, data);
+          console.log('✅ 저장 완료:', path);
+          await new Promise(resolve => setTimeout(resolve, 300));
         } catch (error) {
-          console.error('저장 실패:', error);
-          alert('저장에 실패했습니다. 다시 시도해주세요.');
+          console.error('❌ 저장 실패:', error);
+          alert('저장에 실패했습니다. 인터넷 연결을 확인해주세요.');
         } finally {
           setLoading(false);
         }
@@ -187,6 +215,7 @@
         return count;
       };
 
+      // 먹이 주기
       const feedFish = async () => {
         if (!letterContent.trim()) {
           alert('편지를 써주세요!');
@@ -204,8 +233,8 @@
         const updatedMessages = [...messages, newMessage];
         const updatedHistory = { ...feedingHistory, [today]: true };
 
-        await saveToStorage('messages', updatedMessages);
-        await saveToStorage('feedingHistory', updatedHistory);
+        await saveToFirebase('messages', updatedMessages);
+        await saveToFirebase('feedingHistory', updatedHistory);
 
         setMessages(updatedMessages);
         setFeedingHistory(updatedHistory);
@@ -233,7 +262,7 @@
           alert('편지 내용을 입력해주세요.');
           return;
         }
-        await saveToStorage('kingLetter', parentLetter);
+        await saveToFirebase('kingLetter', parentLetter);
         setKingLetterContent(parentLetter);
         alert('물고기 왕의 편지가 저장되었습니다!');
         setParentLetter('');
@@ -242,15 +271,15 @@
       const readKingLetter = async () => {
         setMode('kingLetter');
         setHasReadKingLetter(true);
-        await saveToStorage('hasReadKingLetter', true);
+        await saveToFirebase('hasReadKingLetter', true);
       };
 
       if (loading) {
         return (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 flex flex-col items-center">
+            <div className="bg-white rounded-lg p-8 flex flex-col items-center">
               <Loader />
-              <p className="text-lg font-bold mt-3">저장하는 중...</p>
+              <p className="text-lg font-bold mt-4">저장하는 중...</p>
             </div>
           </div>
         );
@@ -261,7 +290,10 @@
           <div className="min-h-screen bg-gradient-to-b from-blue-200 to-blue-400 flex flex-col items-center justify-center p-6">
             <div className="text-center mb-12">
               <h1 className="text-5xl font-bold text-white mb-4">🐠 마음 어항 🐠</h1>
-              <p className="text-xl text-white">물고기들에게 마음을 나눠주세요</p>
+              <p className="text-xl text-white mb-2">물고기들에게 마음을 나눠주세요</p>
+              {firebaseConnected && (
+                <p className="text-sm text-white/80">🔥 클라우드 연결됨</p>
+              )}
             </div>
             
             <button
@@ -287,6 +319,9 @@
           <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
             <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
               <h2 className="text-2xl font-bold mb-6 text-center">관리자 모드</h2>
+              {firebaseConnected && (
+                <p className="text-sm text-green-600 text-center mb-4">🔥 클라우드 연결됨</p>
+              )}
               <input
                 type="password"
                 value={password}
@@ -317,7 +352,12 @@
           <div className="min-h-screen bg-gray-100 p-6">
             <div className="max-w-4xl mx-auto">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-3xl font-bold">관리자 모드</h2>
+                <div>
+                  <h2 className="text-3xl font-bold">관리자 모드</h2>
+                  {firebaseConnected && (
+                    <p className="text-sm text-green-600">🔥 실시간 동기화 중</p>
+                  )}
+                </div>
                 <button
                   onClick={() => setMode('intro')}
                   className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
@@ -350,7 +390,7 @@
                 {kingLetterContent && (
                   <div className="mt-4 p-4 bg-white rounded-lg border border-yellow-300">
                     <p className="text-sm font-bold mb-2">현재 저장된 편지:</p>
-                    <p className="text-gray-700">{kingLetterContent}</p>
+                    <p className="text-gray-700 whitespace-pre-wrap">{kingLetterContent}</p>
                   </div>
                 )}
               </div>
@@ -366,7 +406,7 @@
                 ) : (
                   <div className="space-y-4">
                     {messages.slice().reverse().map((msg) => (
-                      <div key={msg.id} className="border-2 border-gray-200 rounded-lg p-4">
+                      <div key={msg.id} className="border-2 border-gray-200 rounded-lg p-4 hover:border-blue-300 transition">
                         <div className="flex justify-between items-start mb-2">
                           <span className="font-bold text-lg">{msg.fish} 물고기</span>
                           <span className="text-sm text-gray-500">{msg.date}</span>
@@ -470,7 +510,7 @@
               
               <div className="bg-white/90 rounded-lg p-4 inline-block">
                 <p className="text-sm text-gray-600 mb-2">연속으로 물고기 돌본 날</p>
-                <div className="flex gap-1 justify-center mb-2">
+                <div className="flex gap-1 justify-center mb-2 flex-wrap">
                   {Array.from({ length: 30 }).map((_, i) => (
                     <div
                       key={i}
