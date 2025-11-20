@@ -157,11 +157,16 @@
       transition: transform 0.3s ease;
       filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
       user-select: none;
+      pointer-events: auto;
     }
 
     .fish-swimming:hover {
       filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.35));
-      z-index: 20 !important;
+      z-index: 40 !important;
+    }
+
+    .fish-swimming img {
+      pointer-events: none;
     }
 
     /* 모바일 최적화 */
@@ -240,12 +245,12 @@
       const durations = [16, 14, 15, 18]; // 걱정, 무서움, 화남, 비밀
       const duration = durations[index];
       
-      // 네 귀퉁이에서 시작 (모바일도 고려)
+      // 화면 전체에 골고루 배치 (상단부터)
       const startPositions = [
-        { top: '25%', left: '10%' },   // 좌상단 - 걱정
-        { top: '25%', right: '10%' },  // 우상단 - 무서움
-        { top: '55%', left: '10%' },   // 중간왼쪽 - 화남
-        { top: '55%', right: '10%' }   // 중간오른쪽 - 비밀
+        { top: '35%', left: '10%' },   // 중상단 좌측 - 걱정
+        { top: '35%', right: '10%' },  // 중상단 우측 - 무서움
+        { top: '60%', left: '10%' },   // 중하단 좌측 - 화남
+        { top: '60%', right: '10%' }   // 중하단 우측 - 비밀
       ];
 
       const position = startPositions[index];
@@ -267,8 +272,7 @@
             alt={fish.name}
             className="w-full h-full object-contain"
             style={{ 
-              userSelect: 'none',
-              pointerEvents: 'none'
+              userSelect: 'none'
             }}
           />
         </div>
@@ -708,10 +712,10 @@
           </div>
 
           {/* 하단 버튼 */}
-          <div className="fixed bottom-8 left-0 right-0 z-20 text-center">
+          <div className="fixed bottom-8 left-0 right-0 z-10 text-center pointer-events-none">
             <button
               onClick={() => setMode('intro')}
-              className="bg-white/90 text-blue-600 px-6 py-3 rounded-full font-bold hover:bg-white transition shadow-lg"
+              className="bg-white/90 text-blue-600 px-6 py-3 rounded-full font-bold hover:bg-white transition shadow-lg pointer-events-auto"
             >
               처음으로 돌아가기
             </button>
