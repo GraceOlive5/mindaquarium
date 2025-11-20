@@ -105,15 +105,15 @@
 
     @keyframes bubble {
       0% {
-        transform: translateY(0) scale(0.8);
-        opacity: 0.8;
+        transform: translateY(0) scale(0.9);
+        opacity: 0.9;
       }
       50% {
-        transform: translateY(-50vh) scale(1);
-        opacity: 0.5;
+        transform: translateY(-50vh) scale(1.1);
+        opacity: 0.7;
       }
       100% {
-        transform: translateY(-100vh) scale(1.2);
+        transform: translateY(-100vh) scale(1.3);
         opacity: 0;
       }
     }
@@ -121,9 +121,10 @@
     .bubble {
       position: absolute;
       bottom: -20px;
-      background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.3));
+      background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.9), rgba(200, 230, 255, 0.6));
       border-radius: 50%;
       animation: bubble linear infinite;
+      box-shadow: inset -2px -2px 4px rgba(255, 255, 255, 0.5);
     }
 
     .fish-swimming {
@@ -216,8 +217,8 @@
             ...position,
             animation: `${animation} ${duration}s ease-in-out infinite`,
             animationDelay: `${index * 0.5}s`,
-            width: '300px',
-            height: '300px',
+            width: '400px',
+            height: '400px',
             zIndex: 10
           }}
         >
@@ -547,7 +548,7 @@
                   <img 
                     src={selectedFish.image} 
                     alt={selectedFish.name}
-                    className="w-56 h-56 object-contain"
+                    className="w-64 h-64 object-contain"
                   />
                 </div>
                 <p className="text-gray-600 text-center mb-6">
@@ -625,13 +626,13 @@
 
       return (
         <div className="relative min-h-screen bg-gradient-to-b from-blue-400 via-blue-500 to-blue-600 overflow-hidden">
-          {/* 물방울들 */}
-          {Array.from({ length: 15 }).map((_, i) => (
+          {/* 물방울들 - 더 많이! */}
+          {Array.from({ length: 25 }).map((_, i) => (
             <Bubble 
               key={i} 
-              delay={i * 1.5} 
+              delay={i * 0.8} 
               left={Math.random() * 100}
-              size={10 + Math.random() * 20}
+              size={15 + Math.random() * 25}
             />
           ))}
 
