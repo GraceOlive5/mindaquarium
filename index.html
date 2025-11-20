@@ -23,67 +23,43 @@
       overflow: hidden;
     }
     
-    @keyframes swim {
-      0%, 100% {
-        transform: translateX(0) translateY(0);
-      }
-      25% {
-        transform: translateX(150px) translateY(-100px);
-      }
-      50% {
-        transform: translateX(200px) translateY(80px);
-      }
-      75% {
-        transform: translateX(100px) translateY(-70px);
-      }
+    /* 물고기별 곡선 움직임 애니메이션 */
+    @keyframes swim1 {
+      0% { transform: translate(0, 0); }
+      25% { transform: translate(40vw, 20vh); }
+      50% { transform: translate(60vw, -10vh); }
+      75% { transform: translate(30vw, 30vh); }
+      100% { transform: translate(0, 0); }
     }
 
-    @keyframes swimSlow {
-      0%, 100% {
-        transform: translateX(0) translateY(0) rotate(0deg);
-      }
-      33% {
-        transform: translateX(-150px) translateY(120px) rotate(-5deg);
-      }
-      66% {
-        transform: translateX(120px) translateY(-130px) rotate(5deg);
-      }
+    @keyframes swim2 {
+      0% { transform: translate(0, 0); }
+      20% { transform: translate(-30vw, 25vh); }
+      40% { transform: translate(-50vw, 10vh); }
+      60% { transform: translate(-40vw, 35vh); }
+      80% { transform: translate(-20vw, 20vh); }
+      100% { transform: translate(0, 0); }
     }
 
-    @keyframes swimFast {
-      0%, 100% {
-        transform: translateX(0) translateY(0) rotate(0deg);
-      }
-      50% {
-        transform: translateX(-180px) translateY(140px) rotate(-7deg);
-      }
+    @keyframes swim3 {
+      0% { transform: translate(0, 0); }
+      30% { transform: translate(-35vw, -20vh); }
+      50% { transform: translate(-55vw, -5vh); }
+      70% { transform: translate(-45vw, -25vh); }
+      100% { transform: translate(0, 0); }
     }
 
-    @keyframes swimZigzag {
-      0%, 100% {
-        transform: translateX(0) translateY(0);
-      }
-      20% {
-        transform: translateX(130px) translateY(-140px);
-      }
-      40% {
-        transform: translateX(-90px) translateY(100px);
-      }
-      60% {
-        transform: translateX(160px) translateY(-80px);
-      }
-      80% {
-        transform: translateX(-120px) translateY(130px);
-      }
+    @keyframes swim4 {
+      0% { transform: translate(0, 0); }
+      25% { transform: translate(45vw, -25vh); }
+      50% { transform: translate(35vw, -15vh); }
+      75% { transform: translate(50vw, -30vh); }
+      100% { transform: translate(0, 0); }
     }
     
     @keyframes pulse {
-      0%, 100% {
-        opacity: 1;
-      }
-      50% {
-        opacity: .5;
-      }
+      0%, 100% { opacity: 1; }
+      50% { opacity: .5; }
     }
     
     .animate-pulse {
@@ -91,12 +67,8 @@
     }
 
     @keyframes spin {
-      from {
-        transform: rotate(0deg);
-      }
-      to {
-        transform: rotate(360deg);
-      }
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
     }
     
     .animate-spin {
@@ -128,19 +100,15 @@
     }
 
     .fish-swimming {
-      cursor: grab;
+      cursor: pointer;
       transition: transform 0.3s ease;
       filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
       user-select: none;
     }
 
     .fish-swimming:hover {
-      transform: scale(1.15) !important;
-      filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.3));
-    }
-
-    .fish-swimming:active {
-      cursor: grabbing;
+      filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.35));
+      z-index: 20 !important;
     }
   </style>
 </head>
@@ -194,101 +162,36 @@
       );
     }
 
-    // 헤엄치는 물고기 컴포넌트 (드래그 가능)
+    // 헤엄치는 물고기 컴포넌트
     function SwimmingFish({ fish, onClick, index }) {
-      const [isDragging, setIsDragging] = React.useState(false);
-      const [dragStart, setDragStart] = React.useState({ x: 0, y: 0 });
-      const [customPosition, setCustomPosition] = React.useState(null);
-      const fishRef = React.useRef(null);
-
-      const animations = ['swim', 'swimSlow', 'swimFast', 'swimZigzag'];
-      const animation = animations[index % animations.length];
-      const duration = 4 + Math.random() * 3;
+      // 각 물고기마다 고유한 애니메이션
+      const animationName = `swim${index + 1}`;
       
-      // 물고기마다 다른 시작 위치 (화면 중앙~우측 상단, 초록 원 안쪽)
-      const defaultPositions = [
-        { top: '25%', left: '50%' },
-        { top: '35%', left: '60%' },
-        { top: '30%', left: '45%' },
-        { top: '40%', left: '55%' }
+      // 물고기별 속도 (비밀 물고기는 느리게)
+      const durations = [12, 14, 16, 18]; // 걱정, 무서움, 화남, 비밀
+      const duration = durations[index];
+      
+      // 네 귀퉁이에서 시작 (화면 밖으로 안 나가게 여유 공간)
+      const startPositions = [
+        { top: '15%', left: '10%' },   // 좌상단
+        { top: '15%', right: '10%' },  // 우상단  
+        { bottom: '15%', left: '10%' }, // 좌하단
+        { bottom: '15%', right: '10%' } // 우하단
       ];
 
-      const position = customPosition || defaultPositions[index];
-
-      const handleMouseDown = (e) => {
-        e.preventDefault();
-        setDragStart({ 
-          x: e.clientX, 
-          y: e.clientY,
-          startTime: Date.now()
-        });
-      };
-
-      const handleMouseMove = (e) => {
-        if (dragStart.x === 0) return;
-
-        const deltaX = e.clientX - dragStart.x;
-        const deltaY = e.clientY - dragStart.y;
-        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-
-        // 10px 이상 움직이면 드래그로 판단
-        if (distance > 10) {
-          setIsDragging(true);
-          
-          const rect = fishRef.current.getBoundingClientRect();
-          const viewportWidth = window.innerWidth;
-          const viewportHeight = window.innerHeight;
-          
-          const newLeft = (e.clientX / viewportWidth) * 100;
-          const newTop = (e.clientY / viewportHeight) * 100;
-          
-          setCustomPosition({
-            left: `${Math.max(0, Math.min(95, newLeft))}%`,
-            top: `${Math.max(10, Math.min(85, newTop))}%`
-          });
-        }
-      };
-
-      const handleMouseUp = (e) => {
-        if (isDragging) {
-          // 드래그였으면 위치만 고정
-          setIsDragging(false);
-        } else {
-          // 클릭이었으면 편지 쓰기
-          const timeDiff = Date.now() - dragStart.startTime;
-          if (timeDiff < 300) { // 300ms 이내면 클릭으로 간주
-            onClick();
-          }
-        }
-        setDragStart({ x: 0, y: 0 });
-      };
-
-      React.useEffect(() => {
-        if (dragStart.x !== 0) {
-          window.addEventListener('mousemove', handleMouseMove);
-          window.addEventListener('mouseup', handleMouseUp);
-          
-          return () => {
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('mouseup', handleMouseUp);
-          };
-        }
-      }, [dragStart, isDragging]);
+      const position = startPositions[index];
 
       return (
         <div
-          ref={fishRef}
-          onMouseDown={handleMouseDown}
+          onClick={onClick}
           className="fish-swimming absolute"
           style={{
             ...position,
-            animation: isDragging ? 'none' : `${animation} ${duration}s ease-in-out infinite`,
-            animationDelay: isDragging ? '0s' : `${index * 0.5}s`,
+            animation: `${animationName} ${duration}s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite`,
+            animationDelay: `${index * 2}s`,
             width: '400px',
             height: '400px',
-            zIndex: isDragging ? 100 : 10,
-            cursor: isDragging ? 'grabbing' : 'grab',
-            transition: isDragging ? 'none' : 'transform 0.3s ease'
+            zIndex: 10
           }}
         >
           <img
@@ -318,26 +221,10 @@
       const [firebaseConnected, setFirebaseConnected] = useState(false);
 
       const fishes = [
-        { 
-          id: 'worry', 
-          name: '걱정', 
-          image: 'mindaquarium_worry.png'
-        },
-        { 
-          id: 'fear', 
-          name: '무서움', 
-          image: 'mindaquarium_fear.png'
-        },
-        { 
-          id: 'anger', 
-          name: '화남', 
-          image: 'mindaquarium_angry.png'
-        },
-        { 
-          id: 'secret', 
-          name: '비밀', 
-          image: 'mindaquarium_secret.png'
-        }
+        { id: 'worry', name: '걱정', image: 'mindaquarium_worry.png' },
+        { id: 'fear', name: '무서움', image: 'mindaquarium_fear.png' },
+        { id: 'anger', name: '화남', image: 'mindaquarium_angry.png' },
+        { id: 'secret', name: '비밀', image: 'mindaquarium_secret.png' }
       ];
 
       useEffect(() => {
@@ -394,7 +281,6 @@
 
       const getTodayString = () => new Date().toISOString().split('T')[0];
 
-      // 총 먹이 준 일수 계산 (연속 아니어도 됨)
       const getTotalDays = () => {
         return Object.keys(feedingHistory).length;
       };
@@ -689,13 +575,13 @@
         );
       }
 
-      // 어항 메인 화면 - 물고기들이 헤엄치는 화면
+      // 어항 메인 화면
       const totalDays = getTotalDays();
       const canShowKingLetter = totalDays >= 30 && kingLetterContent && !hasReadKingLetter;
 
       return (
         <div className="relative min-h-screen bg-gradient-to-b from-blue-400 via-blue-500 to-blue-600 overflow-hidden">
-          {/* 물방울들 - 더 많이! */}
+          {/* 물방울들 */}
           {Array.from({ length: 25 }).map((_, i) => (
             <Bubble 
               key={i} 
