@@ -565,20 +565,20 @@
 
       if (mode === 'letter' && selectedFish) {
         return (
-          <div className="min-h-screen bg-gradient-to-b from-blue-200 to-blue-400 p-6">
-            <div className="max-w-2xl mx-auto">
-              <div className="bg-white rounded-lg shadow-xl p-8">
-                <h2 className="text-3xl font-bold mb-4 text-center">
+          <div className="min-h-screen bg-gradient-to-b from-blue-200 to-blue-400 p-4 overflow-y-auto">
+            <div className="max-w-2xl mx-auto py-4">
+              <div className="bg-white rounded-lg shadow-xl p-6">
+                <h2 className="text-2xl font-bold mb-3 text-center">
                   {selectedFish.name} 물고기에게 먹이 주기
                 </h2>
-                <div className="flex justify-center mb-6">
+                <div className="flex justify-center mb-4">
                   <img 
                     src={selectedFish.image} 
                     alt={selectedFish.name}
-                    className="w-64 h-64 object-contain"
+                    className="w-40 h-40 object-contain"
                   />
                 </div>
-                <p className="text-gray-600 text-center mb-6">
+                <p className="text-gray-600 text-center mb-4 text-sm">
                   오늘의 마음을 편지로 써보세요
                 </p>
                 
@@ -586,7 +586,7 @@
                   value={letterContent}
                   onChange={(e) => setLetterContent(e.target.value)}
                   placeholder={`${selectedFish.name} 물고기에게 하고 싶은 이야기를 써주세요...`}
-                  className="w-full border-2 border-gray-300 rounded-lg p-4 mb-4 h-48 text-lg"
+                  className="w-full border-2 border-gray-300 rounded-lg p-3 mb-3 h-32 text-base"
                   maxLength={100}
                 />
                 
@@ -594,19 +594,19 @@
                   {letterContent.length}/100자
                 </div>
                 
-                <div className="flex gap-4">
+                <div className="flex gap-3">
                   <button
                     onClick={() => {
                       setMode('aquarium');
                       setLetterContent('');
                     }}
-                    className="flex-1 bg-gray-300 text-gray-700 py-4 rounded-lg font-bold hover:bg-gray-400 transition"
+                    className="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg font-bold hover:bg-gray-400 transition"
                   >
                     취소
                   </button>
                   <button
                     onClick={feedFish}
-                    className="flex-1 bg-blue-600 text-white py-4 rounded-lg font-bold hover:bg-blue-700 transition flex items-center justify-center gap-2"
+                    className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition flex items-center justify-center gap-2"
                   >
                     <Heart />
                     먹이 주기
