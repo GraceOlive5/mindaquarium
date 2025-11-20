@@ -28,13 +28,13 @@
         transform: translateX(0) translateY(0);
       }
       25% {
-        transform: translateX(80px) translateY(-60px);
+        transform: translateX(150px) translateY(-100px);
       }
       50% {
-        transform: translateX(120px) translateY(40px);
+        transform: translateX(200px) translateY(80px);
       }
       75% {
-        transform: translateX(60px) translateY(-40px);
+        transform: translateX(100px) translateY(-70px);
       }
     }
 
@@ -43,10 +43,10 @@
         transform: translateX(0) translateY(0) rotate(0deg);
       }
       33% {
-        transform: translateX(-90px) translateY(70px) rotate(-3deg);
+        transform: translateX(-150px) translateY(120px) rotate(-5deg);
       }
       66% {
-        transform: translateX(60px) translateY(-80px) rotate(3deg);
+        transform: translateX(120px) translateY(-130px) rotate(5deg);
       }
     }
 
@@ -55,7 +55,7 @@
         transform: translateX(0) translateY(0) rotate(0deg);
       }
       50% {
-        transform: translateX(-110px) translateY(90px) rotate(-5deg);
+        transform: translateX(-180px) translateY(140px) rotate(-7deg);
       }
     }
 
@@ -64,16 +64,16 @@
         transform: translateX(0) translateY(0);
       }
       20% {
-        transform: translateX(70px) translateY(-90px);
+        transform: translateX(130px) translateY(-140px);
       }
       40% {
-        transform: translateX(-50px) translateY(60px);
+        transform: translateX(-90px) translateY(100px);
       }
       60% {
-        transform: translateX(100px) translateY(-50px);
+        transform: translateX(160px) translateY(-80px);
       }
       80% {
-        transform: translateX(-70px) translateY(80px);
+        transform: translateX(-120px) translateY(130px);
       }
     }
     
@@ -128,9 +128,10 @@
     }
 
     .fish-swimming {
-      cursor: pointer;
+      cursor: grab;
       transition: transform 0.3s ease;
       filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+      user-select: none;
     }
 
     .fish-swimming:hover {
@@ -139,7 +140,7 @@
     }
 
     .fish-swimming:active {
-      transform: scale(0.95) !important;
+      cursor: grabbing;
     }
   </style>
 </head>
@@ -193,33 +194,101 @@
       );
     }
 
-    // 헤엄치는 물고기 컴포넌트
+    // 헤엄치는 물고기 컴포넌트 (드래그 가능)
     function SwimmingFish({ fish, onClick, index }) {
+      const [isDragging, setIsDragging] = React.useState(false);
+      const [dragStart, setDragStart] = React.useState({ x: 0, y: 0 });
+      const [customPosition, setCustomPosition] = React.useState(null);
+      const fishRef = React.useRef(null);
+
       const animations = ['swim', 'swimSlow', 'swimFast', 'swimZigzag'];
       const animation = animations[index % animations.length];
-      const duration = 6 + Math.random() * 4;
+      const duration = 4 + Math.random() * 3;
       
-      // 물고기마다 다른 시작 위치 (화면 중앙 중심, 넓은 범위)
-      const positions = [
-        { top: '25%', left: '20%' },
-        { top: '45%', left: '65%' },
-        { top: '35%', left: '40%' },
-        { top: '55%', left: '30%' }
+      // 물고기마다 다른 시작 위치 (화면 중앙~우측 상단, 초록 원 안쪽)
+      const defaultPositions = [
+        { top: '25%', left: '50%' },
+        { top: '35%', left: '60%' },
+        { top: '30%', left: '45%' },
+        { top: '40%', left: '55%' }
       ];
 
-      const position = positions[index];
+      const position = customPosition || defaultPositions[index];
+
+      const handleMouseDown = (e) => {
+        e.preventDefault();
+        setDragStart({ 
+          x: e.clientX, 
+          y: e.clientY,
+          startTime: Date.now()
+        });
+      };
+
+      const handleMouseMove = (e) => {
+        if (dragStart.x === 0) return;
+
+        const deltaX = e.clientX - dragStart.x;
+        const deltaY = e.clientY - dragStart.y;
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+        // 10px 이상 움직이면 드래그로 판단
+        if (distance > 10) {
+          setIsDragging(true);
+          
+          const rect = fishRef.current.getBoundingClientRect();
+          const viewportWidth = window.innerWidth;
+          const viewportHeight = window.innerHeight;
+          
+          const newLeft = (e.clientX / viewportWidth) * 100;
+          const newTop = (e.clientY / viewportHeight) * 100;
+          
+          setCustomPosition({
+            left: `${Math.max(0, Math.min(95, newLeft))}%`,
+            top: `${Math.max(10, Math.min(85, newTop))}%`
+          });
+        }
+      };
+
+      const handleMouseUp = (e) => {
+        if (isDragging) {
+          // 드래그였으면 위치만 고정
+          setIsDragging(false);
+        } else {
+          // 클릭이었으면 편지 쓰기
+          const timeDiff = Date.now() - dragStart.startTime;
+          if (timeDiff < 300) { // 300ms 이내면 클릭으로 간주
+            onClick();
+          }
+        }
+        setDragStart({ x: 0, y: 0 });
+      };
+
+      React.useEffect(() => {
+        if (dragStart.x !== 0) {
+          window.addEventListener('mousemove', handleMouseMove);
+          window.addEventListener('mouseup', handleMouseUp);
+          
+          return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
+          };
+        }
+      }, [dragStart, isDragging]);
 
       return (
         <div
-          onClick={onClick}
+          ref={fishRef}
+          onMouseDown={handleMouseDown}
           className="fish-swimming absolute"
           style={{
             ...position,
-            animation: `${animation} ${duration}s ease-in-out infinite`,
-            animationDelay: `${index * 0.5}s`,
+            animation: isDragging ? 'none' : `${animation} ${duration}s ease-in-out infinite`,
+            animationDelay: isDragging ? '0s' : `${index * 0.5}s`,
             width: '400px',
             height: '400px',
-            zIndex: 10
+            zIndex: isDragging ? 100 : 10,
+            cursor: isDragging ? 'grabbing' : 'grab',
+            transition: isDragging ? 'none' : 'transform 0.3s ease'
           }}
         >
           <img
