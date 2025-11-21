@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
@@ -12,7 +11,7 @@
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
-
+  
   <style>
     body {
       margin: 0;
@@ -24,50 +23,50 @@
       overflow: hidden;
     }
     
-    /* 물고기별 자연스러운 곡선 움직임 - 직선 제거 */
+    /* 물고기별 자연스러운 곡선 움직임 - 상단~중앙에서만 */
     @keyframes swim1 {
       0% { transform: translate(0, 0) rotate(0deg); }
-      15% { transform: translate(15vw, 8vh) rotate(3deg); }
-      30% { transform: translate(28vw, 18vh) rotate(-2deg); }
-      45% { transform: translate(35vw, 12vh) rotate(4deg); }
-      60% { transform: translate(30vw, 3vh) rotate(-3deg); }
-      75% { transform: translate(18vw, 10vh) rotate(2deg); }
-      90% { transform: translate(8vw, 5vh) rotate(-2deg); }
+      15% { transform: translate(15vw, -5vh) rotate(3deg); }
+      30% { transform: translate(28vw, 8vh) rotate(-2deg); }
+      45% { transform: translate(35vw, 2vh) rotate(4deg); }
+      60% { transform: translate(30vw, -7vh) rotate(-3deg); }
+      75% { transform: translate(18vw, 5vh) rotate(2deg); }
+      90% { transform: translate(8vw, -3vh) rotate(-2deg); }
       100% { transform: translate(0, 0) rotate(0deg); }
     }
 
     @keyframes swim2 {
       0% { transform: translate(0, 0) rotate(0deg); }
-      12% { transform: translate(-12vw, 10vh) rotate(-2deg); }
-      25% { transform: translate(-22vw, 8vh) rotate(3deg); }
-      38% { transform: translate(-30vw, 15vh) rotate(-3deg); }
-      50% { transform: translate(-32vw, 10vh) rotate(2deg); }
-      62% { transform: translate(-25vw, 5vh) rotate(-2deg); }
-      75% { transform: translate(-15vw, 12vh) rotate(3deg); }
-      88% { transform: translate(-8vw, 8vh) rotate(-2deg); }
+      12% { transform: translate(-12vw, 5vh) rotate(-2deg); }
+      25% { transform: translate(-22vw, -3vh) rotate(3deg); }
+      38% { transform: translate(-30vw, 10vh) rotate(-3deg); }
+      50% { transform: translate(-32vw, 0vh) rotate(2deg); }
+      62% { transform: translate(-25vw, -5vh) rotate(-2deg); }
+      75% { transform: translate(-15vw, 7vh) rotate(3deg); }
+      88% { transform: translate(-8vw, 3vh) rotate(-2deg); }
       100% { transform: translate(0, 0) rotate(0deg); }
     }
 
     @keyframes swim3 {
       0% { transform: translate(0, 0) rotate(0deg); }
       14% { transform: translate(18vw, -8vh) rotate(3deg); }
-      28% { transform: translate(32vw, -5vh) rotate(-2deg); }
-      42% { transform: translate(38vw, -12vh) rotate(4deg); }
-      56% { transform: translate(33vw, -15vh) rotate(-3deg); }
-      70% { transform: translate(22vw, -10vh) rotate(2deg); }
-      85% { transform: translate(10vw, -6vh) rotate(-2deg); }
+      28% { transform: translate(32vw, -15vh) rotate(-2deg); }
+      42% { transform: translate(38vw, -5vh) rotate(4deg); }
+      56% { transform: translate(33vw, -12vh) rotate(-3deg); }
+      70% { transform: translate(22vw, -3vh) rotate(2deg); }
+      85% { transform: translate(10vw, -10vh) rotate(-2deg); }
       100% { transform: translate(0, 0) rotate(0deg); }
     }
 
     @keyframes swim4 {
       0% { transform: translate(0, 0) rotate(0deg); }
       13% { transform: translate(-15vw, -10vh) rotate(-3deg); }
-      26% { transform: translate(-28vw, -8vh) rotate(2deg); }
+      26% { transform: translate(-28vw, -5vh) rotate(2deg); }
       39% { transform: translate(-35vw, -15vh) rotate(-4deg); }
-      52% { transform: translate(-32vw, -18vh) rotate(3deg); }
+      52% { transform: translate(-32vw, -8vh) rotate(3deg); }
       65% { transform: translate(-25vw, -12vh) rotate(-2deg); }
-      78% { transform: translate(-18vw, -8vh) rotate(3deg); }
-      91% { transform: translate(-10vw, -5vh) rotate(-2deg); }
+      78% { transform: translate(-18vw, -3vh) rotate(3deg); }
+      91% { transform: translate(-10vw, -7vh) rotate(-2deg); }
       100% { transform: translate(0, 0) rotate(0deg); }
     }
 
@@ -184,7 +183,6 @@
       }
     }
   </style>
-
 </head>
 <body>
   <div id="root"></div>
@@ -245,12 +243,12 @@
       const durations = [16, 14, 15, 18]; // 걱정, 무서움, 화남, 비밀
       const duration = durations[index];
       
-      // 화면 전체에 골고루 배치 (상단부터)
+      // 화면 상단~중앙에 배치 (하단 버튼 안 가리게)
       const startPositions = [
-        { top: '35%', left: '10%' },   // 중상단 좌측 - 걱정
-        { top: '35%', right: '10%' },  // 중상단 우측 - 무서움
-        { top: '60%', left: '10%' },   // 중하단 좌측 - 화남
-        { top: '60%', right: '10%' }   // 중하단 우측 - 비밀
+        { top: '30%', left: '10%' },   // 상단 좌측 - 걱정
+        { top: '30%', right: '10%' },  // 상단 우측 - 무서움
+        { top: '50%', left: '10%' },   // 중앙 좌측 - 화남
+        { top: '50%', right: '10%' }   // 중앙 우측 - 비밀
       ];
 
       const position = startPositions[index];
@@ -727,6 +725,5 @@
     const root = ReactDOM.createRoot(document.getElementById('root'));
     root.render(<MindAquarium />);
   </script>
-
 </body>
 </html>
