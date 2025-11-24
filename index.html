@@ -525,8 +525,9 @@
 
       if (mode === 'admin') {
         return (
-          <div className="h-screen bg-gray-100 overflow-y-auto">
-            <div className="max-w-4xl mx-auto p-6 pb-8">
+          <div className="fixed inset-0 bg-gray-100 overflow-hidden">
+            <div className="h-full overflow-y-auto">
+              <div className="max-w-4xl mx-auto p-6 pb-20">
               <div className="flex justify-between items-center mb-6">
                 <div>
                   <h2 className="text-3xl font-bold">관리자 모드</h2>
@@ -593,6 +594,7 @@
                   </div>
                 )}
               </div>
+            </div>
             </div>
           </div>
         );
