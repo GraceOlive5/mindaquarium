@@ -6,6 +6,9 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="마음 어항">
+  <meta name="copyright" content="Copyright 2024 happyfamilydais. All rights reserved.">
+  <meta name="author" content="Grace">
+  <meta name="description" content="아이들의 감정 표현을 돕는 감정 어항 앱 - Mind Aquarium">
   <title>마음 어항</title>
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -486,6 +489,11 @@
               <Lock />
               <span className="text-sm">관리자 모드</span>
             </button>
+            
+            <div className="mt-12 text-white/60 text-xs text-center">
+              <p>© 2024 Grace. All rights reserved.</p>
+              <p className="mt-1">마음 어항 - Mind Aquarium</p>
+            </div>
           </div>
         );
       }
@@ -593,6 +601,11 @@
                     ))}
                   </div>
                 )}
+              </div>
+              
+              <div className="text-center text-gray-500 text-xs mt-8 pb-4">
+                <p>© 2024 Grace. All rights reserved.</p>
+                <p className="mt-1">마음 어항 (Mind Aquarium) v1.0</p>
               </div>
             </div>
             </div>
@@ -752,10 +765,11 @@
           <div className="fixed bottom-8 left-0 right-0 z-10 text-center pointer-events-none">
             <button
               onClick={() => setMode('intro')}
-              className="bg-white/90 text-blue-600 px-6 py-3 rounded-full font-bold hover:bg-white transition shadow-lg pointer-events-auto"
+              className="bg-white/90 text-blue-600 px-6 py-3 rounded-full font-bold hover:bg-white transition shadow-lg pointer-events-auto mb-2"
             >
               처음으로 돌아가기
             </button>
+            <p className="text-white/50 text-xs mt-2">© 2024 Grace</p>
           </div>
         </div>
       );
