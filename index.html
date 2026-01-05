@@ -187,14 +187,15 @@
 
     .fish-swimming {
       cursor: pointer;
-      transition: transform 0.3s ease;
+      transition: all 0.3s ease;
       filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
       user-select: none;
       pointer-events: none;
     }
 
     .fish-swimming:hover {
-      filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.35));
+      filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.6)) brightness(1.1);
+      transform: scale(1.1);
       z-index: 40 !important;
     }
 
@@ -205,7 +206,7 @@
       object-fit: contain;
     }
     
-    /* 물고기 클릭 영역 - 중앙 70% 정도만 */
+    /* 물고기 클릭 영역 - 중앙 50% */
     .fish-click-area {
       position: absolute;
       top: 25%;
@@ -215,6 +216,17 @@
       cursor: pointer;
       pointer-events: auto;
       z-index: 1;
+      transition: all 0.3s ease;
+    }
+    
+    .fish-click-area:hover {
+      transform: scale(1.05);
+    }
+    
+    /* 호버 시 부모 물고기에 효과 전달 */
+    .fish-swimming:has(.fish-click-area:hover) {
+      filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.6)) brightness(1.1);
+      transform: scale(1.1);
     }
 
     /* 모바일 최적화 */
