@@ -502,19 +502,33 @@
                   }}
                 />
                 
-                {/* 로고 (앞 - 인트로 이미지 하단과 정렬) */}
-                <div className="absolute" style={{ 
-                  bottom: 'calc(0px - 25%)',
-                  left: '50%',
-                  transform: 'translateX(-50%)'
-                }}>
-                  <img 
-                    src="mindaquarium_logo.png" 
-                    alt="Mind Aquarium Logo"
-                    className="w-[160rem] md:w-[200rem] lg:w-[256rem] drop-shadow-2xl"
-                  />
-                </div>
-              </div>
+{/* 로고 전용 레이어 - 레이아웃 영향 없음 */}
+<div
+  className="pointer-events-none absolute left-1/2 z-30"
+  style={{
+    bottom: '-15vh',
+    transform: 'translateX(-50%)',
+    width: '100vw',
+    display: 'flex',
+    justifyContent: 'center'
+  }}
+>
+  <img
+    src="mindaquarium_logo.png"
+    alt="Mind Aquarium Logo"
+    className="
+      w-[70vw]
+      max-w-[900px]
+      md:w-[60vw]
+      lg:w-[50vw]
+      drop-shadow-2xl
+    "
+    style={{
+      height: 'auto'
+    }}
+  />
+</div>
+
               
               {/* 텍스트 + 버튼 */}
               <div className="relative z-20 flex flex-col items-center w-full max-w-3xl mt-4 md:mt-6">
