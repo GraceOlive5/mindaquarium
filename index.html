@@ -575,7 +575,7 @@
               
               {/* 레이어 2 + 3: 캐릭터 이미지와 로고를 겹쳐서 배치 */}
               <div className="relative flex items-center justify-center mb-2 md:mb-4">
-                {/* 캐릭터 이미지 (뒤) - 더 작게 */}
+                {/* 캐릭터 이미지 (뒤) */}
                 <img 
                   src="mindaquarium_intro.png" 
                   alt="아이들과 물고기들"
@@ -588,16 +588,16 @@
                   }}
                 />
                 
-                {/* 로고 (앞 - 더 아래, 더 크게) */}
+                {/* 로고 (앞 - 인트로 이미지 하단과 정렬) */}
                 <div className="absolute" style={{ 
-                  bottom: '3%',
+                  bottom: '0',
                   left: '50%',
                   transform: 'translateX(-50%)'
                 }}>
                   <img 
                     src="mindaquarium_logo.png" 
                     alt="Mind Aquarium Logo"
-                    className="w-[34rem] md:w-[42rem] lg:w-[52rem] drop-shadow-2xl"
+                    className="w-[40rem] md:w-[50rem] lg:w-[64rem] drop-shadow-2xl"
                   />
                 </div>
               </div>
