@@ -517,79 +517,84 @@
             backgroundRepeat: 'no-repeat'
           }}>
             {/* 물방울 애니메이션 */}
-            {Array.from({ length: 20 }).map((_, i) => (
+            {Array.from({ length: 25 }).map((_, i) => (
               <Bubble 
                 key={i} 
-                delay={i * 1.2} 
+                delay={i * 1} 
                 left={Math.random() * 100}
-                size={12 + Math.random() * 20}
+                size={10 + Math.random() * 20}
               />
             ))}
             
-            {/* 캐릭터들 배경 */}
-            <img 
-              src="mindaquarium_ch1.png" 
-              alt="character1"
-              className="absolute bottom-0 left-10 w-32 md:w-48 z-10"
-              style={{ animation: 'fishTilt 4s ease-in-out infinite' }}
-            />
-            <img 
-              src="mindaquarium_ch2.png" 
-              alt="character2"
-              className="absolute bottom-0 right-10 w-32 md:w-48 z-10"
-              style={{ animation: 'fishTilt 3.5s ease-in-out infinite', animationDelay: '0.5s' }}
-            />
-            
             <div className="relative z-20 flex flex-col items-center justify-center min-h-screen p-6">
+              {/* 상단: 아이들 + 물고기들 */}
+              <div className="relative w-full max-w-4xl mb-8">
+                {/* 왼쪽 아이 (ch1) */}
+                <div className="absolute top-0 left-[5%] md:left-[10%]" style={{ animation: 'fishTilt 4s ease-in-out infinite' }}>
+                  <img src="mindaquarium_ch1.png" alt="아이1" className="w-32 md:w-40" />
+                </div>
+                
+                {/* 오른쪽 아이 (ch2) */}
+                <div className="absolute top-0 right-[5%] md:right-[10%]" style={{ animation: 'fishTilt 3.5s ease-in-out infinite', animationDelay: '0.5s' }}>
+                  <img src="mindaquarium_ch2.png" alt="아이2" className="w-32 md:w-40" />
+                </div>
+                
+                {/* 중앙 물고기들 - 2줄로 배치 */}
+                <div className="flex flex-col items-center gap-6 pt-32 md:pt-40">
+                  {/* 첫번째 줄: 걱정, 무서움 */}
+                  <div className="flex gap-8 md:gap-12">
+                    <div className="intro-fish" style={{ animationDelay: '0s' }}>
+                      <img src="mindaquarium_worry.png" alt="걱정" className="w-24 h-24 md:w-32 md:h-32" />
+                    </div>
+                    <div className="intro-fish" style={{ animationDelay: '0.3s' }}>
+                      <img src="mindaquarium_fear.png" alt="무서움" className="w-24 h-24 md:w-32 md:h-32" />
+                    </div>
+                  </div>
+                  
+                  {/* 두번째 줄: 비밀, 부끄러움 */}
+                  <div className="flex gap-8 md:gap-12">
+                    <div className="intro-fish" style={{ animationDelay: '0.6s' }}>
+                      <img src="mindaquarium_secret.png" alt="비밀" className="w-24 h-24 md:w-32 md:h-32" />
+                    </div>
+                    <div className="intro-fish" style={{ animationDelay: '0.9s' }}>
+                      <img src="mindaquarium_shy.png" alt="부끄러움" className="w-24 h-24 md:w-32 md:h-32" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
               {/* 로고 */}
-              <div className="mb-8">
+              <div className="mb-6">
                 <img 
                   src="mindaquarium_logo.png" 
                   alt="Mind Aquarium Logo"
-                  className="w-80 md:w-96 drop-shadow-2xl"
+                  className="w-72 md:w-96 drop-shadow-2xl"
                 />
               </div>
               
-              {/* 물고기들 */}
-              <div className="grid grid-cols-4 gap-4 mb-8">
-                <div className="intro-fish" style={{ animationDelay: '0s' }}>
-                  <img src="mindaquarium_worry.png" alt="걱정" className="w-20 h-20 md:w-24 md:h-24" />
-                </div>
-                <div className="intro-fish" style={{ animationDelay: '0.3s' }}>
-                  <img src="mindaquarium_fear.png" alt="무서움" className="w-20 h-20 md:w-24 md:h-24" />
-                </div>
-                <div className="intro-fish" style={{ animationDelay: '0.6s' }}>
-                  <img src="mindaquarium_secret.png" alt="비밀" className="w-20 h-20 md:w-24 md:h-24" />
-                </div>
-                <div className="intro-fish" style={{ animationDelay: '0.9s' }}>
-                  <img src="mindaquarium_shy.png" alt="부끄러움" className="w-20 h-20 md:w-24 md:h-24" />
-                </div>
-              </div>
-              
               {/* 설명 문구 */}
-              <p className="text-white text-center text-lg md:text-xl mb-8 px-4 max-w-md bg-black/20 rounded-lg p-4 backdrop-blur-sm">
+              <p className="text-white text-center text-base md:text-lg mb-8 px-4 max-w-md bg-black/30 rounded-lg p-3 backdrop-blur-sm">
                 마음속 감정을 물고기에게 편지로 전하고<br/>
                 30일 동안 꾸준히 기록해보세요
               </p>
               
               <button
                 onClick={() => setMode('aquarium')}
-                className="bg-white text-blue-600 px-12 py-6 rounded-full text-2xl font-bold shadow-lg hover:bg-blue-50 hover:scale-105 transition-all mb-6"
+                className="bg-white text-blue-600 px-10 py-4 rounded-full text-xl font-bold shadow-lg hover:bg-blue-50 hover:scale-105 transition-all mb-4"
               >
                 시작하기
               </button>
               
               <button
                 onClick={() => setMode('adminLogin')}
-                className="text-white/70 hover:text-white transition flex items-center gap-2"
+                className="text-white/70 hover:text-white transition flex items-center gap-2 mb-8"
               >
                 <Lock />
                 <span className="text-sm">관리자 모드</span>
               </button>
               
-              <div className="mt-12 text-white/60 text-xs text-center">
+              <div className="text-white/60 text-xs text-center">
                 <p>© 2024 Grace. All rights reserved.</p>
-                <p className="mt-1">마음 어항 - Mind Aquarium</p>
               </div>
             </div>
           </div>
