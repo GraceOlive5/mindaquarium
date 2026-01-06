@@ -354,6 +354,14 @@
               userSelect: 'none'
             }}
           />
+          {/* 물고기 이름 텍스트 */}
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+            <span className="text-white text-xl md:text-2xl font-bold drop-shadow-lg" style={{
+              textShadow: '2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.5)'
+            }}>
+              {fish.name}
+            </span>
+          </div>
         </div>
       );
     }
