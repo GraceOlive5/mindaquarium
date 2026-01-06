@@ -363,36 +363,38 @@
           style={{
             ...position,
             animation: `${animationName} ${duration}s ease-in-out infinite`,
-            width: 'min(200px, 25vw)',
-            height: 'min(200px, 25vw)',
-            zIndex: 30,
-            transform: `scaleX(${direction})`
+            width: 'min(150px, 20vw)',
+            height: 'min(150px, 20vw)',
+            zIndex: 30
           }}
         >
-          {/* 클릭 가능한 영역 - 물고기 중앙 부분만 */}
-          <div 
-            className="fish-click-area"
-            onClick={onClick}
-          />
-          <img
-            src={fish.image}
-            alt={fish.name}
-            style={{ 
-              userSelect: 'none'
-            }}
-          />
-          {/* 물고기 이름 텍스트 - 항상 정방향 */}
-          <div 
-            className="absolute top-1/2 left-1/2 pointer-events-none"
-            style={{
-              transform: `translate(-50%, -50%) scaleX(${direction})`
-            }}
-          >
-            <span className="text-white text-sm md:text-base font-bold drop-shadow-lg" style={{
-              textShadow: '2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.5)'
-            }}>
-              {fish.name}
-            </span>
+          {/* 물고기 이미지와 텍스트를 함께 묶어서 뒤집기 */}
+          <div style={{ transform: `scaleX(${direction})`, width: '100%', height: '100%', position: 'relative' }}>
+            {/* 클릭 가능한 영역 - 물고기 중앙 부분만 */}
+            <div 
+              className="fish-click-area"
+              onClick={onClick}
+            />
+            <img
+              src={fish.image}
+              alt={fish.name}
+              style={{ 
+                userSelect: 'none'
+              }}
+            />
+            {/* 물고기 이름 텍스트 - 물고기와 함께 뒤집힘 방지 */}
+            <div 
+              className="absolute top-1/2 left-1/2 pointer-events-none"
+              style={{
+                transform: `translate(-50%, -50%) scaleX(${direction})`
+              }}
+            >
+              <span className="text-white text-sm md:text-base font-bold drop-shadow-lg" style={{
+                textShadow: '2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.5)'
+              }}>
+                {fish.name}
+              </span>
+            </div>
           </div>
         </div>
       );
