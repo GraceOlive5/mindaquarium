@@ -363,8 +363,8 @@
           style={{
             ...position,
             animation: `${animationName} ${duration}s ease-in-out infinite`,
-            width: 'min(150px, 20vw)',
-            height: 'min(150px, 20vw)',
+            width: 'min(120px, 15vw)',
+            height: 'min(120px, 15vw)',
             zIndex: 30
           }}
         >
@@ -574,12 +574,12 @@
             <div className="relative h-screen flex flex-col items-center justify-center py-4 px-4">
               
               {/* 레이어 2 + 3: 캐릭터 이미지와 로고를 겹쳐서 배치 */}
-              <div className="relative flex items-center justify-center mb-6 md:mb-8">
-                {/* 캐릭터 이미지 (뒤) - 70% 크기 */}
+              <div className="relative flex items-center justify-center mb-2 md:mb-4">
+                {/* 캐릭터 이미지 (뒤) - 더 작게 */}
                 <img 
                   src="mindaquarium_intro.png" 
                   alt="아이들과 물고기들"
-                  className="w-full max-w-sm md:max-w-lg lg:max-w-2xl"
+                  className="w-full max-w-xs md:max-w-md lg:max-w-xl"
                   style={{ 
                     objectFit: 'contain',
                     filter: 'drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3))',
@@ -588,22 +588,22 @@
                   }}
                 />
                 
-                {/* 로고 (앞 - 보물상자 아래 20%만 겹침) - 130% 크기 */}
+                {/* 로고 (앞 - 더 아래, 더 크게) */}
                 <div className="absolute" style={{ 
-                  bottom: '8%',
+                  bottom: '3%',
                   left: '50%',
                   transform: 'translateX(-50%)'
                 }}>
                   <img 
                     src="mindaquarium_logo.png" 
                     alt="Mind Aquarium Logo"
-                    className="w-[30rem] md:w-[36rem] lg:w-[46rem] drop-shadow-2xl"
+                    className="w-[34rem] md:w-[42rem] lg:w-[52rem] drop-shadow-2xl"
                   />
                 </div>
               </div>
               
               {/* 텍스트 + 버튼 */}
-              <div className="relative z-20 flex flex-col items-center w-full max-w-3xl">
+              <div className="relative z-20 flex flex-col items-center w-full max-w-3xl mt-4 md:mt-6">
                 {/* 설명 문구 */}
                 <div className="bg-blue-900/60 rounded-2xl px-6 py-3 mb-4 md:mb-6 backdrop-blur-md border border-blue-400/30">
                   <p className="text-white text-center text-base md:text-xl lg:text-2xl font-medium leading-relaxed">
