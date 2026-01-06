@@ -18,15 +18,13 @@
   <style>
     body {
       margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-        sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       overflow: hidden;
     }
     
-    /* 물고기별 움직임 - 전체 화면 골고루 사용, 겹치지 않게 */
+    /* Fish Animations */
     @keyframes swim1 {
       0% { transform: translate(0, 0) rotate(0deg); }
       14% { transform: translate(20vw, 8vh) rotate(3deg); }
@@ -105,18 +103,9 @@
     }
 
     @keyframes bubble {
-      0% {
-        transform: translateY(0) scale(0.9);
-        opacity: 0.9;
-      }
-      50% {
-        transform: translateY(-50vh) scale(1.1);
-        opacity: 0.7;
-      }
-      100% {
-        transform: translateY(-100vh) scale(1.3);
-        opacity: 0;
-      }
+      0% { transform: translateY(0) scale(0.9); opacity: 0.9; }
+      50% { transform: translateY(-50vh) scale(1.1); opacity: 0.7; }
+      100% { transform: translateY(-100vh) scale(1.3); opacity: 0; }
     }
 
     .bubble {
@@ -149,7 +138,6 @@
       object-fit: contain;
     }
     
-    /* 물고기 클릭 영역 - 중앙 50% */
     .fish-click-area {
       position: absolute;
       top: 25%;
@@ -166,7 +154,6 @@
       transform: scale(1.05);
     }
     
-    /* 호버 시 부모 물고기에 효과 전달 */
     .fish-swimming:has(.fish-click-area:hover) {
       filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.6)) brightness(1.1);
       transform: scale(1.1);
@@ -195,7 +182,6 @@
     window.dbRef = ref;
     window.dbSet = set;
     window.dbOnValue = onValue;
-    console.log('🔥 Firebase 연결 완료!');
   </script>
 
   <script type="text/babel">
@@ -207,102 +193,57 @@
     const Loader = () => <div className="animate-spin text-4xl">⏳</div>;
     const Heart = () => <span>❤️</span>;
 
-    // 물방울 컴포넌트
     function Bubble({ delay, left, size }) {
       return (
-        <div
-          className="bubble"
-          style={{
-            left: `${left}%`,
-            width: `${size}px`,
-            height: `${size}px`,
-            animationDelay: `${delay}s`,
-            animationDuration: `${8 + Math.random() * 4}s`
-          }}
-        />
+        <div className="bubble" style={{
+          left: `${left}%`,
+          width: `${size}px`,
+          height: `${size}px`,
+          animationDelay: `${delay}s`,
+          animationDuration: `${8 + Math.random() * 4}s`
+        }} />
       );
     }
 
-    // 헤엄치는 물고기 컴포넌트
     function SwimmingFish({ fish, onClick, index }) {
-      const [direction, setDirection] = React.useState(1); // 1: 오른쪽, -1: 왼쪽
+      const [direction, setDirection] = React.useState(1);
       const fishRef = React.useRef(null);
       
-      // 각 물고기마다 고유한 애니메이션
-      const animationName = `swim${index + 1}`;
-      
-      // 물고기별 속도 (7마리 - 서로 다르게)
-      const durations = [18, 15, 20, 17, 14, 19, 16]; // 걱정, 무서움, 화남, 비밀, 재미, 부끄러움, 행복
-      const duration = durations[index];
-      
-      // 7마리를 전체 화면에 골고루 분산 배치 (겹치지 않게)
+      const durations = [18, 15, 20, 17, 14, 19, 16];
       const startPositions = [
-        { top: '15%', left: '10%' },    // 최상단 좌 - 걱정
-        { top: '15%', right: '10%' },   // 최상단 우 - 무서움
-        { top: '30%', left: '50%' },    // 상중 중앙 - 화남
-        { top: '45%', left: '15%' },    // 중앙 좌 - 비밀
-        { top: '45%', right: '15%' },   // 중앙 우 - 재미
-        { top: '60%', left: '35%' },    // 중하 좌중 - 부끄러움
-        { top: '60%', right: '30%' }    // 중하 우중 - 행복
+        { top: '15%', left: '10%' },
+        { top: '15%', right: '10%' },
+        { top: '30%', left: '50%' },
+        { top: '45%', left: '15%' },
+        { top: '45%', right: '15%' },
+        { top: '60%', left: '35%' },
+        { top: '60%', right: '30%' }
       ];
-
-      const position = startPositions[index];
       
-      // 경계 체크 및 방향 전환
       React.useEffect(() => {
         const checkBoundary = () => {
           if (fishRef.current) {
             const rect = fishRef.current.getBoundingClientRect();
-            const windowWidth = window.innerWidth;
-            
-            // 왼쪽 끝에 도달
-            if (rect.left <= 0) {
-              setDirection(1); // 오른쪽으로
-            }
-            // 오른쪽 끝에 도달
-            else if (rect.right >= windowWidth) {
-              setDirection(-1); // 왼쪽으로
-            }
+            if (rect.left <= 0) setDirection(1);
+            else if (rect.right >= window.innerWidth) setDirection(-1);
           }
         };
-        
         const interval = setInterval(checkBoundary, 100);
         return () => clearInterval(interval);
       }, []);
 
       return (
-        <div
-          ref={fishRef}
-          className="fish-swimming absolute"
-          style={{
-            ...position,
-            animation: `${animationName} ${duration}s ease-in-out infinite`,
-            width: 'min(150px, 20vw)',
-            height: 'min(150px, 20vw)',
-            zIndex: 30
-          }}
-        >
-          {/* 물고기 이미지와 텍스트를 함께 묶어서 뒤집기 */}
+        <div ref={fishRef} className="fish-swimming absolute" style={{
+          ...startPositions[index],
+          animation: `swim${index + 1} ${durations[index]}s ease-in-out infinite`,
+          width: 'min(120px, 15vw)',
+          height: 'min(120px, 15vw)',
+          zIndex: 30
+        }}>
           <div style={{ transform: `scaleX(${direction})`, width: '100%', height: '100%', position: 'relative' }}>
-            {/* 클릭 가능한 영역 - 물고기 중앙 부분만 */}
-            <div 
-              className="fish-click-area"
-              onClick={onClick}
-            />
-            <img
-              src={fish.image}
-              alt={fish.name}
-              style={{ 
-                userSelect: 'none'
-              }}
-            />
-            {/* 물고기 이름 텍스트 - 물고기와 함께 뒤집힘 방지 */}
-            <div 
-              className="absolute top-1/2 left-1/2 pointer-events-none"
-              style={{
-                transform: `translate(-50%, -50%) scaleX(${direction})`
-              }}
-            >
+            <div className="fish-click-area" onClick={onClick} />
+            <img src={fish.image} alt={fish.name} style={{ userSelect: 'none' }} />
+            <div className="absolute top-1/2 left-1/2 pointer-events-none" style={{ transform: `translate(-50%, -50%) scaleX(${direction})` }}>
               <span className="text-white text-sm md:text-base font-bold drop-shadow-lg" style={{
                 textShadow: '2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.5)'
               }}>
@@ -371,18 +312,17 @@
             if (data) setHasReadKingLetter(data);
           });
         } catch (error) {
-          console.error('Firebase 연결 오류:', error);
+          console.error('Firebase error:', error);
         }
       }, []);
 
       const saveToFirebase = async (path, data) => {
         setLoading(true);
         try {
-          const dataRef = window.dbRef(window.database, path);
-          await window.dbSet(dataRef, data);
+          await window.dbSet(window.dbRef(window.database, path), data);
           await new Promise(resolve => setTimeout(resolve, 300));
         } catch (error) {
-          console.error('저장 실패:', error);
+          console.error('Save error:', error);
           alert('저장에 실패했습니다.');
         } finally {
           setLoading(false);
@@ -390,10 +330,7 @@
       };
 
       const getTodayString = () => new Date().toISOString().split('T')[0];
-
-      const getTotalDays = () => {
-        return Object.keys(feedingHistory).length;
-      };
+      const getTotalDays = () => Object.keys(feedingHistory).length;
 
       const feedFish = async () => {
         if (!letterContent.trim()) {
@@ -401,16 +338,13 @@
           return;
         }
 
-        const today = getTodayString();
-        const newMessage = {
+        const updatedMessages = [...messages, {
           id: Date.now(),
           fish: selectedFish.name,
           content: letterContent,
           date: new Date().toLocaleString('ko-KR')
-        };
-
-        const updatedMessages = [...messages, newMessage];
-        const updatedHistory = { ...feedingHistory, [today]: true };
+        }];
+        const updatedHistory = { ...feedingHistory, [getTodayString()]: true };
 
         await saveToFirebase('messages', updatedMessages);
         await saveToFirebase('feedingHistory', updatedHistory);
@@ -420,8 +354,7 @@
         setLetterContent('');
         setMode('aquarium');
         
-        const totalDays = Object.keys(updatedHistory).length;
-        if (totalDays >= 30 && kingLetterContent && !hasReadKingLetter) {
+        if (Object.keys(updatedHistory).length >= 30 && kingLetterContent && !hasReadKingLetter) {
           setTimeout(() => alert('🎉 물고기 왕이 편지를 보냈어요!'), 500);
         }
       };
@@ -472,62 +405,36 @@
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat'
           }}>
-            {/* 레이어 1: 배경 (mindaquarium_bg.png) - 이미 적용됨 */}
-            
-            {/* 물방울 애니메이션 */}
             {Array.from({ length: 30 }).map((_, i) => (
-              <Bubble 
-                key={i} 
-                delay={i * 0.8} 
-                left={Math.random() * 100}
-                size={15 + Math.random() * 25}
-              />
+              <Bubble key={i} delay={i * 0.8} left={Math.random() * 100} size={15 + Math.random() * 25} />
             ))}
             
-            {/* 전체 컨텐츠 컨테이너 */}
             <div className="relative h-screen flex flex-col items-center justify-center py-4 px-4">
+              <div className="relative flex items-center justify-center mb-2 md:mb-4">
+                <img 
+                  src="mindaquarium_intro.png" 
+                  alt="아이들과 물고기들"
+                  className="w-full max-w-xs md:max-w-md lg:max-w-xl"
+                  style={{ 
+                    objectFit: 'contain',
+                    filter: 'drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3))'
+                  }}
+                />
+                
+                <div className="absolute" style={{ 
+                  bottom: 'calc(0px - 25%)',
+                  left: '50%',
+                  transform: 'translateX(-50%)'
+                }}>
+                  <img 
+                    src="mindaquarium_logo.png" 
+                    alt="Mind Aquarium Logo"
+                    className="w-[80rem] md:w-[100rem] lg:w-[128rem] drop-shadow-2xl"
+                  />
+                </div>
+              </div>
               
-{/* 캐릭터 + 로고 영역 (정리된 버전) */}
-<div className="relative flex flex-col items-center">
-  {/* 캐릭터 이미지 */}
-  <img 
-    src="mindaquarium_intro.png"
-    alt="아이들과 물고기들"
-    className="w-full max-w-xs md:max-w-md lg:max-w-xl"
-    style={{
-      objectFit: 'contain',
-      filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.3))'
-    }}
-  />
-
-  {/* 로고 */}
-  <div
-    className="absolute left-1/2 z-30 pointer-events-none"
-    style={{
-      bottom: '-12vh',
-      transform: 'translateX(-50%)',
-      width: '100vw',
-      display: 'flex',
-      justifyContent: 'center'
-    }}
-  >
-<img
-  src="mindaquarium_logo.png"
-  alt="Mind Aquarium Logo"
-  className="w-[80vw] max-w-[1000px] md:w-[65vw] lg:w-[55vw]"
-/>
-
-  </div>
-</div>
-
-{/* 🔽 로고 아래 공간 확보 (겹침 방지용) */}
-<div className="h-[22vh] md:h-[20vh]" />
-
-
-              
-              {/* 텍스트 + 버튼 */}
               <div className="relative z-20 flex flex-col items-center w-full max-w-3xl mt-4 md:mt-6">
-                {/* 설명 문구 */}
                 <div className="bg-blue-900/60 rounded-2xl px-6 py-3 mb-4 md:mb-6 backdrop-blur-md border border-blue-400/30">
                   <p className="text-white text-center text-base md:text-xl lg:text-2xl font-medium leading-relaxed">
                     마음 속 감정을 마음 어항 속<br/>
@@ -535,7 +442,6 @@
                   </p>
                 </div>
                 
-                {/* 시작하기 버튼 */}
                 <button
                   onClick={() => setMode('aquarium')}
                   className="bg-white text-blue-600 px-12 py-4 md:px-16 md:py-5 rounded-full text-xl md:text-2xl lg:text-3xl font-bold shadow-2xl hover:bg-blue-50 hover:scale-105 transition-all mb-3 md:mb-4"
@@ -565,7 +471,6 @@
           <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
             <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
               <h2 className="text-2xl font-bold mb-6 text-center">관리자 모드</h2>
-            
               <input
                 type="password"
                 value={password}
@@ -574,16 +479,10 @@
                 placeholder="비밀번호 입력"
                 className="w-full border-2 border-gray-300 rounded-lg p-3 mb-4"
               />
-              <button
-                onClick={handleAdminLogin}
-                className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition mb-3"
-              >
+              <button onClick={handleAdminLogin} className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition mb-3">
                 로그인
               </button>
-              <button
-                onClick={() => setMode('intro')}
-                className="w-full bg-gray-300 text-gray-700 py-3 rounded-lg font-bold hover:bg-gray-400 transition"
-              >
+              <button onClick={() => setMode('intro')} className="w-full bg-gray-300 text-gray-700 py-3 rounded-lg font-bold hover:bg-gray-400 transition">
                 돌아가기
               </button>
             </div>
@@ -596,78 +495,70 @@
           <div className="fixed inset-0 bg-gray-100 overflow-hidden">
             <div className="h-full overflow-y-auto">
               <div className="max-w-4xl mx-auto p-6 pb-20">
-              <div className="flex justify-between items-center mb-6">
-                <div>
-                  <h2 className="text-3xl font-bold">관리자 모드</h2>
-                  {firebaseConnected && (
-                    <p className="text-sm text-green-600">🔥 실시간 동기화 중</p>
-                  )}
-                </div>
-                <button
-                  onClick={() => setMode('intro')}
-                  className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
-                >
-                  나가기
-                </button>
-              </div>
-
-              <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-6 mb-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <Crown />
-                  <h3 className="text-xl font-bold">물고기 왕의 편지 (30일 달성 시 표시)</h3>
-                </div>
-                <textarea
-                  value={parentLetter}
-                  onChange={(e) => setParentLetter(e.target.value)}
-                  placeholder="아이에게 보낼 격려의 편지를 작성하세요..."
-                  className="w-full border-2 border-gray-300 rounded-lg p-3 mb-3 h-32"
-                  maxLength={300}
-                />
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">{parentLetter.length}/300자</span>
-                  <button
-                    onClick={saveKingLetter}
-                    className="bg-yellow-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-yellow-600"
-                  >
-                    편지 저장
+                <div className="flex justify-between items-center mb-6">
+                  <div>
+                    <h2 className="text-3xl font-bold">관리자 모드</h2>
+                    {firebaseConnected && <p className="text-sm text-green-600">🔥 실시간 동기화 중</p>}
+                  </div>
+                  <button onClick={() => setMode('intro')} className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
+                    나가기
                   </button>
                 </div>
-                {kingLetterContent && (
-                  <div className="mt-4 p-4 bg-white rounded-lg border border-yellow-300">
-                    <p className="text-sm font-bold mb-2">현재 저장된 편지:</p>
-                    <p className="text-gray-700 whitespace-pre-wrap">{kingLetterContent}</p>
-                  </div>
-                )}
-              </div>
 
-              <div className="bg-white rounded-lg shadow-lg p-6">
-                <h3 className="text-2xl font-bold mb-4 flex items-center gap-2">
-                  <Mail />
-                  수신 편지함 ({messages.length}개)
-                </h3>
-                
-                {messages.length === 0 ? (
-                  <p className="text-gray-500 text-center py-8">아직 받은 편지가 없습니다.</p>
-                ) : (
-                  <div className="space-y-4">
-                    {messages.slice().reverse().map((msg) => (
-                      <div key={msg.id} className="border-2 border-gray-200 rounded-lg p-4 hover:border-blue-300 transition">
-                        <div className="flex justify-between items-start mb-2">
-                          <span className="font-bold text-lg">{msg.fish} 물고기</span>
-                          <span className="text-sm text-gray-500">{msg.date}</span>
-                        </div>
-                        <p className="text-gray-700 whitespace-pre-wrap">{msg.content}</p>
-                      </div>
-                    ))}
+                <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-6 mb-6">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Crown />
+                    <h3 className="text-xl font-bold">물고기 왕의 편지 (30일 달성 시 표시)</h3>
                   </div>
-                )}
+                  <textarea
+                    value={parentLetter}
+                    onChange={(e) => setParentLetter(e.target.value)}
+                    placeholder="아이에게 보낼 격려의 편지를 작성하세요..."
+                    className="w-full border-2 border-gray-300 rounded-lg p-3 mb-3 h-32"
+                    maxLength={300}
+                  />
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">{parentLetter.length}/300자</span>
+                    <button onClick={saveKingLetter} className="bg-yellow-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-yellow-600">
+                      편지 저장
+                    </button>
+                  </div>
+                  {kingLetterContent && (
+                    <div className="mt-4 p-4 bg-white rounded-lg border border-yellow-300">
+                      <p className="text-sm font-bold mb-2">현재 저장된 편지:</p>
+                      <p className="text-gray-700 whitespace-pre-wrap">{kingLetterContent}</p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="bg-white rounded-lg shadow-lg p-6">
+                  <h3 className="text-2xl font-bold mb-4 flex items-center gap-2">
+                    <Mail />
+                    수신 편지함 ({messages.length}개)
+                  </h3>
+                  
+                  {messages.length === 0 ? (
+                    <p className="text-gray-500 text-center py-8">아직 받은 편지가 없습니다.</p>
+                  ) : (
+                    <div className="space-y-4">
+                      {messages.slice().reverse().map((msg) => (
+                        <div key={msg.id} className="border-2 border-gray-200 rounded-lg p-4 hover:border-blue-300 transition">
+                          <div className="flex justify-between items-start mb-2">
+                            <span className="font-bold text-lg">{msg.fish} 물고기</span>
+                            <span className="text-sm text-gray-500">{msg.date}</span>
+                          </div>
+                          <p className="text-gray-700 whitespace-pre-wrap">{msg.content}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                
+                <div className="text-center text-gray-500 text-xs mt-8 pb-4">
+                  <p>© 2024 Grace. All rights reserved.</p>
+                  <p className="mt-1">마음 어항 v1.0</p>
+                </div>
               </div>
-              
-              <div className="text-center text-gray-500 text-xs mt-8 pb-4">
-                <p>© 2024 Grace. All rights reserved.</p>
-                <p className="mt-1">마음 어항 (Mind Aquarium) v1.0</p>
-              </div>
-            </div>
             </div>
           </div>
         );
@@ -678,19 +569,11 @@
           <div className="min-h-screen bg-gradient-to-b from-blue-200 to-blue-400 p-4 overflow-y-auto">
             <div className="max-w-2xl mx-auto py-4">
               <div className="bg-white rounded-lg shadow-xl p-6">
-                <h2 className="text-2xl font-bold mb-3 text-center">
-                  {selectedFish.name} 물고기에게 먹이 주기
-                </h2>
+                <h2 className="text-2xl font-bold mb-3 text-center">{selectedFish.name} 물고기에게 먹이 주기</h2>
                 <div className="flex justify-center mb-4">
-                  <img 
-                    src={selectedFish.image} 
-                    alt={selectedFish.name}
-                    className="w-40 h-40 object-contain"
-                  />
+                  <img src={selectedFish.image} alt={selectedFish.name} className="w-40 h-40 object-contain" />
                 </div>
-                <p className="text-gray-600 text-center mb-4 text-sm">
-                  오늘의 마음을 편지로 써보세요
-                </p>
+                <p className="text-gray-600 text-center mb-4 text-sm">오늘의 마음을 편지로 써보세요</p>
                 
                 <textarea
                   value={letterContent}
@@ -700,16 +583,11 @@
                   maxLength={100}
                 />
                 
-                <div className="text-right text-sm text-gray-600 mb-4">
-                  {letterContent.length}/100자
-                </div>
+                <div className="text-right text-sm text-gray-600 mb-4">{letterContent.length}/100자</div>
                 
                 <div className="flex gap-3">
                   <button
-                    onClick={() => {
-                      setMode('aquarium');
-                      setLetterContent('');
-                    }}
+                    onClick={() => { setMode('aquarium'); setLetterContent(''); }}
                     className="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg font-bold hover:bg-gray-400 transition"
                   >
                     취소
@@ -740,15 +618,10 @@
                 </div>
                 
                 <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-6 mb-6">
-                  <p className="text-lg whitespace-pre-wrap leading-relaxed">
-                    {kingLetterContent}
-                  </p>
+                  <p className="text-lg whitespace-pre-wrap leading-relaxed">{kingLetterContent}</p>
                 </div>
                 
-                <button
-                  onClick={() => setMode('aquarium')}
-                  className="w-full bg-blue-600 text-white py-4 rounded-lg font-bold hover:bg-blue-700 transition"
-                >
+                <button onClick={() => setMode('aquarium')} className="w-full bg-blue-600 text-white py-4 rounded-lg font-bold hover:bg-blue-700 transition">
                   어항으로 돌아가기
                 </button>
               </div>
@@ -757,7 +630,6 @@
         );
       }
 
-      // 어항 메인 화면
       const totalDays = getTotalDays();
       const canShowKingLetter = totalDays >= 30 && kingLetterContent && !hasReadKingLetter;
 
@@ -768,17 +640,10 @@
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat'
         }}>
-          {/* 물방울 애니메이션 */}
           {Array.from({ length: 25 }).map((_, i) => (
-            <Bubble 
-              key={i} 
-              delay={i * 0.8} 
-              left={Math.random() * 100}
-              size={15 + Math.random() * 25}
-            />
+            <Bubble key={i} delay={i * 0.8} left={Math.random() * 100} size={15 + Math.random() * 25} />
           ))}
 
-          {/* 상단 정보 - 모바일 최적화 */}
           <div className="relative z-20 text-center pt-4 pb-2">
             <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-lg">🐠 마음 어항 🐠</h1>
             
@@ -786,19 +651,13 @@
               <p className="text-xs text-gray-600 mb-1">물고기에게 먹이 준 날</p>
               <div className="flex gap-1 justify-center mb-1 flex-wrap">
                 {Array.from({ length: 30 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className={`w-2.5 h-2.5 rounded-full ${
-                      i < totalDays ? 'bg-blue-500' : 'bg-gray-300'
-                    }`}
-                  />
+                  <div key={i} className={`w-2.5 h-2.5 rounded-full ${i < totalDays ? 'bg-blue-500' : 'bg-gray-300'}`} />
                 ))}
               </div>
               <p className="text-xl font-bold text-blue-600">{totalDays} / 30일</p>
             </div>
           </div>
 
-          {/* 왕 편지 알림 */}
           {canShowKingLetter && (
             <div className="relative z-20 px-6 mb-4">
               <button
@@ -811,32 +670,23 @@
             </div>
           )}
 
-          {/* 헤엄치는 물고기들 */}
           <div className="relative w-full h-screen">
             {fishes.map((fish, index) => (
               <SwimmingFish
                 key={fish.id}
                 fish={fish}
                 index={index}
-                onClick={() => {
-                  setSelectedFish(fish);
-                  setMode('letter');
-                }}
+                onClick={() => { setSelectedFish(fish); setMode('letter'); }}
               />
             ))}
           </div>
 
-          {/* 좌상단 버튼 */}
           <div className="fixed top-6 left-6 z-20">
-            <button
-              onClick={() => setMode('intro')}
-              className="bg-white/90 text-blue-600 px-4 py-2 rounded-lg font-bold hover:bg-white transition shadow-lg text-sm"
-            >
+            <button onClick={() => setMode('intro')} className="bg-white/90 text-blue-600 px-4 py-2 rounded-lg font-bold hover:bg-white transition shadow-lg text-sm">
               ← 처음으로
             </button>
           </div>
           
-          {/* 저작권 표시 */}
           <div className="fixed bottom-8 left-0 right-0 z-10 text-center pointer-events-none">
             <p className="text-white/50 text-xs">© 2024 Grace</p>
           </div>
