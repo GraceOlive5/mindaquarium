@@ -104,63 +104,6 @@
       100% { transform: translate(0, 0) rotate(0deg); }
     }
 
-    /* 모바일용 더 작은 움직임 */
-    @media (max-width: 768px) {
-      @keyframes swim1 {
-        0% { transform: translate(0, 0) rotate(0deg); }
-        20% { transform: translate(25vw, 10vh) rotate(3deg); }
-        40% { transform: translate(40vw, 15vh) rotate(-2deg); }
-        60% { transform: translate(35vw, 8vh) rotate(3deg); }
-        80% { transform: translate(20vw, 12vh) rotate(-2deg); }
-        100% { transform: translate(0, 0) rotate(0deg); }
-      }
-
-      @keyframes swim2 {
-        0% { transform: translate(0, 0) rotate(0deg); }
-        20% { transform: translate(-20vw, 12vh) rotate(-2deg); }
-        40% { transform: translate(-35vw, 10vh) rotate(3deg); }
-        60% { transform: translate(-30vw, 15vh) rotate(-3deg); }
-        80% { transform: translate(-18vw, 8vh) rotate(2deg); }
-        100% { transform: translate(0, 0) rotate(0deg); }
-      }
-
-      @keyframes swim3 {
-        0% { transform: translate(0, 0) rotate(0deg); }
-        20% { transform: translate(22vw, -10vh) rotate(3deg); }
-        40% { transform: translate(38vw, -8vh) rotate(-2deg); }
-        60% { transform: translate(32vw, -12vh) rotate(3deg); }
-        80% { transform: translate(18vw, -7vh) rotate(-2deg); }
-        100% { transform: translate(0, 0) rotate(0deg); }
-      }
-
-      @keyframes swim4 {
-        0% { transform: translate(0, 0) rotate(0deg); }
-        20% { transform: translate(-20vw, -10vh) rotate(-3deg); }
-        40% { transform: translate(-35vw, -12vh) rotate(2deg); }
-        60% { transform: translate(-30vw, -15vh) rotate(-3deg); }
-        80% { transform: translate(-18vw, -8vh) rotate(2deg); }
-        100% { transform: translate(0, 0) rotate(0deg); }
-      }
-    }
-    
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: .5; }
-    }
-    
-    .animate-pulse {
-      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    }
-
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-    
-    .animate-spin {
-      animation: spin 1s linear infinite;
-    }
-
     @keyframes bubble {
       0% {
         transform: translateY(0) scale(0.9);
@@ -183,20 +126,6 @@
       border-radius: 50%;
       animation: bubble linear infinite;
       box-shadow: inset -2px -2px 4px rgba(255, 255, 255, 0.5);
-    }
-    
-    /* 인트로 물고기들 살짝 기울기 애니메이션 */
-    @keyframes fishTilt {
-      0%, 100% {
-        transform: rotate(-2deg);
-      }
-      50% {
-        transform: rotate(2deg);
-      }
-    }
-    
-    .intro-fish {
-      animation: fishTilt 3s ease-in-out infinite;
     }
 
     .fish-swimming {
@@ -241,21 +170,6 @@
     .fish-swimming:has(.fish-click-area:hover) {
       filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.6)) brightness(1.1);
       transform: scale(1.1);
-    }
-
-    /* 모바일 최적화 */
-    @media (max-width: 768px) {
-      .fish-swimming {
-        width: 280px !important;
-        height: 280px !important;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .fish-swimming {
-        width: 250px !important;
-        height: 250px !important;
-      }
     }
   </style>
 </head>
