@@ -575,11 +575,11 @@
               
               {/* 레이어 2 + 3: 캐릭터 이미지와 로고를 겹쳐서 배치 */}
               <div className="relative flex items-center justify-center mb-6 md:mb-8">
-                {/* 캐릭터 이미지 (뒤) */}
+                {/* 캐릭터 이미지 (뒤) - 70% 크기 */}
                 <img 
                   src="mindaquarium_intro.png" 
                   alt="아이들과 물고기들"
-                  className="w-full max-w-xl md:max-w-2xl lg:max-w-4xl"
+                  className="w-full max-w-sm md:max-w-lg lg:max-w-2xl"
                   style={{ 
                     objectFit: 'contain',
                     filter: 'drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3))',
@@ -588,16 +588,16 @@
                   }}
                 />
                 
-                {/* 로고 (앞 - 보물상자 위에 겹침) */}
+                {/* 로고 (앞 - 보물상자 아래 20%만 겹침) - 130% 크기 */}
                 <div className="absolute" style={{ 
-                  bottom: '15%',
+                  bottom: '8%',
                   left: '50%',
                   transform: 'translateX(-50%)'
                 }}>
                   <img 
                     src="mindaquarium_logo.png" 
                     alt="Mind Aquarium Logo"
-                    className="w-96 md:w-[28rem] lg:w-[36rem] drop-shadow-2xl"
+                    className="w-[30rem] md:w-[36rem] lg:w-[46rem] drop-shadow-2xl"
                   />
                 </div>
               </div>
