@@ -311,6 +311,9 @@
 
     // 헤엄치는 물고기 컴포넌트
     function SwimmingFish({ fish, onClick, index }) {
+      const [direction, setDirection] = React.useState(1); // 1: 오른쪽, -1: 왼쪽
+      const fishRef = React.useRef(null);
+      
       // 각 물고기마다 고유한 애니메이션
       const animationName = `swim${index + 1}`;
       
@@ -330,16 +333,40 @@
       ];
 
       const position = startPositions[index];
+      
+      // 경계 체크 및 방향 전환
+      React.useEffect(() => {
+        const checkBoundary = () => {
+          if (fishRef.current) {
+            const rect = fishRef.current.getBoundingClientRect();
+            const windowWidth = window.innerWidth;
+            
+            // 왼쪽 끝에 도달
+            if (rect.left <= 0) {
+              setDirection(1); // 오른쪽으로
+            }
+            // 오른쪽 끝에 도달
+            else if (rect.right >= windowWidth) {
+              setDirection(-1); // 왼쪽으로
+            }
+          }
+        };
+        
+        const interval = setInterval(checkBoundary, 100);
+        return () => clearInterval(interval);
+      }, []);
 
       return (
         <div
+          ref={fishRef}
           className="fish-swimming absolute"
           style={{
             ...position,
             animation: `${animationName} ${duration}s ease-in-out infinite`,
             width: 'min(200px, 25vw)',
             height: 'min(200px, 25vw)',
-            zIndex: 30
+            zIndex: 30,
+            transform: `scaleX(${direction})`
           }}
         >
           {/* 클릭 가능한 영역 - 물고기 중앙 부분만 */}
@@ -354,8 +381,13 @@
               userSelect: 'none'
             }}
           />
-          {/* 물고기 이름 텍스트 */}
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+          {/* 물고기 이름 텍스트 - 항상 정방향 */}
+          <div 
+            className="absolute top-1/2 left-1/2 pointer-events-none"
+            style={{
+              transform: `translate(-50%, -50%) scaleX(${direction})`
+            }}
+          >
             <span className="text-white text-sm md:text-base font-bold drop-shadow-lg" style={{
               textShadow: '2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.5)'
             }}>
