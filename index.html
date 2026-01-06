@@ -487,47 +487,47 @@
             {/* 전체 컨텐츠 컨테이너 */}
             <div className="relative h-screen flex flex-col items-center justify-center py-4 px-4">
               
-              {/* 레이어 2 + 3: 캐릭터 이미지와 로고를 겹쳐서 배치 */}
-              <div className="relative flex items-center justify-center mb-2 md:mb-4">
-                {/* 캐릭터 이미지 (뒤) */}
-                <img 
-                  src="mindaquarium_intro.png" 
-                  alt="아이들과 물고기들"
-                  className="w-full max-w-xs md:max-w-md lg:max-w-xl"
-                  style={{ 
-                    objectFit: 'contain',
-                    filter: 'drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3))',
-                    border: 'none',
-                    outline: 'none'
-                  }}
-                />
-                
-{/* 로고 전용 레이어 - 레이아웃 영향 없음 */}
-<div
-  className="pointer-events-none absolute left-1/2 z-30"
-  style={{
-    bottom: '-15vh',
-    transform: 'translateX(-50%)',
-    width: '100vw',
-    display: 'flex',
-    justifyContent: 'center'
-  }}
->
-  <img
-    src="mindaquarium_logo.png"
-    alt="Mind Aquarium Logo"
-    className="
-      w-[70vw]
-      max-w-[900px]
-      md:w-[60vw]
-      lg:w-[50vw]
-      drop-shadow-2xl
-    "
+{/* 캐릭터 + 로고 영역 (정리된 버전) */}
+<div className="relative flex flex-col items-center">
+  {/* 캐릭터 이미지 */}
+  <img 
+    src="mindaquarium_intro.png"
+    alt="아이들과 물고기들"
+    className="w-full max-w-xs md:max-w-md lg:max-w-xl"
     style={{
-      height: 'auto'
+      objectFit: 'contain',
+      filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.3))'
     }}
   />
+
+  {/* 로고 */}
+  <div
+    className="absolute left-1/2 z-30 pointer-events-none"
+    style={{
+      bottom: '-18vh',
+      transform: 'translateX(-50%)',
+      width: '100vw',
+      display: 'flex',
+      justifyContent: 'center'
+    }}
+  >
+    <img
+      src="mindaquarium_logo.png"
+      alt="Mind Aquarium Logo"
+      className="
+        w-[80vw]
+        max-w-[1000px]
+        md:w-[65vw]
+        lg:w-[55vw]
+        drop-shadow-2xl
+      "
+    />
+  </div>
 </div>
+
+{/* 🔽 로고 아래 공간 확보 (겹침 방지용) */}
+<div className="h-[22vh] md:h-[20vh]" />
+
 
               
               {/* 텍스트 + 버튼 */}
