@@ -14,7 +14,7 @@
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
-  
+
   <style>
     body {
       margin: 0;
@@ -23,7 +23,7 @@
       -moz-osx-font-smoothing: grayscale;
       overflow: hidden;
     }
-    
+
     /* Fish Animations */
     @keyframes swim1 {
       0% { transform: translate(0, 0) rotate(0deg); }
@@ -137,7 +137,7 @@
       height: 100%;
       object-fit: contain;
     }
-    
+
     .fish-click-area {
       position: absolute;
       top: 25%;
@@ -149,11 +149,11 @@
       z-index: 1;
       transition: all 0.3s ease;
     }
-    
+
     .fish-click-area:hover {
       transform: scale(1.05);
     }
-    
+
     .fish-swimming:has(.fish-click-area:hover) {
       filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.6)) brightness(1.1);
       transform: scale(1.1);
@@ -166,7 +166,7 @@
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-    
+
     const firebaseConfig = {
       apiKey: "AIzaSyCQLxHoTcKvS1X7ausB1slF27tZoFvh99o",
       authDomain: "mind-aquarium.firebaseapp.com",
@@ -208,7 +208,7 @@
     function SwimmingFish({ fish, onClick, index }) {
       const [direction, setDirection] = React.useState(1);
       const fishRef = React.useRef(null);
-      
+
       const durations = [18, 15, 20, 17, 14, 19, 16];
       const startPositions = [
         { top: '15%', left: '10%' },
@@ -219,7 +219,7 @@
         { top: '60%', left: '35%' },
         { top: '60%', right: '30%' }
       ];
-      
+
       React.useEffect(() => {
         const checkBoundary = () => {
           if (fishRef.current) {
@@ -353,7 +353,7 @@
         setFeedingHistory(updatedHistory);
         setLetterContent('');
         setMode('aquarium');
-        
+
         if (Object.keys(updatedHistory).length >= 30 && kingLetterContent && !hasReadKingLetter) {
           setTimeout(() => alert('🎉 물고기 왕이 편지를 보냈어요!'), 500);
         }
@@ -408,8 +408,31 @@
             {Array.from({ length: 30 }).map((_, i) => (
               <Bubble key={i} delay={i * 0.8} left={Math.random() * 100} size={15 + Math.random() * 25} />
             ))}
-            
+
             <div className="relative h-screen flex flex-col items-center justify-center py-4 px-4">
+              <div className="relative flex items-center justify-center mb-2 md:mb-4">
+                <img 
+                  src="mindaquarium_intro.png" 
+                  alt="아이들과 물고기들"
+                  className="w-full max-w-xs md:max-w-md lg:max-w-xl"
+                  style={{ 
+                    objectFit: 'contain',
+                    filter: 'drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3))'
+                  }}
+                />
+                
+                <div className="absolute" style={{ 
+                  bottom: 'calc(0px - 25%)',
+                  left: '50%',
+                  transform: 'translateX(-50%)'
+                }}>
+                  <img 
+                    src="mindaquarium_logo.png" 
+                    alt="Mind Aquarium Logo"
+                    className="w-[80rem] md:w-[100rem] lg:w-[128rem] drop-shadow-2xl"
+                  />
+                </div>
+              </div>
            {/* 캐릭터 + 로고 영역 (안정 버전) */}
 <div className="relative flex flex-col items-center">
   {/* 캐릭터 이미지 */}
@@ -445,7 +468,7 @@
 {/* ✅ 로고 아래 공간 (이게 겹침 방지 핵심) */}
 <div className="h-[72px]" />
 
-              
+
               <div className="relative z-20 flex flex-col items-center w-full max-w-3xl mt-4 md:mt-6">
                 <div className="bg-blue-900/60 rounded-2xl px-6 py-3 mb-4 md:mb-6 backdrop-blur-md border border-blue-400/30">
                   <p className="text-white text-center text-base md:text-xl lg:text-2xl font-medium leading-relaxed">
@@ -453,14 +476,14 @@
                     물고기 친구들에게 나누어주세요
                   </p>
                 </div>
-                
+
                 <button
                   onClick={() => setMode('aquarium')}
                   className="bg-white text-blue-600 px-12 py-4 md:px-16 md:py-5 rounded-full text-xl md:text-2xl lg:text-3xl font-bold shadow-2xl hover:bg-blue-50 hover:scale-105 transition-all mb-3 md:mb-4"
                 >
                   시작하기
                 </button>
-                
+
                 <button
                   onClick={() => setMode('adminLogin')}
                   className="text-white/80 hover:text-white transition flex items-center gap-2 mb-3 md:mb-4"
@@ -468,7 +491,7 @@
                   <Lock />
                   <span className="text-xs md:text-base">관리자 모드</span>
                 </button>
-                
+
                 <div className="text-white/50 text-xs text-center">
                   <p>© 2024 Grace. All rights reserved.</p>
                 </div>
@@ -548,7 +571,7 @@
                     <Mail />
                     수신 편지함 ({messages.length}개)
                   </h3>
-                  
+
                   {messages.length === 0 ? (
                     <p className="text-gray-500 text-center py-8">아직 받은 편지가 없습니다.</p>
                   ) : (
@@ -565,7 +588,7 @@
                     </div>
                   )}
                 </div>
-                
+
                 <div className="text-center text-gray-500 text-xs mt-8 pb-4">
                   <p>© 2024 Grace. All rights reserved.</p>
                   <p className="mt-1">마음 어항 v1.0</p>
@@ -586,7 +609,7 @@
                   <img src={selectedFish.image} alt={selectedFish.name} className="w-40 h-40 object-contain" />
                 </div>
                 <p className="text-gray-600 text-center mb-4 text-sm">오늘의 마음을 편지로 써보세요</p>
-                
+
                 <textarea
                   value={letterContent}
                   onChange={(e) => setLetterContent(e.target.value)}
@@ -594,9 +617,9 @@
                   className="w-full border-2 border-gray-300 rounded-lg p-3 mb-3 h-32 text-base"
                   maxLength={100}
                 />
-                
+
                 <div className="text-right text-sm text-gray-600 mb-4">{letterContent.length}/100자</div>
-                
+
                 <div className="flex gap-3">
                   <button
                     onClick={() => { setMode('aquarium'); setLetterContent(''); }}
@@ -628,11 +651,11 @@
                   <h2 className="text-3xl font-bold mb-2">물고기 왕의 편지</h2>
                   <p className="text-gray-600">30일 동안 물고기들을 돌봐줘서 고마워요!</p>
                 </div>
-                
+
                 <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-6 mb-6">
                   <p className="text-lg whitespace-pre-wrap leading-relaxed">{kingLetterContent}</p>
                 </div>
-                
+
                 <button onClick={() => setMode('aquarium')} className="w-full bg-blue-600 text-white py-4 rounded-lg font-bold hover:bg-blue-700 transition">
                   어항으로 돌아가기
                 </button>
@@ -658,7 +681,7 @@
 
           <div className="relative z-20 text-center pt-4 pb-2">
             <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-lg">🐠 마음 어항 🐠</h1>
-            
+
             <div className="bg-white/90 rounded-lg p-3 inline-block mx-auto max-w-xs">
               <p className="text-xs text-gray-600 mb-1">물고기에게 먹이 준 날</p>
               <div className="flex gap-1 justify-center mb-1 flex-wrap">
@@ -698,7 +721,7 @@
               ← 처음으로
             </button>
           </div>
-          
+
           <div className="fixed bottom-8 left-0 right-0 z-10 text-center pointer-events-none">
             <p className="text-white/50 text-xs">© 2024 Grace</p>
           </div>
