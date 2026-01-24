@@ -619,7 +619,7 @@ const handleSignIn = async () => {
 const handleGoogleSignIn = async () => {
   setLoading(true);
   try {
-    const provider = new GoogleAuthProvider();
+    const provider = new window.GoogleAuthProvider();
 const result = await signInWithPopup(window.auth, provider);
     const newUser = result.user;
     
