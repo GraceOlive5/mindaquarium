@@ -255,79 +255,6 @@
       );
     }
 
-  }
-
-function FishNameEditor({ defaultFishes, customFishNames, onSave }) {
-  const [editedNames, setEditedNames] = React.useState({});
-
-  React.useEffect(() => {
-    if (customFishNames) {
-      setEditedNames(customFishNames);
-    }
-  }, [customFishNames]);
-
-  const handleNameChange = (fishId, newName) => {
-    if (newName.length <= 4) {
-      setEditedNames({ ...editedNames, [fishId]: newName });
-    }
-  };
-
-  const handleSave = () => {
-    onSave(editedNames);
-  };
-
-  const handleReset = () => {
-    setEditedNames({});
-    onSave({});
-  };
-
-  return (
-    <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-6 mb-6">
-      <h3 className="text-xl font-bold mb-4">🐟 물고기 이름 설정</h3>
-      <p className="text-sm text-gray-600 mb-4">각 물고기의 이름을 최대 4글자까지 설정할 수 있습니다.</p>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        {defaultFishes.map(fish => (
-          <div key={fish.id} className="bg-white rounded-lg p-4 border-2 border-gray-200">
-            <div className="flex items-center gap-3 mb-2">
-              <img src={fish.image} alt={fish.color} className="w-16 h-16 object-contain" />
-              <div className="flex-1">
-                <p className="text-sm text-gray-600 mb-1">{fish.color} 물고기</p>
-                <input
-                  type="text"
-                  value={editedNames[fish.id] || fish.defaultName}
-                  onChange={(e) => handleNameChange(fish.id, e.target.value)}
-                  placeholder={fish.defaultName}
-                  maxLength={4}
-                  className="w-full border-2 border-gray-300 rounded-lg p-2 text-lg font-bold"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  {(editedNames[fish.id] || fish.defaultName).length}/4자
-                </p>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-      
-      <div className="flex gap-3">
-        <button
-          onClick={handleSave}
-          className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 transition"
-        >
-          이름 저장
-        </button>
-        <button
-          onClick={handleReset}
-          className="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-400 transition"
-        >
-          기본값으로 되돌리기
-        </button>
-      </div>
-    </div>
-  );
-}
-
     function MindAquarium() {
       const [mode, setMode] = useState('intro');
       const [selectedFish, setSelectedFish] = useState(null);
@@ -340,26 +267,16 @@ function FishNameEditor({ defaultFishes, customFishNames, onSave }) {
       const [hasReadKingLetter, setHasReadKingLetter] = useState(false);
       const [loading, setLoading] = useState(false);
       const [firebaseConnected, setFirebaseConnected] = useState(false);
-      const [firebaseConnected, setFirebaseConnected] = useState(false);
-      const [adminPassword, setAdminPassword] = useState('1234');
-      const [newPassword, setNewPassword] = useState('');
-      const [confirmPassword, setConfirmPassword] = useState('');
-      const [customFishNames, setCustomFishNames] = useState(null);
 
-      const defaultFishes = [
-       { id: 'worry', defaultName: '걱정', color: '노란색', image: 'mindaquarium_worry.png' },
-        { id: 'fear', defaultName: '무서움', color: '파란색', image: 'mindaquarium_fear.png' },
-       { id: 'anger', defaultName: '화남', color: '빨간색', image: 'mindaquarium_angry.png' },
-        { id: 'secret', defaultName: '비밀', color: '보라색', image: 'mindaquarium_secret.png' },
-        { id: 'fun', defaultName: '재미', color: '초록색', image: 'mindaquarium_fun.png' },
-        { id: 'shy', defaultName: '부끄러움', color: '핑크색', image: 'mindaquarium_shy.png' },
-        { id: 'happy', defaultName: '행복', color: '하얀색', image: 'mindaquarium_happy.png' }
-         ];
-
-const fishes = defaultFishes.map(fish => ({
-  ...fish,
-  name: customFishNames?.[fish.id] || fish.defaultName
-}));
+      const fishes = [
+        { id: 'worry', name: '걱정', image: 'mindaquarium_worry.png' },
+        { id: 'fear', name: '무서움', image: 'mindaquarium_fear.png' },
+        { id: 'anger', name: '화남', image: 'mindaquarium_angry.png' },
+        { id: 'secret', name: '비밀', image: 'mindaquarium_secret.png' },
+        { id: 'fun', name: '재미', image: 'mindaquarium_fun.png' },
+        { id: 'shy', name: '부끄러움', image: 'mindaquarium_shy.png' },
+        { id: 'happy', name: '행복', image: 'mindaquarium_happy.png' }
+      ];
 
       useEffect(() => {
         if (!window.database) return;
@@ -394,20 +311,7 @@ const fishes = defaultFishes.map(fish => ({
             const data = snapshot.val();
             if (data) setHasReadKingLetter(data);
           });
-
-          const passwordRef = window.dbRef(window.database, 'adminPassword');
-          window.dbOnValue(passwordRef, (snapshot) => {
-            const data = snapshot.val();
-            if (data) setAdminPassword(data);
-          });
-
-          const fishNamesRef = window.dbRef(window.database, 'customFishNames');
-          window.dbOnValue(fishNamesRef, (snapshot) => {
-            const data = snapshot.val();
-            if (data) setCustomFishNames(data);
-          });
         } catch (error) {
-
           console.error('Firebase error:', error);
         }
       }, []);
@@ -476,40 +380,11 @@ const fishes = defaultFishes.map(fish => ({
         setParentLetter('');
       };
 
-      const changePassword = async () => {
-        if (!newPassword.trim()) {
-          alert('새 비밀번호를 입력해주세요.');
-          return;
-        }
-        if (newPassword !== confirmPassword) {
-          alert('비밀번호가 일치하지 않습니다.');
-          return;
-        }
-        if (newPassword.length < 4) {
-          alert('비밀번호는 4자 이상이어야 합니다.');
-          return;
-        }
-        
-        await saveToFirebase('adminPassword', newPassword);
-        setAdminPassword(newPassword);
-        setNewPassword('');
-        setConfirmPassword('');
-        alert('비밀번호가 변경되었습니다!');
+      const readKingLetter = async () => {
+        setMode('kingLetter');
+        setHasReadKingLetter(true);
+        await saveToFirebase('hasReadKingLetter', true);
       };
-
-      const saveFishNames = async (names) => {
-        await saveToFirebase('customFishNames', names);
-        setCustomFishNames(names);
-        alert('물고기 이름이 저장되었습니다!');
-      
-      };
-
-const readKingLetter = async () => {
-  setMode('kingLetter');
-  setHasReadKingLetter(true);
-  await saveToFirebase('hasReadKingLetter', true);
-};
-        
 
       if (loading) {
         return (
@@ -627,12 +502,7 @@ const readKingLetter = async () => {
         );
       }
 
-      
       if (mode === 'admin') {
-        const totalDays = getTotalDays();
-        const canEditKingLetter = totalDays >= 30 && hasReadKingLetter;
-        const hasKingLetter = !!kingLetterContent;
-
         return (
           <div className="fixed inset-0 bg-gray-100 overflow-hidden">
             <div className="h-full overflow-y-auto">
@@ -647,94 +517,32 @@ const readKingLetter = async () => {
                   </button>
                 </div>
 
-                {/* 비밀번호 변경 */}
-                <div className="bg-red-50 border-2 border-red-300 rounded-lg p-6 mb-6">
-                  <h3 className="text-xl font-bold mb-4">🔒 관리자 비밀번호 변경</h3>
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-sm font-bold mb-1">새 비밀번호 (4자 이상)</label>
-                      <input
-                        type="password"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        placeholder="새 비밀번호 입력"
-                        className="w-full border-2 border-gray-300 rounded-lg p-3"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-bold mb-1">비밀번호 확인</label>
-                      <input
-                        type="password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        placeholder="비밀번호 다시 입력"
-                        className="w-full border-2 border-gray-300 rounded-lg p-3"
-                      />
-                    </div>
-                    <button
-                      onClick={changePassword}
-                      className="w-full bg-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-700 transition"
-                    >
-                      비밀번호 변경
-                    </button>
-                  </div>
-                </div>
-
-                {/* 물고기 이름 설정 */}
-                <FishNameEditor 
-                  defaultFishes={defaultFishes}
-                  customFishNames={customFishNames}
-                  onSave={saveFishNames}
-                />
-
-                {/* 물고기 왕의 편지 */}
                 <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-6 mb-6">
                   <div className="flex items-center gap-2 mb-4">
                     <Crown />
-                    <h3 className="text-xl font-bold">물고기 왕의 편지</h3>
+                    <h3 className="text-xl font-bold">물고기 왕의 편지 (30일 달성 시 표시)</h3>
                   </div>
-                  
-                  <div className="bg-white rounded-lg p-4 mb-4 border-2 border-yellow-200">
-                    <p className="text-sm font-bold mb-2">📊 현재 상태:</p>
-                    <p className="text-gray-700">• 달성 일수: {totalDays}/30일</p>
-                    <p className="text-gray-700">• 저장된 편지: {hasKingLetter ? '있음' : '없음'}</p>
-                    <p className="text-gray-700">• 아이가 읽음: {hasReadKingLetter ? '예' : '아니오'}</p>
-                    {totalDays >= 30 && !hasReadKingLetter && hasKingLetter && (
-                      <p className="text-green-600 font-bold mt-2">✅ 아이가 편지를 받을 수 있습니다!</p>
-                    )}
+                  <textarea
+                    value={parentLetter}
+                    onChange={(e) => setParentLetter(e.target.value)}
+                    placeholder="아이에게 보낼 격려의 편지를 작성하세요..."
+                    className="w-full border-2 border-gray-300 rounded-lg p-3 mb-3 h-32"
+                    maxLength={300}
+                  />
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">{parentLetter.length}/300자</span>
+                    <button onClick={saveKingLetter} className="bg-yellow-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-yellow-600">
+                      편지 저장
+                    </button>
                   </div>
-
-                  {(!hasKingLetter || canEditKingLetter) ? (
-                    <>
-                      <textarea
-                        value={parentLetter}
-                        onChange={(e) => setParentLetter(e.target.value)}
-                        placeholder="아이에게 보낼 격려의 편지를 작성하세요..."
-                        className="w-full border-2 border-gray-300 rounded-lg p-3 mb-3 h-32"
-                        maxLength={300}
-                      />
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">{parentLetter.length}/300자</span>
-                        <button
-                          onClick={saveKingLetter}
-                          className="bg-yellow-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-yellow-600"
-                        >
-                          편지 저장
-                        </button>
-                      </div>
-                    </>
-                  ) : (
-                    <div className="bg-yellow-100 border-2 border-yellow-400 rounded-lg p-4">
-                      <p className="text-sm font-bold mb-2 text-yellow-800">💌 현재 저장된 편지:</p>
-                      <p className="text-gray-700 whitespace-pre-wrap mb-3">{kingLetterContent}</p>
-                      <p className="text-sm text-yellow-700">
-                        ℹ️ 아이가 30일을 달성하고 편지를 읽으면 새로운 편지를 작성할 수 있습니다.
-                      </p>
+                  {kingLetterContent && (
+                    <div className="mt-4 p-4 bg-white rounded-lg border border-yellow-300">
+                      <p className="text-sm font-bold mb-2">현재 저장된 편지:</p>
+                      <p className="text-gray-700 whitespace-pre-wrap">{kingLetterContent}</p>
                     </div>
                   )}
                 </div>
 
-                {/* 수신 편지함 */}
                 <div className="bg-white rounded-lg shadow-lg p-6">
                   <h3 className="text-2xl font-bold mb-4 flex items-center gap-2">
                     <Mail />
