@@ -6,8 +6,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="마음 어항">
-  <meta name="copyright" content="Copyright 2024 Grace. All rights reserved.">
-  <meta name="author" content="Grace">
+  <meta name="copyright" content="Copyright 2024 hhappyfamilydais. All rights reserved.">
+  <meta name="author" content="hhappyfamilydais">
   <meta name="description" content="아이들의 감정 표현을 돕는 감정 어항 앱 - Mind Aquarium">
   <title>마음 어항</title>
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -286,7 +286,8 @@ function AuthScreen({ onSuccess }) {
   const googleSignIn = async () => {
     setBusy(true);
     try {
-      const provider = new fa().GoogleAuthProvider();
+      const Provider = fa().GoogleAuthProvider;
+      const provider = new Provider();
       const result = await fa().signInWithPopup(auth(), provider);
       const uid = result.user.uid;
       const snap = await new Promise(r => fa().onValue(fa().ref(db(),`users/${uid}/profile`), r, {onlyOnce:true}));
@@ -352,7 +353,7 @@ function AuthScreen({ onSuccess }) {
             {isSignUp ? '이미 계정이 있으신가요? 로그인' : '계정이 없으신가요? 회원가입'}
           </button>
         </div>
-        <p className="text-center text-gray-400 text-xs mt-6">© 2024 Grace. All rights reserved.</p>
+        <p className="text-center text-gray-400 text-xs mt-6">© 2024 hhappyfamilydais. All rights reserved.</p>
       </div>
     </div>
   );
@@ -384,12 +385,12 @@ function IntroScreen({ userEmail, onStart, onAdmin, onSignOut }) {
             시작하기
           </button>
           <button onClick={onAdmin} className="text-white/80 hover:text-white transition flex items-center gap-2 mb-3">
-            <span>🔒</span><span className="text-xs md:text-base">관리자 모드</span>
+            <span>🔑</span><span className="text-xs md:text-base">어항 관리센터</span>
           </button>
           <button onClick={onSignOut} className="text-white/60 hover:text-white/80 transition text-xs md:text-sm">
             {userEmail} | 로그아웃
           </button>
-          <p className="text-white/40 text-xs mt-2">© 2024 Grace. All rights reserved.</p>
+          <p className="text-white/40 text-xs mt-2">© 2024 hhappyfamilydais. All rights reserved.</p>
         </div>
       </div>
     </div>
@@ -401,7 +402,7 @@ function AdminLoginScreen({ onSuccess, onBack }) {
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
       <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
-        <h2 className="text-2xl font-bold mb-6 text-center">관리자 모드</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center">🐠 어항 관리센터</h2>
         <input type="password" value={pw} onChange={e=>setPw(e.target.value)}
           onKeyPress={e=>e.key==='Enter'&&onSuccess(pw)}
           placeholder="비밀번호 입력"
@@ -427,10 +428,10 @@ function AdminScreen({ messages, goalCount, cycleCount, pendingKingLetter, kingL
   const [confirmPw, setConfirmPw] = useState('');
 
   const TABS = [
-    { id:'mail', label:'📬 편지함' },
-    { id:'fish', label:'🐟 이름 설정' },
-    { id:'king', label:'👑 왕의 편지' },
-    { id:'pw',   label:'🔒 비밀번호' },
+    { id:'mail', label:'🐚 마음 수신함' },
+    { id:'fish', label:'🐠 물고기 도감' },
+    { id:'king', label:'👑 왕의 우체국' },
+    { id:'pw',   label:'🔑 잠금 설정' },
   ];
 
   // 왕의 편지 저장 (새로 작성 or 수정)
@@ -467,12 +468,16 @@ function AdminScreen({ messages, goalCount, cycleCount, pendingKingLetter, kingL
       <div className="admin-scroll">
         <div className="admin-inner">
           {/* 헤더 */}
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'1.5rem' }}>
-            <div>
-              <span style={{ fontSize:'20px', fontWeight:700 }}>관리자 모드</span>
-              {firebaseConnected && <div style={{ fontSize:'12px', color:'#16a34a', marginTop:'2px' }}>🔥 실시간 동기화 중</div>}
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'1.5rem' }}>
+            <div style={{ flex:1, marginRight:'12px' }}>
+              <span style={{ fontSize:'20px', fontWeight:700 }}>🐠 어항 관리센터</span>
+              <p style={{ fontSize:'12px', color:'#6b7280', marginTop:'6px', lineHeight:'1.6' }}>
+                관리자페이지는 아이의 마음 어항을 살펴보고 필요한 정보를 조정하는 공간이에요.<br/>
+                아이들이 남긴 마음은 양육자만 살며시 읽고, 알은 체 말아주세요.<br/>
+                아이들이 눈치 보지 않고 자유롭게 마음을 가꿀 수 있도록 도와주세요.
+              </p>
             </div>
-            <button onClick={onExit} className="a-btn btn-gray">나가기</button>
+            <button onClick={onExit} className="a-btn btn-gray" style={{ flexShrink:0 }}>어항으로 🐟</button>
           </div>
 
           {/* 탭 */}
@@ -486,7 +491,7 @@ function AdminScreen({ messages, goalCount, cycleCount, pendingKingLetter, kingL
 
           {/* 📬 편지함 */}
           {tab === 'mail' && (
-            <AdminSection title="수신 편지함" badge={`${messages.length}개`}>
+            <AdminSection title="아이가 보낸 마음들" badge={`${messages.length}개`}>
               {messages.length === 0
                 ? <p style={{ color:'#9ca3af', textAlign:'center', padding:'16px 0', fontSize:'14px' }}>아직 받은 편지가 없습니다.</p>
                 : messages.slice().reverse().map(msg => (
@@ -504,7 +509,7 @@ function AdminScreen({ messages, goalCount, cycleCount, pendingKingLetter, kingL
 
           {/* 🐟 이름 설정 */}
           {tab === 'fish' && (
-            <AdminSection title="물고기 이름 설정">
+            <AdminSection title="우리 어항의 물고기들">
               <FishNameEditor
                 customFishNames={customFishNames}
                 onSave={async (names) => { await onSave('customFishNames', names); alert('저장되었습니다!'); }}
@@ -515,10 +520,10 @@ function AdminScreen({ messages, goalCount, cycleCount, pendingKingLetter, kingL
           {/* 👑 왕의 편지 */}
           {tab === 'king' && (<>
             {/* 목표 횟수 설정 */}
-            <AdminSection title="목표 횟수 설정">
+            <AdminSection title="왕의 편지 발송 주기">
               <div className="sbar" style={{ marginBottom:'12px' }}>
                 현재 사이클: <strong>{cycleCount}</strong> / <strong>{goalCount}</strong>번 &nbsp;·&nbsp;
-                목표 달성 시 왕의 편지가 발송됩니다
+                목표 횟수 달성 시 왕의 편지가 발송됩니다
               </div>
               <div style={{ display:'flex', gap:'8px', alignItems:'center' }}>
                 <input type="number" min="1" value={goalInput} onChange={e=>setGoalInput(e.target.value)}
@@ -528,8 +533,7 @@ function AdminScreen({ messages, goalCount, cycleCount, pendingKingLetter, kingL
               </div>
             </AdminSection>
 
-            {/* 미발송 편지 */}
-            <AdminSection title="대기 중인 왕의 편지">
+            <AdminSection title="발송 준비 중인 편지">
               {hasPending && !editingLetter ? (
                 <div>
                   <div style={{ background:'#fffbeb', border:'1px solid #fcd34d', borderRadius:'8px', padding:'12px', marginBottom:'10px' }}>
@@ -570,7 +574,7 @@ function AdminScreen({ messages, goalCount, cycleCount, pendingKingLetter, kingL
             </AdminSection>
 
             {/* 발송 기록 */}
-            <AdminSection title="발송된 편지 기록" badge={`${history.length}개`} defaultOpen={false}>
+            <AdminSection title="보낸 편지 보관함" badge={`${history.length}개`} defaultOpen={false}>
               {history.length === 0
                 ? <p style={{ color:'#9ca3af', textAlign:'center', padding:'12px 0', fontSize:'13px' }}>아직 발송된 편지가 없습니다.</p>
                 : history.slice().reverse().map((h, i) => (
@@ -588,18 +592,18 @@ function AdminScreen({ messages, goalCount, cycleCount, pendingKingLetter, kingL
 
           {/* 🔒 비밀번호 */}
           {tab === 'pw' && (
-            <AdminSection title="관리자 비밀번호 변경">
+            <AdminSection title="관리센터 잠금 설정">
               <div style={{ display:'flex', flexDirection:'column', gap:'8px' }}>
                 <input type="password" value={newPw} onChange={e=>setNewPw(e.target.value)}
                   placeholder="새 비밀번호 (4자 이상)" className="a-input" />
                 <input type="password" value={confirmPw} onChange={e=>setConfirmPw(e.target.value)}
                   placeholder="비밀번호 확인" className="a-input" />
-                <button onClick={changePw} className="a-btn btn-red">비밀번호 변경</button>
+                <button onClick={changePw} className="a-btn btn-red">잠금 비밀번호 변경</button>
               </div>
             </AdminSection>
           )}
 
-          <p style={{ textAlign:'center', color:'#d1d5db', fontSize:'11px', marginTop:'2rem' }}>© 2024 Grace. All rights reserved. · v1.0</p>
+          <p style={{ textAlign:'center', color:'#d1d5db', fontSize:'11px', marginTop:'2rem' }}>© 2024 hhappyfamilydais. All rights reserved. · 어항 관리센터 v1.0</p>
         </div>
       </div>
     </div>
@@ -695,7 +699,7 @@ function AquariumScreen({ fishes, cycleCount, goalCount, pendingKingLetter, mess
 
       <div className="relative z-20 text-center pt-4 pb-2">
         <div className="bg-white/90 rounded-lg p-3 inline-block mx-auto max-w-xs">
-          <p className="text-xs text-gray-600 mb-1">물고기에게 마음을 나눠준 횟수</p>
+          <p className="text-xs text-gray-600 mb-1">물고기에게 나눠준 마음의 기록</p>
           <p className="text-3xl font-bold text-blue-600">{messages.length}번</p>
         </div>
       </div>
@@ -721,7 +725,7 @@ function AquariumScreen({ fishes, cycleCount, goalCount, pendingKingLetter, mess
         </button>
       </div>
       <div className="fixed bottom-8 left-0 right-0 z-10 text-center pointer-events-none">
-        <p className="text-white/50 text-xs">© 2024 Grace</p>
+        <p className="text-white/50 text-xs">© 2024 hhappyfamilydais</p>
       </div>
     </div>
   );
