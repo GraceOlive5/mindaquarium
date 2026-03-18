@@ -164,21 +164,37 @@
   <div id="root"></div>
 
   <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-    import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+import { 
+  getAuth, 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithPopup
+} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
     
     const firebaseConfig = {
-      apiKey: "AIzaSyCQLxHoTcKvS1X7ausB1slF27tZoFvh99o",
-      authDomain: "mind-aquarium.firebaseapp.com",
-      databaseURL: "https://mind-aquarium-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "mind-aquarium",
-      storageBucket: "mind-aquarium.firebasestorage.app",
-      messagingSenderId: "812802606438",
-      appId: "1:812802606438:web:07fef3f1b4f89e78b3f4a7"
-    };
+  apiKey: "AIzaSyCUwWiApplMdRLNeiF3vYOgCPrNHQGecw0",
+  authDomain: "mind-aquarium-test.firebaseapp.com",
+  databaseURL: "https://mind-aquarium-test-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "mind-aquarium-test",
+  storageBucket: "mind-aquarium-test.firebasestorage.app",
+  messagingSenderId: "945664106523",
+  appId: "1:945664106523:web:4a4a46e867207fa70f58be"
+};
 
     const app = initializeApp(firebaseConfig);
     window.database = getDatabase(app);
+   window.auth = getAuth(app);
+window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+window.signOut = signOut;
+window.onAuthStateChanged = onAuthStateChanged;
+window.GoogleAuthProvider = GoogleAuthProvider;
+window.signInWithPopup = signInWithPopup;
     window.dbRef = ref;
     window.dbSet = set;
     window.dbOnValue = onValue;
@@ -255,9 +271,87 @@
       );
     }
 
+  
+
+function FishNameEditor({ defaultFishes, customFishNames, onSave }) {
+  const [editedNames, setEditedNames] = React.useState({});
+
+  React.useEffect(() => {
+    if (customFishNames) {
+      setEditedNames(customFishNames);
+    }
+  }, [customFishNames]);
+
+  const handleNameChange = (fishId, newName) => {
+    if (newName.length <= 4) {
+      setEditedNames({ ...editedNames, [fishId]: newName });
+    }
+  };
+
+  const handleSave = () => {
+    onSave(editedNames);
+  };
+
+  const handleReset = () => {
+    setEditedNames({});
+    onSave({});
+  };
+
+  return (
+    <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-6 mb-6">
+      <h3 className="text-xl font-bold mb-4">🐟 물고기 이름 설정</h3>
+      <p className="text-sm text-gray-600 mb-4">각 물고기의 이름을 최대 4글자까지 설정할 수 있습니다.</p>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        {defaultFishes.map(fish => (
+          <div key={fish.id} className="bg-white rounded-lg p-4 border-2 border-gray-200">
+            <div className="flex items-center gap-3 mb-2">
+              <img src={fish.image} alt={fish.color} className="w-16 h-16 object-contain" />
+              <div className="flex-1">
+                <p className="text-sm text-gray-600 mb-1">{fish.color} 물고기</p>
+                <input
+                  type="text"
+                  value={editedNames[fish.id] || fish.defaultName}
+                  onChange={(e) => handleNameChange(fish.id, e.target.value)}
+                  placeholder={fish.defaultName}
+                  maxLength={4}
+                  className="w-full border-2 border-gray-300 rounded-lg p-2 text-lg font-bold"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  {(editedNames[fish.id] || fish.defaultName).length}/4자
+                </p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      <div className="flex gap-3">
+        <button
+          onClick={handleSave}
+          className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 transition"
+        >
+          이름 저장
+        </button>
+        <button
+          onClick={handleReset}
+          className="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-400 transition"
+        >
+          기본값으로 되돌리기
+        </button>
+      </div>
+    </div>
+  );
+}
+
     function MindAquarium() {
       const [mode, setMode] = useState('intro');
       const [selectedFish, setSelectedFish] = useState(null);
+      const [user, setUser] = useState(null);
+      const [authLoading, setAuthLoading] = useState(true);
+      const [email, setEmail] = useState('');
+      const [childName, setChildName] = useState('');
+      const [isSignUp, setIsSignUp] = useState(false);
       const [letterContent, setLetterContent] = useState('');
       const [password, setPassword] = useState('');
       const [feedingHistory, setFeedingHistory] = useState({});
@@ -267,67 +361,106 @@
       const [hasReadKingLetter, setHasReadKingLetter] = useState(false);
       const [loading, setLoading] = useState(false);
       const [firebaseConnected, setFirebaseConnected] = useState(false);
+      const [adminPassword, setAdminPassword] = useState('1234');
+      const [newPassword, setNewPassword] = useState('');
+      const [confirmPassword, setConfirmPassword] = useState('');
+      const [customFishNames, setCustomFishNames] = useState(null);
 
-      const fishes = [
-        { id: 'worry', name: '걱정', image: 'mindaquarium_worry.png' },
-        { id: 'fear', name: '무서움', image: 'mindaquarium_fear.png' },
-        { id: 'anger', name: '화남', image: 'mindaquarium_angry.png' },
-        { id: 'secret', name: '비밀', image: 'mindaquarium_secret.png' },
-        { id: 'fun', name: '재미', image: 'mindaquarium_fun.png' },
-        { id: 'shy', name: '부끄러움', image: 'mindaquarium_shy.png' },
-        { id: 'happy', name: '행복', image: 'mindaquarium_happy.png' }
-      ];
+      const defaultFishes = [
+       { id: 'worry', defaultName: '걱정', color: '노란색', image: 'mindaquarium_worry.png' },
+        { id: 'fear', defaultName: '무서움', color: '파란색', image: 'mindaquarium_fear.png' },
+       { id: 'anger', defaultName: '화남', color: '빨간색', image: 'mindaquarium_angry.png' },
+        { id: 'secret', defaultName: '비밀', color: '보라색', image: 'mindaquarium_secret.png' },
+        { id: 'fun', defaultName: '재미', color: '초록색', image: 'mindaquarium_fun.png' },
+        { id: 'shy', defaultName: '부끄러움', color: '핑크색', image: 'mindaquarium_shy.png' },
+        { id: 'happy', defaultName: '행복', color: '하얀색', image: 'mindaquarium_happy.png' }
+         ];
+
+const fishes = defaultFishes.map(fish => ({
+  ...fish,
+  name: customFishNames?.[fish.id] || fish.defaultName
+}));
 
       useEffect(() => {
-        if (!window.database) return;
-        setFirebaseConnected(true);
+        const unsubscribe = window.auth.onAuthStateChanged((currentUser) => {
+      setUser(currentUser);
+       setAuthLoading(false);
+      if (currentUser) {
+       console.log('로그인됨:', currentUser.email);
+     } else {
+      console.log('로그아웃됨');
+      setMode('auth');
+      }
+      });
+     return () => unsubscribe();
+       }, []);
+
+       useEffect(() => {
+        if (!window.database || !user) return; 
+         setFirebaseConnected(true);
 
         try {
-          const messagesRef = window.dbRef(window.database, 'messages');
-          window.dbOnValue(messagesRef, (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-              const messagesArray = Array.isArray(data) ? data : Object.values(data);
-              setMessages(messagesArray.filter(m => m && m.id));
-            } else {
-              setMessages([]);
-            }
-          });
+          const messagesRef = window.dbRef(window.database, `users/${user.uid}/messages`);
+    window.dbOnValue(messagesRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const messagesArray = Array.isArray(data) ? data : Object.values(data);
+        setMessages(messagesArray.filter(m => m && m.id));
+      } else {
+        setMessages([]);
+      }
+    });
 
-          const historyRef = window.dbRef(window.database, 'feedingHistory');
-          window.dbOnValue(historyRef, (snapshot) => {
-            const data = snapshot.val();
-            if (data) setFeedingHistory(data);
-          });
+    const historyRef = window.dbRef(window.database, `users/${user.uid}/feedingHistory`);
+    window.dbOnValue(historyRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) setFeedingHistory(data);
+    });
 
-          const kingLetterRef = window.dbRef(window.database, 'kingLetter');
-          window.dbOnValue(kingLetterRef, (snapshot) => {
-            const data = snapshot.val();
-            if (data) setKingLetterContent(data);
-          });
+    const kingLetterRef = window.dbRef(window.database, `users/${user.uid}/kingLetter`);
+    window.dbOnValue(kingLetterRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) setKingLetterContent(data);
+    });
 
-          const readStatusRef = window.dbRef(window.database, 'hasReadKingLetter');
-          window.dbOnValue(readStatusRef, (snapshot) => {
-            const data = snapshot.val();
-            if (data) setHasReadKingLetter(data);
-          });
-        } catch (error) {
-          console.error('Firebase error:', error);
-        }
-      }, []);
+    const readStatusRef = window.dbRef(window.database, `users/${user.uid}/hasReadKingLetter`);
+    window.dbOnValue(readStatusRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) setHasReadKingLetter(data);
+    });
 
-      const saveToFirebase = async (path, data) => {
-        setLoading(true);
-        try {
-          await window.dbSet(window.dbRef(window.database, path), data);
-          await new Promise(resolve => setTimeout(resolve, 300));
-        } catch (error) {
-          console.error('Save error:', error);
-          alert('저장에 실패했습니다.');
-        } finally {
-          setLoading(false);
-        }
-      };
+    const passwordRef = window.dbRef(window.database, `users/${user.uid}/adminPassword`);
+    window.dbOnValue(passwordRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) setAdminPassword(data);
+    });
+
+    const fishNamesRef = window.dbRef(window.database, `users/${user.uid}/customFishNames`);
+    window.dbOnValue(fishNamesRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) setCustomFishNames(data);
+    });
+  } catch (error) {
+    console.error('Firebase error:', error);
+  }
+}, [user]);
+
+  const saveToFirebase = async (path, data) => {
+     if (!user) {
+     alert('로그인이 필요합니다.');
+      return;
+     }
+   setLoading(true);
+   try {
+     await window.dbSet(window.dbRef(window.database, `users/${user.uid}/${path}`), data);
+     await new Promise(resolve => setTimeout(resolve, 300));
+   } catch (error) {
+    console.error('Save error:', error);
+    alert('저장에 실패했습니다.');
+  } finally {
+    setLoading(false);
+  }
+};
 
       const getTodayString = () => new Date().toISOString().split('T')[0];
       const getTotalDays = () => Object.keys(feedingHistory).length;
@@ -360,7 +493,7 @@
       };
 
       const handleAdminLogin = () => {
-        if (password === '1234') {
+        if (password === 'adminPassword') {
           setMode('admin');
           setPassword('');
         } else {
@@ -374,17 +507,169 @@
           alert('편지 내용을 입력해주세요.');
           return;
         }
+        if (getTotalDays() < 30 && kingLetterContent) {
+    alert('이미 편지가 저장되어 있습니다. 아이가 30일을 달성하고 편지를 읽으면 새로운 편지를 작성할 수 있습니다.');
+    return;
+  }
         await saveToFirebase('kingLetter', parentLetter);
         setKingLetterContent(parentLetter);
         alert('물고기 왕의 편지가 저장되었습니다!');
         setParentLetter('');
       };
 
-      const readKingLetter = async () => {
-        setMode('kingLetter');
-        setHasReadKingLetter(true);
-        await saveToFirebase('hasReadKingLetter', true);
+      const changePassword = async () => {
+        if (!newPassword.trim()) {
+          alert('새 비밀번호를 입력해주세요.');
+          return;
+        }
+        if (newPassword !== confirmPassword) {
+          alert('비밀번호가 일치하지 않습니다.');
+          return;
+        }
+        if (newPassword.length < 4) {
+          alert('비밀번호는 4자 이상이어야 합니다.');
+          return;
+        }
+        
+        await saveToFirebase('adminPassword', newPassword);
+        setAdminPassword(newPassword);
+        setNewPassword('');
+        setConfirmPassword('');
+        alert('비밀번호가 변경되었습니다!');
       };
+
+      const saveFishNames = async (names) => {
+        await saveToFirebase('customFishNames', names);
+        setCustomFishNames(names);
+        alert('물고기 이름이 저장되었습니다!');
+      
+      };
+
+const readKingLetter = async () => {
+  setMode('kingLetter');
+  setHasReadKingLetter(true);
+  await saveToFirebase('hasReadKingLetter', true);
+};
+        
+const handleSignUp = async () => {
+  if (!email.trim() || !password.trim()) {
+    alert('이메일과 비밀번호를 입력해주세요.');
+    return;
+  }
+  if (password !== confirmPassword) {
+    alert('비밀번호가 일치하지 않습니다.');
+    return;
+  }
+  if (password.length < 6) {
+    alert('비밀번호는 6자 이상이어야 합니다.');
+    return;
+  }
+  if (!childName.trim()) {
+    alert('아이 이름을 입력해주세요.');
+    return;
+  }
+
+  setLoading(true);
+  try {
+    const userCredential = await createUserWithEmailAndPassword(window.auth, email, password);
+    const newUser = userCredential.user;
+    
+    // 초기 프로필 저장
+    await window.dbSet(window.dbRef(window.database, `users/${newUser.uid}/profile`), {
+      email: email,
+      childName: childName,
+      createdAt: new Date().toISOString()
+    });
+    
+    // 기본 관리자 비밀번호 설정
+await window.dbSet(window.dbRef(window.database, `users/${newUser.uid}/adminPassword`), '1234');
+    
+    alert('회원가입이 완료되었습니다!');
+    setMode('intro');
+  } catch (error) {
+    console.error('SignUp error:', error);
+    if (error.code === 'auth/email-already-in-use') {
+      alert('이미 사용 중인 이메일입니다.');
+    } else if (error.code === 'auth/invalid-email') {
+      alert('잘못된 이메일 형식입니다.');
+    } else {
+      alert('회원가입에 실패했습니다: ' + error.message);
+    }
+  } finally {
+    setLoading(false);
+  }
+};
+
+const handleSignIn = async () => {
+  if (!email.trim() || !password.trim()) {
+    alert('이메일과 비밀번호를 입력해주세요.');
+    return;
+  }
+
+  setLoading(true);
+  try {
+await window.signInWithEmailAndPassword(window.auth, email, password);
+    setMode('intro');
+  } catch (error) {
+    console.error('SignIn error:', error);
+    if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+      alert('이메일 또는 비밀번호가 잘못되었습니다.');
+    } else {
+      alert('로그인에 실패했습니다: ' + error.message);
+    }
+  } finally {
+    setLoading(false);
+  }
+};
+
+const handleGoogleSignIn = async () => {
+  setLoading(true);
+  try {
+    const provider = new GoogleAuthProvider();
+const result = await signInWithPopup(window.auth, provider);
+    const newUser = result.user;
+    
+    // 프로필이 없으면 생성
+    const profileRef = window.dbRef(window.database, `users/${newUser.uid}/profile`);
+    const profileSnapshot = await new Promise(resolve => {
+      window.dbOnValue(profileRef, resolve, { onlyOnce: true });
+    });
+    
+    if (!profileSnapshot.val()) {
+      await window.dbSet(profileRef, {
+        email: newUser.email,
+        childName: '아이',
+        createdAt: new Date().toISOString()
+      });
+      await window.dbSet(window.dbRef(window.database, `users/${newUser.uid}/adminPassword`), '1234');
+    }
+    
+    setMode('intro');
+  } catch (error) {
+    console.error('Google SignIn error:', error);
+    alert('Google 로그인에 실패했습니다: ' + error.message);
+  } finally {
+    setLoading(false);
+  }
+};
+
+const handleSignOut = async () => {
+  if (confirm('로그아웃 하시겠습니까?')) {
+    try {
+      await signOut(window.auth);
+      setMode('auth');
+      // 모든 상태 초기화
+      setMessages([]);
+      setFeedingHistory({});
+      setKingLetterContent('');
+      setHasReadKingLetter(false);
+      setCustomFishNames(null);
+    } catch (error) {
+      console.error('SignOut error:', error);
+      alert('로그아웃에 실패했습니다.');
+    }
+  }
+};
 
       if (loading) {
         return (
@@ -396,7 +681,116 @@
           </div>
         );
       }
+      if (authLoading) {
+  return (
+    <div className="fixed inset-0 bg-gradient-to-b from-blue-200 to-blue-400 flex items-center justify-center">
+      <div className="text-white text-2xl font-bold">마음 어항을 준비하고 있어요...</div>
+    </div>
+  );
+}
 
+if (!user || mode === 'auth') {
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-blue-200 to-blue-400 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full">
+        <div className="text-center mb-6">
+          <h1 className="text-3xl font-bold text-blue-600 mb-2">🐠 마음 어항 🐠</h1>
+          <p className="text-gray-600">{isSignUp ? '새 계정 만들기' : '로그인'}</p>
+        </div>
+
+        <div className="space-y-4">
+          {isSignUp && (
+            <div>
+              <label className="block text-sm font-bold mb-1 text-gray-700">아이 이름</label>
+              <input
+                type="text"
+                value={childName}
+                onChange={(e) => setChildName(e.target.value)}
+                placeholder="예: 민수"
+                className="w-full border-2 border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+          )}
+
+          <div>
+            <label className="block text-sm font-bold mb-1 text-gray-700">이메일</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="example@email.com"
+              className="w-full border-2 border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold mb-1 text-gray-700">비밀번호</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder={isSignUp ? '6자 이상 입력' : '비밀번호'}
+              className="w-full border-2 border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:outline-none"
+            />
+          </div>
+
+          {isSignUp && (
+            <div>
+              <label className="block text-sm font-bold mb-1 text-gray-700">비밀번호 확인</label>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="비밀번호 다시 입력"
+                className="w-full border-2 border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+          )}
+
+          <button
+            onClick={isSignUp ? handleSignUp : handleSignIn}
+            className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition"
+          >
+            {isSignUp ? '회원가입' : '로그인'}
+          </button>
+
+          <div className="relative my-4">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-gray-500">또는</span>
+            </div>
+          </div>
+
+          <button
+            onClick={handleGoogleSignIn}
+            className="w-full bg-white border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-bold hover:bg-gray-50 transition flex items-center justify-center gap-2"
+          >
+            <svg className="w-5 h-5" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            Google로 계속하기
+          </button>
+
+          <button
+            onClick={() => setIsSignUp(!isSignUp)}
+            className="w-full text-blue-600 py-2 text-sm hover:underline"
+          >
+            {isSignUp ? '이미 계정이 있으신가요? 로그인' : '계정이 없으신가요? 회원가입'}
+          </button>
+        </div>
+
+        <div className="text-center text-gray-500 text-xs mt-6">
+          <p>© 2024 Grace. All rights reserved.</p>
+        </div>
+      </div>
+    </div>
+  );
+}
       if (mode === 'intro') {
         return (
           <div className="relative min-h-screen overflow-hidden" style={{
@@ -468,6 +862,14 @@
                   <Lock />
                   <span className="text-xs md:text-base">관리자 모드</span>
                 </button>
+              
+                <button
+  onClick={handleSignOut}
+  className="text-white/60 hover:text-white/80 transition text-xs md:text-sm"
+>
+  {user?.email} | 로그아웃
+</button>
+
                 
                 <div className="text-white/50 text-xs text-center">
                   <p>© 2024 Grace. All rights reserved.</p>
@@ -502,7 +904,12 @@
         );
       }
 
+      
       if (mode === 'admin') {
+        const totalDays = getTotalDays();
+        const canEditKingLetter = totalDays >= 30 && hasReadKingLetter;
+        const hasKingLetter = !!kingLetterContent;
+
         return (
           <div className="fixed inset-0 bg-gray-100 overflow-hidden">
             <div className="h-full overflow-y-auto">
@@ -517,32 +924,94 @@
                   </button>
                 </div>
 
+                {/* 비밀번호 변경 */}
+                <div className="bg-red-50 border-2 border-red-300 rounded-lg p-6 mb-6">
+                  <h3 className="text-xl font-bold mb-4">🔒 관리자 비밀번호 변경</h3>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-sm font-bold mb-1">새 비밀번호 (4자 이상)</label>
+                      <input
+                        type="password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        placeholder="새 비밀번호 입력"
+                        className="w-full border-2 border-gray-300 rounded-lg p-3"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold mb-1">비밀번호 확인</label>
+                      <input
+                        type="password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="비밀번호 다시 입력"
+                        className="w-full border-2 border-gray-300 rounded-lg p-3"
+                      />
+                    </div>
+                    <button
+                      onClick={changePassword}
+                      className="w-full bg-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-700 transition"
+                    >
+                      비밀번호 변경
+                    </button>
+                  </div>
+                </div>
+
+                {/* 물고기 이름 설정 */}
+                <FishNameEditor 
+                  defaultFishes={defaultFishes}
+                  customFishNames={customFishNames}
+                  onSave={saveFishNames}
+                />
+
+                {/* 물고기 왕의 편지 */}
                 <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-6 mb-6">
                   <div className="flex items-center gap-2 mb-4">
                     <Crown />
-                    <h3 className="text-xl font-bold">물고기 왕의 편지 (30일 달성 시 표시)</h3>
+                    <h3 className="text-xl font-bold">물고기 왕의 편지</h3>
                   </div>
-                  <textarea
-                    value={parentLetter}
-                    onChange={(e) => setParentLetter(e.target.value)}
-                    placeholder="아이에게 보낼 격려의 편지를 작성하세요..."
-                    className="w-full border-2 border-gray-300 rounded-lg p-3 mb-3 h-32"
-                    maxLength={300}
-                  />
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">{parentLetter.length}/300자</span>
-                    <button onClick={saveKingLetter} className="bg-yellow-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-yellow-600">
-                      편지 저장
-                    </button>
+                  
+                  <div className="bg-white rounded-lg p-4 mb-4 border-2 border-yellow-200">
+                    <p className="text-sm font-bold mb-2">📊 현재 상태:</p>
+                    <p className="text-gray-700">• 달성 일수: {totalDays}/30일</p>
+                    <p className="text-gray-700">• 저장된 편지: {hasKingLetter ? '있음' : '없음'}</p>
+                    <p className="text-gray-700">• 아이가 읽음: {hasReadKingLetter ? '예' : '아니오'}</p>
+                    {totalDays >= 30 && !hasReadKingLetter && hasKingLetter && (
+                      <p className="text-green-600 font-bold mt-2">✅ 아이가 편지를 받을 수 있습니다!</p>
+                    )}
                   </div>
-                  {kingLetterContent && (
-                    <div className="mt-4 p-4 bg-white rounded-lg border border-yellow-300">
-                      <p className="text-sm font-bold mb-2">현재 저장된 편지:</p>
-                      <p className="text-gray-700 whitespace-pre-wrap">{kingLetterContent}</p>
+
+                  {(!hasKingLetter || canEditKingLetter) ? (
+                    <>
+                      <textarea
+                        value={parentLetter}
+                        onChange={(e) => setParentLetter(e.target.value)}
+                        placeholder="아이에게 보낼 격려의 편지를 작성하세요..."
+                        className="w-full border-2 border-gray-300 rounded-lg p-3 mb-3 h-32"
+                        maxLength={300}
+                      />
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600">{parentLetter.length}/300자</span>
+                        <button
+                          onClick={saveKingLetter}
+                          className="bg-yellow-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-yellow-600"
+                        >
+                          편지 저장
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="bg-yellow-100 border-2 border-yellow-400 rounded-lg p-4">
+                      <p className="text-sm font-bold mb-2 text-yellow-800">💌 현재 저장된 편지:</p>
+                      <p className="text-gray-700 whitespace-pre-wrap mb-3">{kingLetterContent}</p>
+                      <p className="text-sm text-yellow-700">
+                        ℹ️ 아이가 30일을 달성하고 편지를 읽으면 새로운 편지를 작성할 수 있습니다.
+                      </p>
                     </div>
                   )}
                 </div>
 
+                {/* 수신 편지함 */}
                 <div className="bg-white rounded-lg shadow-lg p-6">
                   <h3 className="text-2xl font-bold mb-4 flex items-center gap-2">
                     <Mail />
