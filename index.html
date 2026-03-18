@@ -656,7 +656,7 @@ function KingLetterScreen({ content, goalCount, onBack }) {
   );
 }
 
-function AquariumScreen({ fishes, cycleCount, goalCount, pendingKingLetter, onFishClick, onReadKingLetter, onBack }) {
+function AquariumScreen({ fishes, cycleCount, goalCount, pendingKingLetter, messages, onFishClick, onReadKingLetter, onBack }) {
   const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
@@ -694,15 +694,9 @@ function AquariumScreen({ fishes, cycleCount, goalCount, pendingKingLetter, onFi
       )}
 
       <div className="relative z-20 text-center pt-4 pb-2">
-        <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-lg">🐠 마음 어항 🐠</h1>
         <div className="bg-white/90 rounded-lg p-3 inline-block mx-auto max-w-xs">
           <p className="text-xs text-gray-600 mb-1">물고기에게 마음을 나눠준 횟수</p>
-          <div className="flex gap-1 justify-center mb-1 flex-wrap">
-            {dots.map((_,i) =>
-              <div key={i} className={`w-2.5 h-2.5 rounded-full ${i < cycleCount ? 'bg-blue-500' : 'bg-gray-300'}`} />
-            )}
-          </div>
-          <p className="text-xl font-bold text-blue-600">{cycleCount} / {goalCount}번</p>
+          <p className="text-3xl font-bold text-blue-600">{messages.length}번</p>
         </div>
       </div>
 
@@ -803,7 +797,7 @@ function App() {
           const rawCount = msgs
             ? (Array.isArray(msgs) ? msgs.filter(m=>m&&m.id).length : Object.values(msgs).filter(m=>m&&m.id).length)
             : 0;
-          updates['cycleCount'] = rawCount >= g ? 0 : rawCount;
+          updates['cycleCount'] = rawCount % g;
         }
 
         // 구버전 kingLetter → 새 구조로 이동
@@ -919,6 +913,7 @@ function App() {
       {mode === 'aquarium'   && (
         <AquariumScreen
           fishes={fishes}
+          messages={messages}
           cycleCount={cycleCount}
           goalCount={goalCount}
           pendingKingLetter={pendingKingLetter}
