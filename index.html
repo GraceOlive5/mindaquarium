@@ -418,15 +418,13 @@ function AdminLoginScreen({ onSuccess, onBack }) {
 }
 
 /* ── 관리자 메인 (탭 + 토글) ── */
-function AdminScreen({ uid, messages, feedingHistory, kingLetterContent, hasReadKingLetter, adminPassword, customFishNames, firebaseConnected, onSave, onExit }) {
+function AdminScreen({ messages, goalCount, cycleCount, pendingKingLetter, kingLetterHistory, adminPassword, customFishNames, firebaseConnected, onSave, onExit }) {
   const [tab, setTab] = useState('mail');
-  const [parentLetter, setParentLetter] = useState('');
+  const [draftLetter, setDraftLetter] = useState('');
+  const [editingLetter, setEditingLetter] = useState(false);
+  const [goalInput, setGoalInput] = useState(String(goalCount));
   const [newPw, setNewPw] = useState('');
   const [confirmPw, setConfirmPw] = useState('');
-
-  const totalDays = Object.keys(feedingHistory).length;
-  const canEdit = totalDays >= 30 && hasReadKingLetter;
-  const hasLetter = !!kingLetterContent;
 
   const TABS = [
     { id:'mail', label:'📬 편지함' },
@@ -435,12 +433,21 @@ function AdminScreen({ uid, messages, feedingHistory, kingLetterContent, hasRead
     { id:'pw',   label:'🔒 비밀번호' },
   ];
 
+  // 왕의 편지 저장 (새로 작성 or 수정)
   const saveKingLetter = async () => {
-    if (!parentLetter.trim()) { alert('편지 내용을 입력해주세요.'); return; }
-    if (totalDays < 30 && hasLetter) { alert('이미 편지가 저장되어 있습니다.'); return; }
-    await onSave('kingLetter', parentLetter);
+    if (!draftLetter.trim()) { alert('편지 내용을 입력해주세요.'); return; }
+    await onSave('pendingKingLetter', draftLetter);
+    setDraftLetter('');
+    setEditingLetter(false);
     alert('저장되었습니다!');
-    setParentLetter('');
+  };
+
+  // 목표 횟수 저장
+  const saveGoal = async () => {
+    const n = parseInt(goalInput);
+    if (isNaN(n) || n < 1) { alert('올바른 숫자를 입력해주세요.'); return; }
+    await onSave('goalCount', n);
+    alert(`목표 횟수가 ${n}번으로 설정되었습니다!`);
   };
 
   const changePw = async () => {
@@ -452,6 +459,9 @@ function AdminScreen({ uid, messages, feedingHistory, kingLetterContent, hasRead
     alert('변경되었습니다!');
   };
 
+  const hasPending = !!pendingKingLetter;
+  const history = kingLetterHistory ? (Array.isArray(kingLetterHistory) ? kingLetterHistory : Object.values(kingLetterHistory)) : [];
+
   return (
     <div className="admin-wrap">
       <div className="admin-scroll">
@@ -460,9 +470,7 @@ function AdminScreen({ uid, messages, feedingHistory, kingLetterContent, hasRead
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'1.5rem' }}>
             <div>
               <span style={{ fontSize:'20px', fontWeight:700 }}>관리자 모드</span>
-              {firebaseConnected && <div style={{ fontSize:'12px', color:'##2E2E2E', marginTop:'2px' }}>관리자페이지는 아이의 마음 어항을 살펴보고 필요한 정보를 조정하는 공간이에요.<br>
-아이들이 남긴 마음은 양육자 분들도 마음으로 읽고, 알은 체 말아주세요.<br>
-아이들이 눈치 보지 않고 자유롭게 마음을 가꿀 수 있도록 도와주세요.</div>}
+              {firebaseConnected && <div style={{ fontSize:'12px', color:'#16a34a', marginTop:'2px' }}>🔥 실시간 동기화 중</div>}
             </div>
             <button onClick={onExit} className="a-btn btn-gray">나가기</button>
           </div>
@@ -505,30 +513,78 @@ function AdminScreen({ uid, messages, feedingHistory, kingLetterContent, hasRead
           )}
 
           {/* 👑 왕의 편지 */}
-          {tab === 'king' && (
-            <AdminSection title="물고기 왕의 편지">
-              <div className="sbar">
-                달성: {totalDays}/30일 &nbsp;·&nbsp; 편지: {hasLetter?'있음':'없음'} &nbsp;·&nbsp; 읽음: {hasReadKingLetter?'예':'아니오'}
-                {totalDays>=30 && !hasReadKingLetter && hasLetter &&
-                  <div style={{ color:'#16a34a', fontWeight:600, marginTop:'4px' }}>✅ 아이가 편지를 받을 수 있습니다!</div>}
+          {tab === 'king' && (<>
+            {/* 목표 횟수 설정 */}
+            <AdminSection title="목표 횟수 설정">
+              <div className="sbar" style={{ marginBottom:'12px' }}>
+                현재 사이클: <strong>{cycleCount}</strong> / <strong>{goalCount}</strong>번 &nbsp;·&nbsp;
+                목표 달성 시 왕의 편지가 발송됩니다
               </div>
-              {(!hasLetter || canEdit) ? <>
-                <textarea value={parentLetter} onChange={e=>setParentLetter(e.target.value)}
-                  placeholder="아이에게 보낼 격려의 편지를 작성하세요..." maxLength={300}
-                  className="a-textarea" style={{ height:'100px', marginBottom:'8px' }} />
-                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-                  <span style={{ fontSize:'12px', color:'#9ca3af' }}>{parentLetter.length}/300자</span>
-                  <button onClick={saveKingLetter} className="a-btn btn-amber">편지 저장</button>
+              <div style={{ display:'flex', gap:'8px', alignItems:'center' }}>
+                <input type="number" min="1" value={goalInput} onChange={e=>setGoalInput(e.target.value)}
+                  className="a-input" style={{ maxWidth:'100px' }} />
+                <span style={{ fontSize:'13px', color:'#6b7280' }}>번마다 왕의 편지 발송</span>
+                <button onClick={saveGoal} className="a-btn btn-blue" style={{ marginLeft:'auto' }}>저장</button>
+              </div>
+            </AdminSection>
+
+            {/* 미발송 편지 */}
+            <AdminSection title="대기 중인 왕의 편지">
+              {hasPending && !editingLetter ? (
+                <div>
+                  <div style={{ background:'#fffbeb', border:'1px solid #fcd34d', borderRadius:'8px', padding:'12px', marginBottom:'10px' }}>
+                    <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'6px' }}>
+                      <span style={{ fontSize:'13px', fontWeight:600, color:'#92400e' }}>💌 저장된 편지 (미발송)</span>
+                      <span style={{ fontSize:'11px', background:'#fef3c7', color:'#d97706', padding:'2px 8px', borderRadius:'99px' }}>대기 중</span>
+                    </div>
+                    <p style={{ fontSize:'13px', whiteSpace:'pre-wrap', color:'#374151', marginBottom:'10px' }}>{pendingKingLetter}</p>
+                    <button onClick={() => { setDraftLetter(pendingKingLetter); setEditingLetter(true); }}
+                      className="a-btn btn-amber" style={{ width:'100%' }}>✏️ 수정하기</button>
+                  </div>
                 </div>
-              </> : (
-                <div style={{ background:'#fffbeb', border:'1px solid #fcd34d', borderRadius:'8px', padding:'12px' }}>
-                  <p style={{ fontSize:'13px', fontWeight:600, color:'#92400e', marginBottom:'6px' }}>💌 저장된 편지:</p>
-                  <p style={{ fontSize:'13px', whiteSpace:'pre-wrap', marginBottom:'8px' }}>{kingLetterContent}</p>
-                  <p style={{ fontSize:'12px', color:'#b45309' }}>ℹ️ 아이가 30일 달성 후 편지를 읽으면 새 편지를 작성할 수 있습니다.</p>
+              ) : (
+                <div>
+                  {editingLetter && (
+                    <p style={{ fontSize:'12px', color:'#f59e0b', marginBottom:'8px', fontWeight:600 }}>✏️ 편지를 수정 중입니다</p>
+                  )}
+                  <textarea
+                    value={draftLetter}
+                    onChange={e=>setDraftLetter(e.target.value)}
+                    placeholder="아이에게 보낼 격려의 편지를 작성하세요... (목표 횟수 달성 시 자동 발송)"
+                    maxLength={300}
+                    className="a-textarea" style={{ height:'110px', marginBottom:'8px' }}
+                  />
+                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                    <span style={{ fontSize:'12px', color:'#9ca3af' }}>{draftLetter.length}/300자</span>
+                    <div style={{ display:'flex', gap:'8px' }}>
+                      {editingLetter && (
+                        <button onClick={() => { setDraftLetter(''); setEditingLetter(false); }} className="a-btn btn-gray">취소</button>
+                      )}
+                      <button onClick={saveKingLetter} className="a-btn btn-amber">
+                        {editingLetter ? '수정 저장' : '편지 저장'}
+                      </button>
+                    </div>
+                  </div>
                 </div>
               )}
             </AdminSection>
-          )}
+
+            {/* 발송 기록 */}
+            <AdminSection title="발송된 편지 기록" badge={`${history.length}개`} defaultOpen={false}>
+              {history.length === 0
+                ? <p style={{ color:'#9ca3af', textAlign:'center', padding:'12px 0', fontSize:'13px' }}>아직 발송된 편지가 없습니다.</p>
+                : history.slice().reverse().map((h, i) => (
+                  <div key={i} className="lcard" style={{ background:'#f9fafb' }}>
+                    <div style={{ display:'flex', justifyContent:'space-between', marginBottom:'4px' }}>
+                      <span style={{ fontSize:'12px', fontWeight:600, color:'#6b7280' }}>#{history.length - i}번째 발송</span>
+                      <span style={{ fontSize:'11px', color:'#9ca3af' }}>{h.sentAt}</span>
+                    </div>
+                    <p style={{ fontSize:'13px', whiteSpace:'pre-wrap', color:'#374151', margin:0 }}>{h.content}</p>
+                  </div>
+                ))
+              }
+            </AdminSection>
+          </>)}
 
           {/* 🔒 비밀번호 */}
           {tab === 'pw' && (
@@ -578,7 +634,7 @@ function LetterScreen({ fish, onSend, onCancel }) {
   );
 }
 
-function KingLetterScreen({ content, onBack }) {
+function KingLetterScreen({ content, goalCount, onBack }) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-yellow-200 to-yellow-400 p-6">
       <div className="max-w-2xl mx-auto">
@@ -586,7 +642,7 @@ function KingLetterScreen({ content, onBack }) {
           <div className="text-center mb-6">
             <div className="text-6xl mb-4">👑</div>
             <h2 className="text-3xl font-bold mb-2">물고기 왕의 편지</h2>
-            <p className="text-gray-600">30일 동안 물고기들을 돌봐줘서 고마워요!</p>
+            <p className="text-gray-600">마음을 {goalCount}번 나눠줘서 고마워요!</p>
           </div>
           <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-6 mb-6">
             <p className="text-lg whitespace-pre-wrap leading-relaxed">{content}</p>
@@ -600,33 +656,66 @@ function KingLetterScreen({ content, onBack }) {
   );
 }
 
-function AquariumScreen({ fishes, feedingHistory, kingLetterContent, hasReadKingLetter, onFishClick, onReadKingLetter, onBack }) {
-  const totalDays = Object.keys(feedingHistory).length;
-  const canShow = totalDays >= 30 && kingLetterContent && !hasReadKingLetter;
+function AquariumScreen({ fishes, cycleCount, goalCount, pendingKingLetter, onFishClick, onReadKingLetter, onBack }) {
+  const [showPopup, setShowPopup] = useState(false);
+
+  useEffect(() => {
+    if (cycleCount >= goalCount && pendingKingLetter) {
+      const t = setTimeout(() => setShowPopup(true), 600);
+      return () => clearTimeout(t);
+    }
+  }, [cycleCount, goalCount, pendingKingLetter]);
+
+  const dots = Array.from({ length: goalCount <= 50 ? goalCount : 50 });
+
   return (
     <div className="relative min-h-screen overflow-hidden"
       style={{ backgroundImage:'url(mindaquarium_bg.png)', backgroundSize:'cover', backgroundPosition:'center' }}>
       <Bubbles n={25} />
+
+      {/* 왕의 편지 팝업 */}
+      {showPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6"
+          style={{ background:'rgba(0,0,0,0.6)' }}>
+          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center">
+            <div className="text-5xl mb-3">👑</div>
+            <h3 className="text-2xl font-bold mb-2">물고기 왕이 편지를 보냈어요!</h3>
+            <p className="text-gray-500 text-sm mb-6">마음을 {goalCount}번 나눠줬어요 🎉</p>
+            <button onClick={() => { setShowPopup(false); onReadKingLetter(); }}
+              className="w-full bg-yellow-400 text-gray-800 py-3 rounded-xl font-bold text-lg hover:bg-yellow-500 transition mb-3">
+              편지 읽기 💌
+            </button>
+            <button onClick={() => setShowPopup(false)}
+              className="w-full text-gray-400 text-sm hover:text-gray-600 transition">
+              나중에 읽기
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="relative z-20 text-center pt-4 pb-2">
         <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-lg">🐠 마음 어항 🐠</h1>
         <div className="bg-white/90 rounded-lg p-3 inline-block mx-auto max-w-xs">
-          <p className="text-xs text-gray-600 mb-1">물고기에게 먹이 준 날</p>
+          <p className="text-xs text-gray-600 mb-1">물고기에게 마음을 나눠준 횟수</p>
           <div className="flex gap-1 justify-center mb-1 flex-wrap">
-            {Array.from({length:30}).map((_,i) =>
-              <div key={i} className={`w-2.5 h-2.5 rounded-full ${i<totalDays?'bg-blue-500':'bg-gray-300'}`} />
+            {dots.map((_,i) =>
+              <div key={i} className={`w-2.5 h-2.5 rounded-full ${i < cycleCount ? 'bg-blue-500' : 'bg-gray-300'}`} />
             )}
           </div>
-          <p className="text-xl font-bold text-blue-600">{totalDays} / 30일</p>
+          <p className="text-xl font-bold text-blue-600">{cycleCount} / {goalCount}번</p>
         </div>
       </div>
-      {canShow && (
+
+      {/* 편지 대기 배너 (팝업 닫은 후에도 보임) */}
+      {cycleCount >= goalCount && pendingKingLetter && !showPopup && (
         <div className="relative z-20 px-6 mb-4">
           <button onClick={onReadKingLetter}
-            className="w-full max-w-2xl mx-auto block bg-yellow-400 text-gray-800 py-6 rounded-lg font-bold text-xl hover:bg-yellow-500 transition flex items-center justify-center gap-3 animate-pulse shadow-xl">
+            className="w-full max-w-2xl mx-auto block bg-yellow-400 text-gray-800 py-4 rounded-lg font-bold text-lg hover:bg-yellow-500 transition flex items-center justify-center gap-3 animate-pulse shadow-xl">
             👑 <span>물고기 왕이 편지를 보냈어요! 📬</span>
           </button>
         </div>
       )}
+
       <div className="relative w-full h-screen">
         {fishes.map((fish, i) =>
           <SwimmingFish key={fish.id} fish={fish} index={i} onClick={() => onFishClick(fish)} />
@@ -655,11 +744,15 @@ function App() {
 
   const [messages, setMessages] = useState([]);
   const [feedingHistory, setFeedingHistory] = useState({});
-  const [kingLetterContent, setKingLetterContent] = useState('');
-  const [hasReadKingLetter, setHasReadKingLetter] = useState(false);
+  const [goalCount, setGoalCount] = useState(30);
+  const [cycleCount, setCycleCount] = useState(0);
+  const [pendingKingLetter, setPendingKingLetter] = useState('');
+  const [kingLetterHistory, setKingLetterHistory] = useState([]);
   const [adminPassword, setAdminPassword] = useState('1234');
   const [customFishNames, setCustomFishNames] = useState(null);
   const [selectedFish, setSelectedFish] = useState(null);
+  // 왕의 편지 읽기용: 팝업에서 읽기 누를 때 보여줄 내용 임시 저장
+  const [kingLetterToShow, setKingLetterToShow] = useState('');
 
   const fishes = DEFAULT_FISHES.map(f => ({ ...f, name: customFishNames?.[f.id] || f.defaultName }));
 
@@ -679,10 +772,63 @@ function App() {
     });
     listen('messages', d => setMessages(Array.isArray(d) ? d.filter(m=>m&&m.id) : Object.values(d).filter(m=>m&&m.id)));
     listen('feedingHistory', setFeedingHistory);
-    listen('kingLetter', setKingLetterContent);
-    listen('hasReadKingLetter', setHasReadKingLetter);
+    listen('goalCount', setGoalCount);
+    listen('cycleCount', setCycleCount);
+    listen('pendingKingLetter', setPendingKingLetter);
+    listen('kingLetterHistory', d => {
+      if (Array.isArray(d)) setKingLetterHistory(d.filter(Boolean));
+      else setKingLetterHistory(Object.values(d).filter(Boolean));
+    });
     listen('adminPassword', setAdminPassword);
     listen('customFishNames', setCustomFishNames);
+
+    // ── 마이그레이션: v2migrated 플래그가 없을 때 딱 한 번만 실행 ──
+    fa().onValue(fa().ref(db(), `users/${user.uid}/v2migrated`), snap => {
+      if (snap.val()) return; // 이미 마이그레이션 완료
+
+      // 필요한 데이터를 한 번에 읽어서 처리
+      const uid = user.uid;
+      Promise.all([
+        new Promise(r => fa().onValue(fa().ref(db(), `users/${uid}/messages`),      s => r(s.val()), { onlyOnce:true })),
+        new Promise(r => fa().onValue(fa().ref(db(), `users/${uid}/goalCount`),     s => r(s.val()), { onlyOnce:true })),
+        new Promise(r => fa().onValue(fa().ref(db(), `users/${uid}/cycleCount`),    s => r(s.val()), { onlyOnce:true })),
+        new Promise(r => fa().onValue(fa().ref(db(), `users/${uid}/kingLetter`),    s => r(s.val()), { onlyOnce:true })),
+        new Promise(r => fa().onValue(fa().ref(db(), `users/${uid}/hasReadKingLetter`), s => r(s.val()), { onlyOnce:true })),
+      ]).then(([msgs, goal, cycle, oldKingLetter, hasRead]) => {
+        const updates = {};
+        const g = goal || 30;
+
+        // cycleCount 없으면 messages 수 기반으로 초기화
+        if (cycle === null || cycle === undefined) {
+          const rawCount = msgs
+            ? (Array.isArray(msgs) ? msgs.filter(m=>m&&m.id).length : Object.values(msgs).filter(m=>m&&m.id).length)
+            : 0;
+          updates['cycleCount'] = rawCount >= g ? 0 : rawCount;
+        }
+
+        // 구버전 kingLetter → 새 구조로 이동
+        if (oldKingLetter) {
+          if (hasRead) {
+            updates['kingLetterHistory'] = [{ content: oldKingLetter, sentAt: '(이전 기록)' }];
+            updates['pendingKingLetter'] = '';
+          } else {
+            updates['pendingKingLetter'] = oldKingLetter;
+          }
+        }
+
+        // 마이그레이션 플래그 저장
+        updates['v2migrated'] = true;
+
+        // 한 번에 저장
+        Object.entries(updates).forEach(([k, v]) =>
+          fa().set(fa().ref(db(), `users/${uid}/${k}`), v)
+        );
+
+        // cycleCount 업데이트가 있으면 로컬 state도 반영
+        if (updates['cycleCount'] !== undefined) setCycleCount(updates['cycleCount']);
+        if (updates['pendingKingLetter'] !== undefined) setPendingKingLetter(updates['pendingKingLetter']);
+      });
+    }, { onlyOnce: true });
   }, [user]);
 
   const saveToFirebase = async (path, data) => {
@@ -698,8 +844,9 @@ function App() {
   const signOut = async () => {
     if (!confirm('로그아웃 하시겠습니까?')) return;
     await fa().signOut(auth());
-    setMessages([]); setFeedingHistory({}); setKingLetterContent('');
-    setHasReadKingLetter(false); setCustomFishNames(null);
+    setMessages([]); setFeedingHistory({});
+    setPendingKingLetter(''); setKingLetterHistory([]);
+    setCycleCount(0); setCustomFishNames(null);
     setMode('auth');
   };
 
@@ -709,21 +856,40 @@ function App() {
   };
 
   const feedFish = async (text) => {
+    // 편지 저장
     const updated = [...messages, { id:Date.now(), fish:selectedFish.name, content:text, date:new Date().toLocaleString('ko-KR') }];
     const today = new Date().toISOString().split('T')[0];
     const updatedHistory = { ...feedingHistory, [today]: true };
+    const newCycle = cycleCount + 1;
+
     await saveToFirebase('messages', updated);
     await saveToFirebase('feedingHistory', updatedHistory);
+    await saveToFirebase('cycleCount', newCycle);
     setMessages(updated);
     setFeedingHistory(updatedHistory);
+    setCycleCount(newCycle);
     setMode('aquarium');
-    if (Object.keys(updatedHistory).length >= 30 && kingLetterContent && !hasReadKingLetter)
-      setTimeout(() => alert('🎉 물고기 왕이 편지를 보냈어요!'), 500);
   };
 
+  // 왕의 편지 읽기: 발송 처리 + 기록 저장 + 리셋
   const readKingLetter = async () => {
+    const sentLetter = pendingKingLetter;
+    setKingLetterToShow(sentLetter);
+
+    const newHistory = [...kingLetterHistory, {
+      content: sentLetter,
+      sentAt: new Date().toLocaleString('ko-KR')
+    }];
+
+    // Firebase 업데이트: 기록에 추가, pendingKingLetter 삭제, cycleCount 리셋
+    await saveToFirebase('kingLetterHistory', newHistory);
+    await saveToFirebase('pendingKingLetter', '');
+    await saveToFirebase('cycleCount', 0);
+
+    setKingLetterHistory(newHistory);
+    setPendingKingLetter('');
+    setCycleCount(0);
     setMode('kingLetter');
-    await saveToFirebase('hasReadKingLetter', true);
   };
 
   if (mode === 'loading') return <LoadingScreen />;
@@ -736,11 +902,11 @@ function App() {
       {mode === 'adminLogin' && <AdminLoginScreen onSuccess={handleAdminLogin} onBack={() => setMode('intro')} />}
       {mode === 'admin'      && (
         <AdminScreen
-          uid={user?.uid}
           messages={messages}
-          feedingHistory={feedingHistory}
-          kingLetterContent={kingLetterContent}
-          hasReadKingLetter={hasReadKingLetter}
+          goalCount={goalCount}
+          cycleCount={cycleCount}
+          pendingKingLetter={pendingKingLetter}
+          kingLetterHistory={kingLetterHistory}
           adminPassword={adminPassword}
           customFishNames={customFishNames}
           firebaseConnected={firebaseConnected}
@@ -749,13 +915,13 @@ function App() {
         />
       )}
       {mode === 'letter'     && selectedFish && <LetterScreen fish={selectedFish} onSend={feedFish} onCancel={() => setMode('aquarium')} />}
-      {mode === 'kingLetter' && <KingLetterScreen content={kingLetterContent} onBack={() => setMode('aquarium')} />}
+      {mode === 'kingLetter' && <KingLetterScreen content={kingLetterToShow} goalCount={goalCount} onBack={() => setMode('aquarium')} />}
       {mode === 'aquarium'   && (
         <AquariumScreen
           fishes={fishes}
-          feedingHistory={feedingHistory}
-          kingLetterContent={kingLetterContent}
-          hasReadKingLetter={hasReadKingLetter}
+          cycleCount={cycleCount}
+          goalCount={goalCount}
+          pendingKingLetter={pendingKingLetter}
           onFishClick={fish => { setSelectedFish(fish); setMode('letter'); }}
           onReadKingLetter={readKingLetter}
           onBack={() => setMode('intro')}
