@@ -24,7 +24,6 @@
       overflow: hidden;
     }
     
-    /* Fish Animations */
     @keyframes swim1 {
       0% { transform: translate(0, 0) rotate(0deg); }
       14% { transform: translate(20vw, 8vh) rotate(3deg); }
@@ -35,7 +34,6 @@
       85% { transform: translate(8vw, 10vh) rotate(-2deg); }
       100% { transform: translate(0, 0) rotate(0deg); }
     }
-
     @keyframes swim2 {
       0% { transform: translate(0, 0) rotate(0deg); }
       15% { transform: translate(-25vw, -5vh) rotate(-3deg); }
@@ -46,7 +44,6 @@
       90% { transform: translate(-5vw, 3vh) rotate(2deg); }
       100% { transform: translate(0, 0) rotate(0deg); }
     }
-
     @keyframes swim3 {
       0% { transform: translate(0, 0) rotate(0deg); }
       12% { transform: translate(-15vw, 12vh) rotate(-2deg); }
@@ -58,7 +55,6 @@
       88% { transform: translate(-5vw, 5vh) rotate(-2deg); }
       100% { transform: translate(0, 0) rotate(0deg); }
     }
-
     @keyframes swim4 {
       0% { transform: translate(0, 0) rotate(0deg); }
       16% { transform: translate(18vw, -8vh) rotate(3deg); }
@@ -68,7 +64,6 @@
       80% { transform: translate(12vw, -5vh) rotate(2deg); }
       100% { transform: translate(0, 0) rotate(0deg); }
     }
-
     @keyframes swim5 {
       0% { transform: translate(0, 0) rotate(0deg); }
       13% { transform: translate(-20vw, 10vh) rotate(-3deg); }
@@ -80,7 +75,6 @@
       91% { transform: translate(-6vw, 5vh) rotate(-2deg); }
       100% { transform: translate(0, 0) rotate(0deg); }
     }
-
     @keyframes swim6 {
       0% { transform: translate(0, 0) rotate(0deg); }
       17% { transform: translate(12vw, -10vh) rotate(2deg); }
@@ -90,7 +84,6 @@
       85% { transform: translate(10vw, 3vh) rotate(2deg); }
       100% { transform: translate(0, 0) rotate(0deg); }
     }
-
     @keyframes swim7 {
       0% { transform: translate(0, 0) rotate(0deg); }
       14% { transform: translate(-18vw, -12vh) rotate(-3deg); }
@@ -101,7 +94,6 @@
       85% { transform: translate(-8vw, -3vh) rotate(3deg); }
       100% { transform: translate(0, 0) rotate(0deg); }
     }
-
     @keyframes bubble {
       0% { transform: translateY(0) scale(0.9); opacity: 0.9; }
       50% { transform: translateY(-50vh) scale(1.1); opacity: 0.7; }
@@ -111,52 +103,141 @@
     .bubble {
       position: absolute;
       bottom: -20px;
-      background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.9), rgba(200, 230, 255, 0.6));
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), rgba(200,230,255,0.6));
       border-radius: 50%;
       animation: bubble linear infinite;
-      box-shadow: inset -2px -2px 4px rgba(255, 255, 255, 0.5);
+      box-shadow: inset -2px -2px 4px rgba(255,255,255,0.5);
     }
-
     .fish-swimming {
       cursor: pointer;
       transition: all 0.3s ease;
-      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
       user-select: none;
       pointer-events: none;
     }
-
-    .fish-swimming:hover {
-      filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.6)) brightness(1.1);
-      transform: scale(1.1);
-      z-index: 40 !important;
-    }
-
     .fish-swimming img {
       pointer-events: none;
       width: 100%;
       height: 100%;
       object-fit: contain;
     }
-    
     .fish-click-area {
       position: absolute;
-      top: 25%;
-      left: 25%;
-      width: 50%;
-      height: 50%;
+      top: 25%; left: 25%;
+      width: 50%; height: 50%;
       cursor: pointer;
       pointer-events: auto;
       z-index: 1;
       transition: all 0.3s ease;
     }
-    
-    .fish-click-area:hover {
-      transform: scale(1.05);
-    }
-    
+    .fish-click-area:hover { transform: scale(1.05); }
     .fish-swimming:has(.fish-click-area:hover) {
-      filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.6)) brightness(1.1);
+      filter: drop-shadow(0 12px 24px rgba(0,0,0,0.6)) brightness(1.1);
       transform: scale(1.1);
+    }
+
+    /* Admin UI */
+    .admin-tab-btn {
+      padding: 10px 16px;
+      font-size: 13px;
+      border: none;
+      background: none;
+      border-bottom: 2px solid transparent;
+      color: #6b7280;
+      cursor: pointer;
+      margin-bottom: -1px;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .admin-tab-btn.active {
+      border-bottom: 2px solid #3b82f6;
+      color: #3b82f6;
+      font-weight: 600;
+    }
+    .admin-section {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+    .admin-section-header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 16px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-align: left;
+    }
+    .admin-section-body {
+      padding: 0 16px 16px;
+    }
+    .admin-input {
+      width: 100%;
+      padding: 9px 12px;
+      font-size: 13px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      box-sizing: border-box;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .admin-input:focus { border-color: #3b82f6; }
+    .admin-textarea {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 13px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      box-sizing: border-box;
+      resize: none;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .admin-textarea:focus { border-color: #3b82f6; }
+    .admin-btn {
+      padding: 9px 18px;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .admin-btn:hover { opacity: 0.85; }
+    .admin-btn-blue { background: #3b82f6; color: white; }
+    .admin-btn-red  { background: #ef4444; color: white; }
+    .admin-btn-amber { background: #f59e0b; color: white; }
+    .admin-btn-gray { background: #e5e7eb; color: #374151; }
+
+    .letter-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 8px;
+      transition: border-color 0.15s;
+    }
+    .letter-card:hover { border-color: #93c5fd; }
+
+    .badge {
+      font-size: 11px;
+      background: #dbeafe;
+      color: #1d4ed8;
+      padding: 2px 8px;
+      border-radius: 99px;
+      margin-left: 8px;
+    }
+    .status-bar {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      font-size: 13px;
+      color: #6b7280;
     }
   </style>
 </head>
@@ -164,44 +245,44 @@
   <div id="root"></div>
 
   <script type="module">
-   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-import { 
-  getAuth, 
-  createUserWithEmailAndPassword, 
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  GoogleAuthProvider,
-  signInWithPopup
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-    
-const firebaseConfig = {
-  apiKey: "AIzaSyCQLxHoTcKvS1X7ausB1slF27tZoFvh99o",
-  authDomain: "mind-aquarium.firebaseapp.com",
-  databaseURL: "https://mind-aquarium-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "mind-aquarium",
-  storageBucket: "mind-aquarium.firebasestorage.app",
-  messagingSenderId: "812802606438",
-  appId: "1:812802606438:web:07fef3f1b4f89e78b3f4a7"
-};
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged,
+      GoogleAuthProvider,
+      signInWithPopup
+    } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCQLxHoTcKvS1X7ausB1slF27tZoFvh99o",
+      authDomain: "mind-aquarium.firebaseapp.com",
+      databaseURL: "https://mind-aquarium-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "mind-aquarium",
+      storageBucket: "mind-aquarium.firebasestorage.app",
+      messagingSenderId: "812802606438",
+      appId: "1:812802606438:web:07fef3f1b4f89e78b3f4a7"
+    };
 
     const app = initializeApp(firebaseConfig);
     window.database = getDatabase(app);
-   window.auth = getAuth(app);
-window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
-window.signInWithEmailAndPassword = signInWithEmailAndPassword;
-window.signOut = signOut;
-window.onAuthStateChanged = onAuthStateChanged;
-window.GoogleAuthProvider = GoogleAuthProvider;
-window.signInWithPopup = signInWithPopup;
+    window.auth = getAuth(app);
+    window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+    window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+    window.signOut = signOut;
+    window.onAuthStateChanged = onAuthStateChanged;
+    window.GoogleAuthProvider = GoogleAuthProvider;
+    window.signInWithPopup = signInWithPopup;
     window.dbRef = ref;
     window.dbSet = set;
     window.dbOnValue = onValue;
   </script>
 
   <script type="text/babel">
-    const { useState, useEffect } = React;
+    const { useState, useEffect, useRef } = React;
 
     const Lock = () => <span>🔒</span>;
     const Mail = () => <span>📧</span>;
@@ -222,9 +303,9 @@ window.signInWithPopup = signInWithPopup;
     }
 
     function SwimmingFish({ fish, onClick, index }) {
-      const [direction, setDirection] = React.useState(1);
-      const fishRef = React.useRef(null);
-      
+      const [direction, setDirection] = useState(1);
+      const fishRef = useRef(null);
+
       const durations = [18, 15, 20, 17, 14, 19, 16];
       const startPositions = [
         { top: '15%', left: '10%' },
@@ -235,8 +316,8 @@ window.signInWithPopup = signInWithPopup;
         { top: '60%', left: '35%' },
         { top: '60%', right: '30%' }
       ];
-      
-      React.useEffect(() => {
+
+      useEffect(() => {
         const checkBoundary = () => {
           if (fishRef.current) {
             const rect = fishRef.current.getBoundingClientRect();
@@ -271,79 +352,79 @@ window.signInWithPopup = signInWithPopup;
       );
     }
 
-  
+    function FishNameEditor({ defaultFishes, customFishNames, onSave }) {
+      const [editedNames, setEditedNames] = useState({});
 
-function FishNameEditor({ defaultFishes, customFishNames, onSave }) {
-  const [editedNames, setEditedNames] = React.useState({});
+      useEffect(() => {
+        if (customFishNames) setEditedNames(customFishNames);
+      }, [customFishNames]);
 
-  React.useEffect(() => {
-    if (customFishNames) {
-      setEditedNames(customFishNames);
-    }
-  }, [customFishNames]);
+      const handleNameChange = (fishId, newName) => {
+        if (newName.length <= 4) setEditedNames({ ...editedNames, [fishId]: newName });
+      };
 
-  const handleNameChange = (fishId, newName) => {
-    if (newName.length <= 4) {
-      setEditedNames({ ...editedNames, [fishId]: newName });
-    }
-  };
-
-  const handleSave = () => {
-    onSave(editedNames);
-  };
-
-  const handleReset = () => {
-    setEditedNames({});
-    onSave({});
-  };
-
-  return (
-    <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-6 mb-6">
-      <h3 className="text-xl font-bold mb-4">🐟 물고기 이름 설정</h3>
-      <p className="text-sm text-gray-600 mb-4">각 물고기의 이름을 최대 4글자까지 설정할 수 있습니다.</p>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        {defaultFishes.map(fish => (
-          <div key={fish.id} className="bg-white rounded-lg p-4 border-2 border-gray-200">
-            <div className="flex items-center gap-3 mb-2">
-              <img src={fish.image} alt={fish.color} className="w-16 h-16 object-contain" />
-              <div className="flex-1">
-                <p className="text-sm text-gray-600 mb-1">{fish.color} 물고기</p>
-                <input
-                  type="text"
-                  value={editedNames[fish.id] || fish.defaultName}
-                  onChange={(e) => handleNameChange(fish.id, e.target.value)}
-                  placeholder={fish.defaultName}
-                  maxLength={4}
-                  className="w-full border-2 border-gray-300 rounded-lg p-2 text-lg font-bold"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  {(editedNames[fish.id] || fish.defaultName).length}/4자
-                </p>
+      return (
+        <div>
+          <p className="text-sm text-gray-500 mb-4">각 물고기의 이름을 최대 4글자까지 설정할 수 있습니다.</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+            {defaultFishes.map(fish => (
+              <div key={fish.id} style={{
+                border: '1px solid #e5e7eb', borderRadius: '8px', padding: '12px',
+                display: 'flex', alignItems: 'center', gap: '10px'
+              }}>
+                <img src={fish.image} alt={fish.color} style={{ width: '48px', height: '48px', objectFit: 'contain' }} />
+                <div style={{ flex: 1 }}>
+                  <p style={{ fontSize: '11px', color: '#9ca3af', margin: '0 0 4px' }}>{fish.color} 물고기</p>
+                  <input
+                    type="text"
+                    value={editedNames[fish.id] !== undefined ? editedNames[fish.id] : fish.defaultName}
+                    onChange={(e) => handleNameChange(fish.id, e.target.value)}
+                    maxLength={4}
+                    className="admin-input"
+                    style={{ padding: '6px 10px', fontSize: '14px', fontWeight: 600 }}
+                  />
+                  <p style={{ fontSize: '11px', color: '#9ca3af', margin: '3px 0 0' }}>
+                    {(editedNames[fish.id] !== undefined ? editedNames[fish.id] : fish.defaultName).length}/4자
+                  </p>
+                </div>
               </div>
-            </div>
+            ))}
           </div>
-        ))}
-      </div>
-      
-      <div className="flex gap-3">
-        <button
-          onClick={handleSave}
-          className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 transition"
-        >
-          이름 저장
-        </button>
-        <button
-          onClick={handleReset}
-          className="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-400 transition"
-        >
-          기본값으로 되돌리기
-        </button>
-      </div>
-    </div>
-  );
-}
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button onClick={() => onSave(editedNames)} className="admin-btn admin-btn-blue" style={{ flex: 1 }}>
+              이름 저장
+            </button>
+            <button onClick={() => { setEditedNames({}); onSave({}); }} className="admin-btn admin-btn-gray">
+              기본값으로
+            </button>
+          </div>
+        </div>
+      );
+    }
 
+    /* ───────── Section 토글 컴포넌트 ───────── */
+    function AdminSection({ title, badge, children, defaultOpen = true }) {
+      const [open, setOpen] = useState(defaultOpen);
+      return (
+        <div className="admin-section">
+          <button className="admin-section-header" onClick={() => setOpen(o => !o)}>
+            <span style={{ fontWeight: 600, fontSize: '15px', color: '#111827' }}>
+              {title}
+              {badge != null && <span className="badge">{badge}</span>}
+            </span>
+            <span style={{
+              color: '#9ca3af', fontSize: '12px',
+              display: 'inline-block',
+              transform: open ? 'rotate(0deg)' : 'rotate(180deg)',
+              transition: 'transform 0.2s'
+            }}>▲</span>
+          </button>
+          {open && <div className="admin-section-body">{children}</div>}
+        </div>
+      );
+    }
+
+    /* ───────── 메인 컴포넌트 ───────── */
     function MindAquarium() {
       const [mode, setMode] = useState('intro');
       const [selectedFish, setSelectedFish] = useState(null);
@@ -366,151 +447,100 @@ function FishNameEditor({ defaultFishes, customFishNames, onSave }) {
       const [confirmPassword, setConfirmPassword] = useState('');
       const [customFishNames, setCustomFishNames] = useState(null);
 
+      /* ── 관리자 탭 state (최상단에 선언 ─ Hook 규칙 준수) ── */
+      const [adminTab, setAdminTab] = useState('mail');
+
       const defaultFishes = [
-       { id: 'worry', defaultName: '걱정', color: '노란색', image: 'mindaquarium_worry.png' },
-        { id: 'fear', defaultName: '무서움', color: '파란색', image: 'mindaquarium_fear.png' },
-       { id: 'anger', defaultName: '화남', color: '빨간색', image: 'mindaquarium_angry.png' },
-        { id: 'secret', defaultName: '비밀', color: '보라색', image: 'mindaquarium_secret.png' },
-        { id: 'fun', defaultName: '재미', color: '초록색', image: 'mindaquarium_fun.png' },
-        { id: 'shy', defaultName: '부끄러움', color: '핑크색', image: 'mindaquarium_shy.png' },
-        { id: 'happy', defaultName: '행복', color: '하얀색', image: 'mindaquarium_happy.png' }
-         ];
+        { id: 'worry',  defaultName: '걱정',   color: '노란색', image: 'mindaquarium_worry.png' },
+        { id: 'fear',   defaultName: '무서움', color: '파란색', image: 'mindaquarium_fear.png' },
+        { id: 'anger',  defaultName: '화남',   color: '빨간색', image: 'mindaquarium_angry.png' },
+        { id: 'secret', defaultName: '비밀',   color: '보라색', image: 'mindaquarium_secret.png' },
+        { id: 'fun',    defaultName: '재미',   color: '초록색', image: 'mindaquarium_fun.png' },
+        { id: 'shy',    defaultName: '부끄러움', color: '핑크색', image: 'mindaquarium_shy.png' },
+        { id: 'happy',  defaultName: '행복',   color: '하얀색', image: 'mindaquarium_happy.png' }
+      ];
 
-const fishes = defaultFishes.map(fish => ({
-  ...fish,
-  name: customFishNames?.[fish.id] || fish.defaultName
-}));
+      const fishes = defaultFishes.map(fish => ({
+        ...fish,
+        name: customFishNames?.[fish.id] || fish.defaultName
+      }));
 
+      /* ── Auth ── */
       useEffect(() => {
         const unsubscribe = window.auth.onAuthStateChanged((currentUser) => {
-      setUser(currentUser);
-       setAuthLoading(false);
-      if (currentUser) {
-       console.log('로그인됨:', currentUser.email);
-     } else {
-      console.log('로그아웃됨');
-      setMode('auth');
-      }
-      });
-     return () => unsubscribe();
-       }, []);
+          setUser(currentUser);
+          setAuthLoading(false);
+          if (!currentUser) setMode('auth');
+        });
+        return () => unsubscribe();
+      }, []);
 
-       useEffect(() => {
-        if (!window.database || !user) return; 
-         setFirebaseConnected(true);
-
+      /* ── Firebase 리스너 ── */
+      useEffect(() => {
+        if (!window.database || !user) return;
+        setFirebaseConnected(true);
         try {
-          const messagesRef = window.dbRef(window.database, `users/${user.uid}/messages`);
-    window.dbOnValue(messagesRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        const messagesArray = Array.isArray(data) ? data : Object.values(data);
-        setMessages(messagesArray.filter(m => m && m.id));
-      } else {
-        setMessages([]);
-      }
-    });
+          const listen = (path, cb) =>
+            window.dbOnValue(window.dbRef(window.database, `users/${user.uid}/${path}`), snap => {
+              const d = snap.val();
+              if (d !== null && d !== undefined) cb(d);
+            });
 
-    const historyRef = window.dbRef(window.database, `users/${user.uid}/feedingHistory`);
-    window.dbOnValue(historyRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) setFeedingHistory(data);
-    });
+          listen('messages', d => {
+            const arr = Array.isArray(d) ? d : Object.values(d);
+            setMessages(arr.filter(m => m && m.id));
+          });
+          listen('feedingHistory', setFeedingHistory);
+          listen('kingLetter', setKingLetterContent);
+          listen('hasReadKingLetter', setHasReadKingLetter);
+          listen('adminPassword', setAdminPassword);
+          listen('customFishNames', setCustomFishNames);
+        } catch (e) { console.error('Firebase error:', e); }
+      }, [user]);
 
-    const kingLetterRef = window.dbRef(window.database, `users/${user.uid}/kingLetter`);
-    window.dbOnValue(kingLetterRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) setKingLetterContent(data);
-    });
-
-    const readStatusRef = window.dbRef(window.database, `users/${user.uid}/hasReadKingLetter`);
-    window.dbOnValue(readStatusRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) setHasReadKingLetter(data);
-    });
-
-    const passwordRef = window.dbRef(window.database, `users/${user.uid}/adminPassword`);
-    window.dbOnValue(passwordRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) setAdminPassword(data);
-    });
-
-    const fishNamesRef = window.dbRef(window.database, `users/${user.uid}/customFishNames`);
-    window.dbOnValue(fishNamesRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) setCustomFishNames(data);
-    });
-  } catch (error) {
-    console.error('Firebase error:', error);
-  }
-}, [user]);
-
-  const saveToFirebase = async (path, data) => {
-     if (!user) {
-     alert('로그인이 필요합니다.');
-      return;
-     }
-   setLoading(true);
-   try {
-     await window.dbSet(window.dbRef(window.database, `users/${user.uid}/${path}`), data);
-     await new Promise(resolve => setTimeout(resolve, 300));
-   } catch (error) {
-    console.error('Save error:', error);
-    alert('저장에 실패했습니다.');
-  } finally {
-    setLoading(false);
-  }
-};
+      const saveToFirebase = async (path, data) => {
+        if (!user) { alert('로그인이 필요합니다.'); return; }
+        setLoading(true);
+        try {
+          await window.dbSet(window.dbRef(window.database, `users/${user.uid}/${path}`), data);
+          await new Promise(r => setTimeout(r, 300));
+        } catch (e) {
+          console.error('Save error:', e);
+          alert('저장에 실패했습니다.');
+        } finally { setLoading(false); }
+      };
 
       const getTodayString = () => new Date().toISOString().split('T')[0];
       const getTotalDays = () => Object.keys(feedingHistory).length;
 
       const feedFish = async () => {
-        if (!letterContent.trim()) {
-          alert('편지를 써주세요!');
-          return;
-        }
-
+        if (!letterContent.trim()) { alert('편지를 써주세요!'); return; }
         const updatedMessages = [...messages, {
-          id: Date.now(),
-          fish: selectedFish.name,
-          content: letterContent,
-          date: new Date().toLocaleString('ko-KR')
+          id: Date.now(), fish: selectedFish.name,
+          content: letterContent, date: new Date().toLocaleString('ko-KR')
         }];
         const updatedHistory = { ...feedingHistory, [getTodayString()]: true };
-
         await saveToFirebase('messages', updatedMessages);
         await saveToFirebase('feedingHistory', updatedHistory);
-
         setMessages(updatedMessages);
         setFeedingHistory(updatedHistory);
         setLetterContent('');
         setMode('aquarium');
-        
-        if (Object.keys(updatedHistory).length >= 30 && kingLetterContent && !hasReadKingLetter) {
+        if (Object.keys(updatedHistory).length >= 30 && kingLetterContent && !hasReadKingLetter)
           setTimeout(() => alert('🎉 물고기 왕이 편지를 보냈어요!'), 500);
-        }
       };
 
       const handleAdminLogin = () => {
-        if (password === adminPassword) {
-          setMode('admin');
-          setPassword('');
-        } else {
-          alert('비밀번호가 틀렸습니다.');
-          setPassword('');
-        }
+        if (password === adminPassword) { setMode('admin'); setPassword(''); }
+        else { alert('비밀번호가 틀렸습니다.'); setPassword(''); }
       };
 
       const saveKingLetter = async () => {
-        if (!parentLetter.trim()) {
-          alert('편지 내용을 입력해주세요.');
+        if (!parentLetter.trim()) { alert('편지 내용을 입력해주세요.'); return; }
+        if (getTotalDays() < 30 && kingLetterContent) {
+          alert('이미 편지가 저장되어 있습니다. 아이가 30일을 달성하고 편지를 읽으면 새로운 편지를 작성할 수 있습니다.');
           return;
         }
-        if (getTotalDays() < 30 && kingLetterContent) {
-    alert('이미 편지가 저장되어 있습니다. 아이가 30일을 달성하고 편지를 읽으면 새로운 편지를 작성할 수 있습니다.');
-    return;
-  }
         await saveToFirebase('kingLetter', parentLetter);
         setKingLetterContent(parentLetter);
         alert('물고기 왕의 편지가 저장되었습니다!');
@@ -518,23 +548,12 @@ const fishes = defaultFishes.map(fish => ({
       };
 
       const changePassword = async () => {
-        if (!newPassword.trim()) {
-          alert('새 비밀번호를 입력해주세요.');
-          return;
-        }
-        if (newPassword !== confirmPassword) {
-          alert('비밀번호가 일치하지 않습니다.');
-          return;
-        }
-        if (newPassword.length < 4) {
-          alert('비밀번호는 4자 이상이어야 합니다.');
-          return;
-        }
-        
+        if (!newPassword.trim()) { alert('새 비밀번호를 입력해주세요.'); return; }
+        if (newPassword !== confirmPassword) { alert('비밀번호가 일치하지 않습니다.'); return; }
+        if (newPassword.length < 4) { alert('비밀번호는 4자 이상이어야 합니다.'); return; }
         await saveToFirebase('adminPassword', newPassword);
         setAdminPassword(newPassword);
-        setNewPassword('');
-        setConfirmPassword('');
+        setNewPassword(''); setConfirmPassword('');
         alert('비밀번호가 변경되었습니다!');
       };
 
@@ -542,621 +561,340 @@ const fishes = defaultFishes.map(fish => ({
         await saveToFirebase('customFishNames', names);
         setCustomFishNames(names);
         alert('물고기 이름이 저장되었습니다!');
-      
       };
 
-const readKingLetter = async () => {
-  setMode('kingLetter');
-  setHasReadKingLetter(true);
-  await saveToFirebase('hasReadKingLetter', true);
-};
-        
-const handleSignUp = async () => {
-  if (!email.trim() || !password.trim()) {
-    alert('이메일과 비밀번호를 입력해주세요.');
-    return;
-  }
-  if (password !== confirmPassword) {
-    alert('비밀번호가 일치하지 않습니다.');
-    return;
-  }
-  if (password.length < 6) {
-    alert('비밀번호는 6자 이상이어야 합니다.');
-    return;
-  }
-  if (!childName.trim()) {
-    alert('아이 이름을 입력해주세요.');
-    return;
-  }
+      const readKingLetter = async () => {
+        setMode('kingLetter');
+        setHasReadKingLetter(true);
+        await saveToFirebase('hasReadKingLetter', true);
+      };
 
-  setLoading(true);
-  try {
-    const userCredential = await createUserWithEmailAndPassword(window.auth, email, password);
-    const newUser = userCredential.user;
-    
-    // 초기 프로필 저장
-    await window.dbSet(window.dbRef(window.database, `users/${newUser.uid}/profile`), {
-      email: email,
-      childName: childName,
-      createdAt: new Date().toISOString()
-    });
-    
-   // 기본 관리자 비밀번호 설정
-await window.dbSet(window.dbRef(window.database, `users/${newUser.uid}/adminPassword`), '1234');
-alert('회원가입이 완료되었습니다!');
+      const handleSignUp = async () => {
+        if (!email.trim() || !password.trim()) { alert('이메일과 비밀번호를 입력해주세요.'); return; }
+        if (password !== confirmPassword) { alert('비밀번호가 일치하지 않습니다.'); return; }
+        if (password.length < 6) { alert('비밀번호는 6자 이상이어야 합니다.'); return; }
+        if (!childName.trim()) { alert('아이 이름을 입력해주세요.'); return; }
+        setLoading(true);
+        try {
+          const cred = await createUserWithEmailAndPassword(window.auth, email, password);
+          await window.dbSet(window.dbRef(window.database, `users/${cred.user.uid}/profile`), {
+            email, childName, createdAt: new Date().toISOString()
+          });
+          await window.dbSet(window.dbRef(window.database, `users/${cred.user.uid}/adminPassword`), '1234');
+          alert('회원가입이 완료되었습니다!');
+          setMode('intro');
+        } catch (e) {
+          if (e.code === 'auth/email-already-in-use') alert('이미 사용 중인 이메일입니다.');
+          else if (e.code === 'auth/invalid-email') alert('잘못된 이메일 형식입니다.');
+          else alert('회원가입에 실패했습니다: ' + e.message);
+        } finally { setLoading(false); }
+      };
 
-setMode('intro');
-  } catch (error) {
-    console.error('SignUp error:', error);
-    if (error.code === 'auth/email-already-in-use') {
-      alert('이미 사용 중인 이메일입니다.');
-    } else if (error.code === 'auth/invalid-email') {
-      alert('잘못된 이메일 형식입니다.');
-    } else {
-      alert('회원가입에 실패했습니다: ' + error.message);
-    }
-  } finally {
-    setLoading(false);
-  }
-};
+      const handleSignIn = async () => {
+        if (!email.trim() || !password.trim()) { alert('이메일과 비밀번호를 입력해주세요.'); return; }
+        setLoading(true);
+        try {
+          await window.signInWithEmailAndPassword(window.auth, email, password);
+          setMode('intro');
+        } catch (e) {
+          if (e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password')
+            alert('이메일 또는 비밀번호가 잘못되었습니다.');
+          else alert('로그인에 실패했습니다: ' + e.message);
+        } finally { setLoading(false); }
+      };
 
-const handleSignIn = async () => {
-  if (!email.trim() || !password.trim()) {
-    alert('이메일과 비밀번호를 입력해주세요.');
-    return;
-  }
+      const handleGoogleSignIn = async () => {
+        setLoading(true);
+        try {
+          const provider = new window.GoogleAuthProvider();
+          const result = await window.signInWithPopup(window.auth, provider);
+          const newUser = result.user;
+          const profileRef = window.dbRef(window.database, `users/${newUser.uid}/profile`);
+          const snap = await new Promise(r => window.dbOnValue(profileRef, r, { onlyOnce: true }));
+          if (!snap.val()) {
+            await window.dbSet(profileRef, { email: newUser.email, childName: '아이', createdAt: new Date().toISOString() });
+            await window.dbSet(window.dbRef(window.database, `users/${newUser.uid}/adminPassword`), '1234');
+          }
+          setMode('intro');
+        } catch (e) {
+          alert('Google 로그인에 실패했습니다: ' + e.message);
+        } finally { setLoading(false); }
+      };
 
-  setLoading(true);
-  try {
-await window.signInWithEmailAndPassword(window.auth, email, password);
-    setMode('intro');
-  } catch (error) {
-    console.error('SignIn error:', error);
-    if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-      alert('이메일 또는 비밀번호가 잘못되었습니다.');
-    } else {
-      alert('로그인에 실패했습니다: ' + error.message);
-    }
-  } finally {
-    setLoading(false);
-  }
-};
+      const handleSignOut = async () => {
+        if (confirm('로그아웃 하시겠습니까?')) {
+          try {
+            await signOut(window.auth);
+            setMode('auth');
+            setMessages([]); setFeedingHistory({});
+            setKingLetterContent(''); setHasReadKingLetter(false); setCustomFishNames(null);
+          } catch (e) { alert('로그아웃에 실패했습니다.'); }
+        }
+      };
 
-const handleGoogleSignIn = async () => {
-  setLoading(true);
-  try {
-    const provider = new window.GoogleAuthProvider();
-    const result = await window.signInWithPopup(window.auth, provider);
-    const newUser = result.user;
+      /* ─────────────── 렌더 분기 ─────────────── */
 
-    const profileRef = window.dbRef(window.database, `users/${newUser.uid}/profile`);
-    const profileSnapshot = await new Promise((resolve) => {
-      window.dbOnValue(profileRef, resolve, { onlyOnce: true });
-    });
-
-    if (!profileSnapshot.val()) {
-      await window.dbSet(profileRef, {
-        email: newUser.email,
-        childName: '아이',
-        createdAt: new Date().toISOString()
-      });
-
-      await window.dbSet(
-        window.dbRef(window.database, `users/${newUser.uid}/adminPassword`),
-        '1234'
+      if (loading) return (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-8 flex flex-col items-center">
+            <Loader />
+            <p className="text-lg font-bold mt-4">저장하는 중...</p>
+          </div>
+        </div>
       );
-    }
 
-    setMode('intro');
-  } catch (error) {
-    console.error('Google SignIn error:', error);
-    alert('Google 로그인에 실패했습니다: ' + error.message);
-  } finally {
-    setLoading(false);
-  }
-};
-
-const handleSignOut = async () => {
-  if (confirm('로그아웃 하시겠습니까?')) {
-    try {
-      await signOut(window.auth);
-      setMode('auth');
-      // 모든 상태 초기화
-      setMessages([]);
-      setFeedingHistory({});
-      setKingLetterContent('');
-      setHasReadKingLetter(false);
-      setCustomFishNames(null);
-    } catch (error) {
-      console.error('SignOut error:', error);
-      alert('로그아웃에 실패했습니다.');
-    }
-  }
-};
-
-      if (loading) {
-        return (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-8 flex flex-col items-center">
-              <Loader />
-              <p className="text-lg font-bold mt-4">저장하는 중...</p>
-            </div>
-          </div>
-        );
-      }
-      if (authLoading) {
-  return (
-    <div className="fixed inset-0 bg-gradient-to-b from-blue-200 to-blue-400 flex items-center justify-center">
-      <div className="text-white text-2xl font-bold">마음 어항을 준비하고 있어요...</div>
-    </div>
-  );
-}
-
-if (!user || mode === 'auth') {
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-200 to-blue-400 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full">
-        <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold text-blue-600 mb-2">🐠 마음 어항 🐠</h1>
-          <p className="text-gray-600">{isSignUp ? '새 계정 만들기' : '로그인'}</p>
+      if (authLoading) return (
+        <div className="fixed inset-0 bg-gradient-to-b from-blue-200 to-blue-400 flex items-center justify-center">
+          <div className="text-white text-2xl font-bold">마음 어항을 준비하고 있어요...</div>
         </div>
+      );
 
-        <div className="space-y-4">
-          {isSignUp && (
-            <div>
-              <label className="block text-sm font-bold mb-1 text-gray-700">아이 이름</label>
-              <input
-                type="text"
-                value={childName}
-                onChange={(e) => setChildName(e.target.value)}
-                placeholder="예: 민수"
-                className="w-full border-2 border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:outline-none"
-              />
+      /* ── 로그인/회원가입 ── */
+      if (!user || mode === 'auth') return (
+        <div className="min-h-screen bg-gradient-to-b from-blue-200 to-blue-400 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full">
+            <div className="text-center mb-6">
+              <h1 className="text-3xl font-bold text-blue-600 mb-2">🐠 마음 어항 🐠</h1>
+              <p className="text-gray-600">{isSignUp ? '새 계정 만들기' : '로그인'}</p>
             </div>
-          )}
-
-          <div>
-            <label className="block text-sm font-bold mb-1 text-gray-700">이메일</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="example@email.com"
-              className="w-full border-2 border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:outline-none"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-bold mb-1 text-gray-700">비밀번호</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder={isSignUp ? '6자 이상 입력' : '비밀번호'}
-              className="w-full border-2 border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:outline-none"
-            />
-          </div>
-
-          {isSignUp && (
-            <div>
-              <label className="block text-sm font-bold mb-1 text-gray-700">비밀번호 확인</label>
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="비밀번호 다시 입력"
-                className="w-full border-2 border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:outline-none"
-              />
-            </div>
-          )}
-
-          <button
-            onClick={isSignUp ? handleSignUp : handleSignIn}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition"
-          >
-            {isSignUp ? '회원가입' : '로그인'}
-          </button>
-
-          <div className="relative my-4">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">또는</span>
-            </div>
-          </div>
-
-          <button
-            onClick={handleGoogleSignIn}
-            className="w-full bg-white border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-bold hover:bg-gray-50 transition flex items-center justify-center gap-2"
-          >
-            <svg className="w-5 h-5" viewBox="0 0 24 24">
-              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-            </svg>
-            Google로 계속하기
-          </button>
-
-          <button
-            onClick={() => setIsSignUp(!isSignUp)}
-            className="w-full text-blue-600 py-2 text-sm hover:underline"
-          >
-            {isSignUp ? '이미 계정이 있으신가요? 로그인' : '계정이 없으신가요? 회원가입'}
-          </button>
-        </div>
-
-        <div className="text-center text-gray-500 text-xs mt-6">
-          <p>© 2024 Grace. All rights reserved.</p>
-        </div>
-      </div>
-    </div>
-  );
-}
-      if (mode === 'intro') {
-        return (
-          <div className="relative min-h-screen overflow-hidden" style={{
-            backgroundImage: 'url(mindaquarium_bg.png)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat'
-          }}>
-            {Array.from({ length: 30 }).map((_, i) => (
-              <Bubble key={i} delay={i * 0.8} left={Math.random() * 100} size={15 + Math.random() * 25} />
-            ))}
-            
-            <div className="relative h-screen flex flex-col items-center justify-center py-4 px-4">
-           {/* 캐릭터 + 로고 영역 (안정 버전) */}
-<div className="relative flex flex-col items-center">
-  {/* 캐릭터 이미지 */}
-  <img 
-    src="mindaquarium_intro.png"
-    alt="아이들과 물고기들"
-    className="w-full max-w-xs md:max-w-md lg:max-w-xl"
-    style={{
-      objectFit: 'contain',
-      filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.3))'
-    }}
-  />
-
-  {/* 로고 */}
-  <div
-    className="absolute left-1/2 pointer-events-none"
-    style={{
-      bottom: '-48px',
-      transform: 'translateX(-50%)',
-      width: '100vw',
-      display: 'flex',
-      justifyContent: 'center'
-    }}
-  >
-    <img
-      src="mindaquarium_logo.png"
-      alt="Mind Aquarium Logo"
-      className="w-[68vw] max-w-[820px] md:w-[55vw] lg:w-[48vw]"
-    />
-  </div>
-</div>
-
-{/* ✅ 로고 아래 공간 (이게 겹침 방지 핵심) */}
-<div className="h-[72px]" />
-
-              
-              <div className="relative z-20 flex flex-col items-center w-full max-w-3xl mt-4 md:mt-6">
-                <div className="bg-blue-900/60 rounded-2xl px-6 py-3 mb-4 md:mb-6 backdrop-blur-md border border-blue-400/30">
-                  <p className="text-white text-center text-base md:text-xl lg:text-2xl font-medium leading-relaxed">
-                    마음 속 감정을 마음 어항 속<br/>
-                    물고기 친구들에게 나누어주세요
-                  </p>
+            <div className="space-y-4">
+              {isSignUp && (
+                <div>
+                  <label className="block text-sm font-bold mb-1 text-gray-700">아이 이름</label>
+                  <input type="text" value={childName} onChange={e => setChildName(e.target.value)}
+                    placeholder="예: 민수" className="w-full border-2 border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:outline-none" />
                 </div>
-                
-                <button
-                  onClick={() => setMode('aquarium')}
-                  className="bg-white text-blue-600 px-12 py-4 md:px-16 md:py-5 rounded-full text-xl md:text-2xl lg:text-3xl font-bold shadow-2xl hover:bg-blue-50 hover:scale-105 transition-all mb-3 md:mb-4"
-                >
-                  시작하기
-                </button>
-                
-                <button
-                  onClick={() => setMode('adminLogin')}
-                  className="text-white/80 hover:text-white transition flex items-center gap-2 mb-3 md:mb-4"
-                >
-                  <Lock />
-                  <span className="text-xs md:text-base">관리자 모드</span>
-                </button>
-              
-                <button
-  onClick={handleSignOut}
-  className="text-white/60 hover:text-white/80 transition text-xs md:text-sm"
->
-  {user?.email} | 로그아웃
-</button>
-
-                
-                <div className="text-white/50 text-xs text-center">
-                  <p>© 2024 Grace. All rights reserved.</p>
-                </div>
+              )}
+              <div>
+                <label className="block text-sm font-bold mb-1 text-gray-700">이메일</label>
+                <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+                  placeholder="example@email.com" className="w-full border-2 border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:outline-none" />
               </div>
+              <div>
+                <label className="block text-sm font-bold mb-1 text-gray-700">비밀번호</label>
+                <input type="password" value={password} onChange={e => setPassword(e.target.value)}
+                  placeholder={isSignUp ? '6자 이상 입력' : '비밀번호'} className="w-full border-2 border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:outline-none" />
+              </div>
+              {isSignUp && (
+                <div>
+                  <label className="block text-sm font-bold mb-1 text-gray-700">비밀번호 확인</label>
+                  <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)}
+                    placeholder="비밀번호 다시 입력" className="w-full border-2 border-gray-300 rounded-lg p-3 focus:border-blue-500 focus:outline-none" />
+                </div>
+              )}
+              <button onClick={isSignUp ? handleSignUp : handleSignIn}
+                className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition">
+                {isSignUp ? '회원가입' : '로그인'}
+              </button>
+              <div className="relative my-4">
+                <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-300"></div></div>
+                <div className="relative flex justify-center text-sm"><span className="px-2 bg-white text-gray-500">또는</span></div>
+              </div>
+              <button onClick={handleGoogleSignIn}
+                className="w-full bg-white border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-bold hover:bg-gray-50 transition flex items-center justify-center gap-2">
+                <svg className="w-5 h-5" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                Google로 계속하기
+              </button>
+              <button onClick={() => setIsSignUp(!isSignUp)} className="w-full text-blue-600 py-2 text-sm hover:underline">
+                {isSignUp ? '이미 계정이 있으신가요? 로그인' : '계정이 없으신가요? 회원가입'}
+              </button>
+            </div>
+            <div className="text-center text-gray-500 text-xs mt-6">
+              <p>© 2024 Grace. All rights reserved.</p>
             </div>
           </div>
-        );
-      }
+        </div>
+      );
 
-      if (mode === 'adminLogin') {
-        return (
-          <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
-            <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
-              <h2 className="text-2xl font-bold mb-6 text-center">관리자 모드</h2>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleAdminLogin()}
-                placeholder="비밀번호 입력"
-                className="w-full border-2 border-gray-300 rounded-lg p-3 mb-4"
-              />
-              <button onClick={handleAdminLogin} className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition mb-3">
-                로그인
-              </button>
-              <button onClick={() => setMode('intro')} className="w-full bg-gray-300 text-gray-700 py-3 rounded-lg font-bold hover:bg-gray-400 transition">
-                돌아가기
-              </button>
-            </div>
-          </div>
-        );
-      }
-
-      
-   if (mode === 'admin') {
-  const totalDays = getTotalDays();
-  const canEditKingLetter = totalDays >= 30 && hasReadKingLetter;
-  const hasKingLetter = !!kingLetterContent;
-
-  const tabs = [
-    { id: 'mail', label: '📬 편지함' },
-    { id: 'fish', label: '🐟 이름 설정' },
-    { id: 'king', label: '👑 왕의 편지' },
-    { id: 'pw',   label: '🔒 비밀번호' },
-  ];
-  const [activeTab, setActiveTab] = React.useState('mail');
-  const [openSections, setOpenSections] = React.useState({ main: true });
-
-  const toggleSection = (key) =>
-    setOpenSections(prev => ({ ...prev, [key]: !prev[key] }));
-
-  const Section = ({ id, title, badge, children }) => {
-    const open = openSections[id] !== false;
-    return (
-      <div style={{
-        background: 'var(--color-background-primary)',
-        border: '0.5px solid var(--color-border-tertiary)',
-        borderRadius: 'var(--border-radius-lg)',
-        overflow: 'hidden',
-        marginBottom: '12px'
-      }}>
-        <button onClick={() => toggleSection(id)} style={{
-          width: '100%', display: 'flex', justifyContent: 'space-between',
-          alignItems: 'center', padding: '14px 16px',
-          background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left'
+      /* ── 인트로 ── */
+      if (mode === 'intro') return (
+        <div className="relative min-h-screen overflow-hidden" style={{
+          backgroundImage: 'url(mindaquarium_bg.png)',
+          backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat'
         }}>
-          <span style={{ fontWeight: 500, fontSize: '15px', color: 'var(--color-text-primary)' }}>
-            {title}
-            {badge != null && (
-              <span style={{
-                fontSize: '12px', background: '#dbeafe', color: '#1d4ed8',
-                padding: '2px 8px', borderRadius: '99px', marginLeft: '8px'
-              }}>{badge}</span>
-            )}
-          </span>
-          <span style={{
-            color: 'var(--color-text-secondary)', fontSize: '12px',
-            transform: open ? 'rotate(0deg)' : 'rotate(180deg)',
-            transition: 'transform 0.2s', display: 'inline-block'
-          }}>▲</span>
-        </button>
-        {open && <div style={{ padding: '0 16px 16px' }}>{children}</div>}
-      </div>
-    );
-  };
-
-  return (
-    <div className="fixed inset-0 bg-gray-100 overflow-hidden">
-      <div className="h-full overflow-y-auto">
-        <div style={{ maxWidth: '680px', margin: '0 auto', padding: '1.5rem 1rem 5rem' }}>
-
-          {/* 헤더 */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-            <div>
-              <span style={{ fontSize: '20px', fontWeight: 500 }}>관리자 모드</span>
-              {firebaseConnected && <div style={{ fontSize: '12px', color: '#16a34a', marginTop: '2px' }}>🔥 실시간 동기화 중</div>}
+          {Array.from({ length: 30 }).map((_, i) => (
+            <Bubble key={i} delay={i * 0.8} left={Math.random() * 100} size={15 + Math.random() * 25} />
+          ))}
+          <div className="relative h-screen flex flex-col items-center justify-center py-4 px-4">
+            <div className="relative flex flex-col items-center">
+              <img src="mindaquarium_intro.png" alt="아이들과 물고기들"
+                className="w-full max-w-xs md:max-w-md lg:max-w-xl"
+                style={{ objectFit: 'contain', filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.3))' }} />
+              <div className="absolute left-1/2 pointer-events-none"
+                style={{ bottom: '-48px', transform: 'translateX(-50%)', width: '100vw', display: 'flex', justifyContent: 'center' }}>
+                <img src="mindaquarium_logo.png" alt="Mind Aquarium Logo"
+                  className="w-[68vw] max-w-[820px] md:w-[55vw] lg:w-[48vw]" />
+              </div>
             </div>
-            <button onClick={() => setMode('intro')} style={{
-              fontSize: '13px', padding: '6px 14px',
-              borderRadius: 'var(--border-radius-md)',
-              border: '0.5px solid var(--color-border-secondary)',
-              background: 'var(--color-background-secondary)',
-              cursor: 'pointer'
-            }}>나가기</button>
-          </div>
-
-          {/* 탭 */}
-          <div style={{ display: 'flex', gap: '4px', borderBottom: '1px solid var(--color-border-tertiary)', marginBottom: '1.5rem' }}>
-            {tabs.map(t => (
-              <button key={t.id} onClick={() => setActiveTab(t.id)} style={{
-                padding: '8px 14px', fontSize: '13px', border: 'none', background: 'none',
-                borderBottom: activeTab === t.id ? '2px solid #3b82f6' : '2px solid transparent',
-                color: activeTab === t.id ? '#3b82f6' : 'var(--color-text-secondary)',
-                fontWeight: activeTab === t.id ? 500 : 400,
-                cursor: 'pointer', marginBottom: '-1px'
-              }}>{t.label}</button>
-            ))}
-          </div>
-
-          {/* 📬 편지함 */}
-          {activeTab === 'mail' && (
-            <Section id="mail" title="수신 편지함" badge={`${messages.length}개`}>
-              {messages.length === 0 ? (
-                <p style={{ color: 'var(--color-text-secondary)', fontSize: '14px', textAlign: 'center', padding: '16px 0' }}>아직 받은 편지가 없습니다.</p>
-              ) : (
-                messages.slice().reverse().map(msg => (
-                  <div key={msg.id} style={{
-                    border: '0.5px solid var(--color-border-tertiary)',
-                    borderRadius: 'var(--border-radius-md)',
-                    padding: '12px', marginBottom: '8px'
-                  }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                      <span style={{ fontWeight: 500, fontSize: '14px' }}>{msg.fish} 물고기</span>
-                      <span style={{ fontSize: '11px', color: 'var(--color-text-secondary)' }}>{msg.date}</span>
-                    </div>
-                    <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', margin: 0, whiteSpace: 'pre-wrap' }}>{msg.content}</p>
-                  </div>
-                ))
-              )}
-            </Section>
-          )}
-
-          {/* 🐟 이름 설정 */}
-          {activeTab === 'fish' && (
-            <Section id="fish" title="물고기 이름 설정">
-              <FishNameEditor
-                defaultFishes={defaultFishes}
-                customFishNames={customFishNames}
-                onSave={saveFishNames}
-              />
-            </Section>
-          )}
-
-          {/* 👑 왕의 편지 */}
-          {activeTab === 'king' && (
-            <Section id="king" title="물고기 왕의 편지">
-              <div style={{
-                background: 'var(--color-background-secondary)',
-                borderRadius: 'var(--border-radius-md)',
-                padding: '10px', marginBottom: '12px', fontSize: '13px',
-                color: 'var(--color-text-secondary)'
-              }}>
-                달성: {totalDays}/30일 · 저장된 편지: {hasKingLetter ? '있음' : '없음'} · 읽음: {hasReadKingLetter ? '예' : '아니오'}
-                {totalDays >= 30 && !hasReadKingLetter && hasKingLetter && (
-                  <span style={{ color: '#16a34a', fontWeight: 500, display: 'block', marginTop: '4px' }}>✅ 아이가 편지를 받을 수 있습니다!</span>
-                )}
+            <div className="h-[72px]" />
+            <div className="relative z-20 flex flex-col items-center w-full max-w-3xl mt-4 md:mt-6">
+              <div className="bg-blue-900/60 rounded-2xl px-6 py-3 mb-4 md:mb-6 backdrop-blur-md border border-blue-400/30">
+                <p className="text-white text-center text-base md:text-xl lg:text-2xl font-medium leading-relaxed">
+                  마음 속 감정을 마음 어항 속<br/>물고기 친구들에게 나누어주세요
+                </p>
               </div>
-              {(!hasKingLetter || canEditKingLetter) ? (
-                <>
-                  <textarea
-                    value={parentLetter}
-                    onChange={(e) => setParentLetter(e.target.value)}
-                    placeholder="아이에게 보낼 격려의 편지를 작성하세요..."
-                    maxLength={300}
-                    style={{
-                      width: '100%', height: '100px', boxSizing: 'border-box',
-                      border: '0.5px solid var(--color-border-secondary)',
-                      borderRadius: 'var(--border-radius-md)',
-                      padding: '10px', fontSize: '13px', resize: 'none'
-                    }}
-                  />
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
-                    <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>{parentLetter.length}/300자</span>
-                    <button onClick={saveKingLetter} style={{
-                      padding: '7px 18px', background: '#f59e0b', color: 'white',
-                      border: 'none', borderRadius: 'var(--border-radius-md)',
-                      fontSize: '13px', fontWeight: 500, cursor: 'pointer'
-                    }}>편지 저장</button>
-                  </div>
-                </>
-              ) : (
-                <div style={{
-                  background: '#fffbeb', border: '0.5px solid #fcd34d',
-                  borderRadius: 'var(--border-radius-md)', padding: '12px'
-                }}>
-                  <p style={{ fontSize: '13px', fontWeight: 500, color: '#92400e', marginBottom: '6px' }}>💌 저장된 편지:</p>
-                  <p style={{ fontSize: '13px', whiteSpace: 'pre-wrap', marginBottom: '8px' }}>{kingLetterContent}</p>
-                  <p style={{ fontSize: '12px', color: '#b45309' }}>ℹ️ 아이가 30일 달성 후 편지를 읽으면 새 편지를 작성할 수 있습니다.</p>
-                </div>
-              )}
-            </Section>
-          )}
-
-          {/* 🔒 비밀번호 */}
-          {activeTab === 'pw' && (
-            <Section id="pw" title="관리자 비밀번호 변경">
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <input
-                  type="password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="새 비밀번호 (4자 이상)"
-                  style={{
-                    padding: '9px 12px', fontSize: '13px',
-                    border: '0.5px solid var(--color-border-secondary)',
-                    borderRadius: 'var(--border-radius-md)'
-                  }}
-                />
-                <input
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="비밀번호 확인"
-                  style={{
-                    padding: '9px 12px', fontSize: '13px',
-                    border: '0.5px solid var(--color-border-secondary)',
-                    borderRadius: 'var(--border-radius-md)'
-                  }}
-                />
-                <button onClick={changePassword} style={{
-                  padding: '9px', background: '#ef4444', color: 'white',
-                  border: 'none', borderRadius: 'var(--border-radius-md)',
-                  fontSize: '13px', fontWeight: 500, cursor: 'pointer'
-                }}>비밀번호 변경</button>
+              <button onClick={() => setMode('aquarium')}
+                className="bg-white text-blue-600 px-12 py-4 md:px-16 md:py-5 rounded-full text-xl md:text-2xl lg:text-3xl font-bold shadow-2xl hover:bg-blue-50 hover:scale-105 transition-all mb-3 md:mb-4">
+                시작하기
+              </button>
+              <button onClick={() => setMode('adminLogin')}
+                className="text-white/80 hover:text-white transition flex items-center gap-2 mb-3 md:mb-4">
+                <Lock /><span className="text-xs md:text-base">관리자 모드</span>
+              </button>
+              <button onClick={handleSignOut} className="text-white/60 hover:text-white/80 transition text-xs md:text-sm">
+                {user?.email} | 로그아웃
+              </button>
+              <div className="text-white/50 text-xs text-center mt-2">
+                <p>© 2024 Grace. All rights reserved.</p>
               </div>
-            </Section>
-          )}
-
-          <div style={{ textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: '11px', marginTop: '2rem' }}>
-            <p>© 2024 Grace. All rights reserved.</p>
-            <p>마음 어항 v1.0</p>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-  );
-}
+      );
 
-      if (mode === 'letter' && selectedFish) {
+      /* ── 관리자 로그인 ── */
+      if (mode === 'adminLogin') return (
+        <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
+          <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
+            <h2 className="text-2xl font-bold mb-6 text-center">관리자 모드</h2>
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)}
+              onKeyPress={e => e.key === 'Enter' && handleAdminLogin()}
+              placeholder="비밀번호 입력"
+              className="w-full border-2 border-gray-300 rounded-lg p-3 mb-4" />
+            <button onClick={handleAdminLogin} className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition mb-3">
+              로그인
+            </button>
+            <button onClick={() => setMode('intro')} className="w-full bg-gray-300 text-gray-700 py-3 rounded-lg font-bold hover:bg-gray-400 transition">
+              돌아가기
+            </button>
+          </div>
+        </div>
+      );
+
+      /* ── 관리자 메인 (탭 + 토글) ── */
+      if (mode === 'admin') {
+        const totalDays = getTotalDays();
+        const canEditKingLetter = totalDays >= 30 && hasReadKingLetter;
+        const hasKingLetter = !!kingLetterContent;
+
+        const TABS = [
+          { id: 'mail', label: '📬 편지함' },
+          { id: 'fish', label: '🐟 이름 설정' },
+          { id: 'king', label: '👑 왕의 편지' },
+          { id: 'pw',   label: '🔒 비밀번호' },
+        ];
+
         return (
-          <div className="min-h-screen bg-gradient-to-b from-blue-200 to-blue-400 p-4 overflow-y-auto">
-            <div className="max-w-2xl mx-auto py-4">
-              <div className="bg-white rounded-lg shadow-xl p-6">
-                <h2 className="text-2xl font-bold mb-3 text-center">{selectedFish.name} 물고기에게 먹이 주기</h2>
-                <div className="flex justify-center mb-4">
-                  <img src={selectedFish.image} alt={selectedFish.name} className="w-40 h-40 object-contain" />
+          <div className="fixed inset-0 bg-gray-100 overflow-hidden">
+            <div className="h-full overflow-y-auto">
+              <div style={{ maxWidth: '680px', margin: '0 auto', padding: '1.5rem 1rem 5rem' }}>
+
+                {/* 헤더 */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                  <div>
+                    <span style={{ fontSize: '20px', fontWeight: 700 }}>관리자 모드</span>
+                    {firebaseConnected && <div style={{ fontSize: '12px', color: '#16a34a', marginTop: '2px' }}>🔥 실시간 동기화 중</div>}
+                  </div>
+                  <button onClick={() => setMode('intro')} className="admin-btn admin-btn-gray">나가기</button>
                 </div>
-                <p className="text-gray-600 text-center mb-4 text-sm">오늘의 마음을 편지로 써보세요</p>
-                
-                <textarea
-                  value={letterContent}
-                  onChange={(e) => setLetterContent(e.target.value)}
-                  placeholder={`${selectedFish.name} 물고기에게 하고 싶은 이야기를 써주세요...`}
-                  className="w-full border-2 border-gray-300 rounded-lg p-3 mb-3 h-32 text-base"
-                  maxLength={100}
-                />
-                
-                <div className="text-right text-sm text-gray-600 mb-4">{letterContent.length}/100자</div>
-                
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => { setMode('aquarium'); setLetterContent(''); }}
-                    className="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg font-bold hover:bg-gray-400 transition"
-                  >
-                    취소
-                  </button>
-                  <button
-                    onClick={feedFish}
-                    className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition flex items-center justify-center gap-2"
-                  >
-                    <Heart />
-                    먹이 주기
-                  </button>
+
+                {/* 탭 바 */}
+                <div style={{ display: 'flex', gap: '2px', borderBottom: '1px solid #e5e7eb', marginBottom: '1.5rem', overflowX: 'auto' }}>
+                  {TABS.map(t => (
+                    <button key={t.id} onClick={() => setAdminTab(t.id)}
+                      className={`admin-tab-btn${adminTab === t.id ? ' active' : ''}`}>
+                      {t.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* ── 탭: 편지함 ── */}
+                {adminTab === 'mail' && (
+                  <AdminSection title="수신 편지함" badge={`${messages.length}개`} defaultOpen={true}>
+                    {messages.length === 0 ? (
+                      <p style={{ color: '#9ca3af', fontSize: '14px', textAlign: 'center', padding: '16px 0' }}>
+                        아직 받은 편지가 없습니다.
+                      </p>
+                    ) : (
+                      messages.slice().reverse().map(msg => (
+                        <div key={msg.id} className="letter-card">
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                            <span style={{ fontWeight: 600, fontSize: '14px' }}>{msg.fish} 물고기</span>
+                            <span style={{ fontSize: '11px', color: '#9ca3af' }}>{msg.date}</span>
+                          </div>
+                          <p style={{ fontSize: '13px', color: '#6b7280', margin: 0, whiteSpace: 'pre-wrap' }}>{msg.content}</p>
+                        </div>
+                      ))
+                    )}
+                  </AdminSection>
+                )}
+
+                {/* ── 탭: 물고기 이름 ── */}
+                {adminTab === 'fish' && (
+                  <AdminSection title="물고기 이름 설정" defaultOpen={true}>
+                    <FishNameEditor
+                      defaultFishes={defaultFishes}
+                      customFishNames={customFishNames}
+                      onSave={saveFishNames}
+                    />
+                  </AdminSection>
+                )}
+
+                {/* ── 탭: 왕의 편지 ── */}
+                {adminTab === 'king' && (
+                  <AdminSection title="물고기 왕의 편지" defaultOpen={true}>
+                    <div className="status-bar">
+                      달성: {totalDays}/30일 &nbsp;·&nbsp; 저장된 편지: {hasKingLetter ? '있음' : '없음'} &nbsp;·&nbsp; 읽음: {hasReadKingLetter ? '예' : '아니오'}
+                      {totalDays >= 30 && !hasReadKingLetter && hasKingLetter && (
+                        <div style={{ color: '#16a34a', fontWeight: 600, marginTop: '4px' }}>✅ 아이가 편지를 받을 수 있습니다!</div>
+                      )}
+                    </div>
+                    {(!hasKingLetter || canEditKingLetter) ? (
+                      <>
+                        <textarea
+                          value={parentLetter}
+                          onChange={e => setParentLetter(e.target.value)}
+                          placeholder="아이에게 보낼 격려의 편지를 작성하세요..."
+                          maxLength={300}
+                          className="admin-textarea"
+                          style={{ height: '100px', marginBottom: '8px' }}
+                        />
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ fontSize: '12px', color: '#9ca3af' }}>{parentLetter.length}/300자</span>
+                          <button onClick={saveKingLetter} className="admin-btn admin-btn-amber">편지 저장</button>
+                        </div>
+                      </>
+                    ) : (
+                      <div style={{ background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: '8px', padding: '12px' }}>
+                        <p style={{ fontSize: '13px', fontWeight: 600, color: '#92400e', marginBottom: '6px' }}>💌 저장된 편지:</p>
+                        <p style={{ fontSize: '13px', whiteSpace: 'pre-wrap', marginBottom: '8px', color: '#374151' }}>{kingLetterContent}</p>
+                        <p style={{ fontSize: '12px', color: '#b45309' }}>ℹ️ 아이가 30일 달성 후 편지를 읽으면 새 편지를 작성할 수 있습니다.</p>
+                      </div>
+                    )}
+                  </AdminSection>
+                )}
+
+                {/* ── 탭: 비밀번호 ── */}
+                {adminTab === 'pw' && (
+                  <AdminSection title="관리자 비밀번호 변경" defaultOpen={true}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)}
+                        placeholder="새 비밀번호 (4자 이상)" className="admin-input" />
+                      <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)}
+                        placeholder="비밀번호 확인" className="admin-input" />
+                      <button onClick={changePassword} className="admin-btn admin-btn-red">비밀번호 변경</button>
+                    </div>
+                  </AdminSection>
+                )}
+
+                <div style={{ textAlign: 'center', color: '#9ca3af', fontSize: '11px', marginTop: '2rem' }}>
+                  <p>© 2024 Grace. All rights reserved.</p>
+                  <p>마음 어항 v1.0</p>
                 </div>
               </div>
             </div>
@@ -1164,47 +902,75 @@ if (!user || mode === 'auth') {
         );
       }
 
-      if (mode === 'kingLetter') {
-        return (
-          <div className="min-h-screen bg-gradient-to-b from-yellow-200 to-yellow-400 p-6">
-            <div className="max-w-2xl mx-auto">
-              <div className="bg-white rounded-lg shadow-xl p-8">
-                <div className="text-center mb-6">
-                  <div className="text-6xl mb-4"><Crown /></div>
-                  <h2 className="text-3xl font-bold mb-2">물고기 왕의 편지</h2>
-                  <p className="text-gray-600">30일 동안 물고기들을 돌봐줘서 고마워요!</p>
-                </div>
-                
-                <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-6 mb-6">
-                  <p className="text-lg whitespace-pre-wrap leading-relaxed">{kingLetterContent}</p>
-                </div>
-                
-                <button onClick={() => setMode('aquarium')} className="w-full bg-blue-600 text-white py-4 rounded-lg font-bold hover:bg-blue-700 transition">
-                  어항으로 돌아가기
+      /* ── 편지 작성 ── */
+      if (mode === 'letter' && selectedFish) return (
+        <div className="min-h-screen bg-gradient-to-b from-blue-200 to-blue-400 p-4 overflow-y-auto">
+          <div className="max-w-2xl mx-auto py-4">
+            <div className="bg-white rounded-lg shadow-xl p-6">
+              <h2 className="text-2xl font-bold mb-3 text-center">{selectedFish.name} 물고기에게 먹이 주기</h2>
+              <div className="flex justify-center mb-4">
+                <img src={selectedFish.image} alt={selectedFish.name} className="w-40 h-40 object-contain" />
+              </div>
+              <p className="text-gray-600 text-center mb-4 text-sm">오늘의 마음을 편지로 써보세요</p>
+              <textarea
+                value={letterContent}
+                onChange={e => setLetterContent(e.target.value)}
+                placeholder={`${selectedFish.name} 물고기에게 하고 싶은 이야기를 써주세요...`}
+                className="w-full border-2 border-gray-300 rounded-lg p-3 mb-3 h-32 text-base"
+                maxLength={100}
+              />
+              <div className="text-right text-sm text-gray-600 mb-4">{letterContent.length}/100자</div>
+              <div className="flex gap-3">
+                <button onClick={() => { setMode('aquarium'); setLetterContent(''); }}
+                  className="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg font-bold hover:bg-gray-400 transition">
+                  취소
+                </button>
+                <button onClick={feedFish}
+                  className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition flex items-center justify-center gap-2">
+                  <Heart /> 먹이 주기
                 </button>
               </div>
             </div>
           </div>
-        );
-      }
+        </div>
+      );
 
+      /* ── 왕의 편지 읽기 ── */
+      if (mode === 'kingLetter') return (
+        <div className="min-h-screen bg-gradient-to-b from-yellow-200 to-yellow-400 p-6">
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-white rounded-lg shadow-xl p-8">
+              <div className="text-center mb-6">
+                <div className="text-6xl mb-4"><Crown /></div>
+                <h2 className="text-3xl font-bold mb-2">물고기 왕의 편지</h2>
+                <p className="text-gray-600">30일 동안 물고기들을 돌봐줘서 고마워요!</p>
+              </div>
+              <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-6 mb-6">
+                <p className="text-lg whitespace-pre-wrap leading-relaxed">{kingLetterContent}</p>
+              </div>
+              <button onClick={() => setMode('aquarium')}
+                className="w-full bg-blue-600 text-white py-4 rounded-lg font-bold hover:bg-blue-700 transition">
+                어항으로 돌아가기
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+
+      /* ── 어항 메인 ── */
       const totalDays = getTotalDays();
       const canShowKingLetter = totalDays >= 30 && kingLetterContent && !hasReadKingLetter;
 
       return (
         <div className="relative min-h-screen overflow-hidden" style={{
           backgroundImage: 'url(mindaquarium_bg.png)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
+          backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat'
         }}>
           {Array.from({ length: 25 }).map((_, i) => (
             <Bubble key={i} delay={i * 0.8} left={Math.random() * 100} size={15 + Math.random() * 25} />
           ))}
-
           <div className="relative z-20 text-center pt-4 pb-2">
             <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-lg">🐠 마음 어항 🐠</h1>
-            
             <div className="bg-white/90 rounded-lg p-3 inline-block mx-auto max-w-xs">
               <p className="text-xs text-gray-600 mb-1">물고기에게 먹이 준 날</p>
               <div className="flex gap-1 justify-center mb-1 flex-wrap">
@@ -1215,36 +981,26 @@ if (!user || mode === 'auth') {
               <p className="text-xl font-bold text-blue-600">{totalDays} / 30일</p>
             </div>
           </div>
-
           {canShowKingLetter && (
             <div className="relative z-20 px-6 mb-4">
-              <button
-                onClick={readKingLetter}
-                className="w-full max-w-2xl mx-auto block bg-yellow-400 text-gray-800 py-6 rounded-lg font-bold text-xl hover:bg-yellow-500 transition flex items-center justify-center gap-3 animate-pulse shadow-xl"
-              >
-                <Crown />
-                <span>물고기 왕이 편지를 보냈어요! 📬</span>
+              <button onClick={readKingLetter}
+                className="w-full max-w-2xl mx-auto block bg-yellow-400 text-gray-800 py-6 rounded-lg font-bold text-xl hover:bg-yellow-500 transition flex items-center justify-center gap-3 animate-pulse shadow-xl">
+                <Crown /><span>물고기 왕이 편지를 보냈어요! 📬</span>
               </button>
             </div>
           )}
-
           <div className="relative w-full h-screen">
             {fishes.map((fish, index) => (
-              <SwimmingFish
-                key={fish.id}
-                fish={fish}
-                index={index}
-                onClick={() => { setSelectedFish(fish); setMode('letter'); }}
-              />
+              <SwimmingFish key={fish.id} fish={fish} index={index}
+                onClick={() => { setSelectedFish(fish); setMode('letter'); }} />
             ))}
           </div>
-
           <div className="fixed top-6 left-6 z-20">
-            <button onClick={() => setMode('intro')} className="bg-white/90 text-blue-600 px-4 py-2 rounded-lg font-bold hover:bg-white transition shadow-lg text-sm">
+            <button onClick={() => setMode('intro')}
+              className="bg-white/90 text-blue-600 px-4 py-2 rounded-lg font-bold hover:bg-white transition shadow-lg text-sm">
               ← 처음으로
             </button>
           </div>
-          
           <div className="fixed bottom-8 left-0 right-0 z-10 text-center pointer-events-none">
             <p className="text-white/50 text-xs">© 2024 Grace</p>
           </div>
