@@ -664,7 +664,7 @@ const handleGoogleSignIn = async () => {
   setLoading(true);
   try {
     const provider = new GoogleAuthProvider();
-const result = await signInWithPopup(window.auth, provider);
+    const result = await signInWithPopup(window.auth, provider);
     const newUser = result.user;
     
     // 프로필이 없으면 생성
@@ -680,6 +680,42 @@ const result = await signInWithPopup(window.auth, provider);
         createdAt: new Date().toISOString()
       });
       await window.dbSet(window.dbRef(window.database, `users/${newUser.uid}/adminPassword`), '1234');
+      
+      // ⭐ 기존 데이터 마이그레이션 (Google 계정도!)
+      console.log('기존 데이터 마이그레이션 시작...');
+      try {
+        const rootRef = window.dbRef(window.database, '/');
+        const rootSnapshot = await new Promise(resolve => {
+          window.dbOnValue(rootRef, resolve, { onlyOnce: true });
+        });
+        const rootData = rootSnapshot.val();
+
+        if (rootData) {
+          if (rootData.messages) {
+            await window.dbSet(window.dbRef(window.database, `users/${newUser.uid}/messages`), rootData.messages);
+            console.log('✅ 편지 데이터 복사 완료');
+          }
+          if (rootData.feedingHistory) {
+            await window.dbSet(window.dbRef(window.database, `users/${newUser.uid}/feedingHistory`), rootData.feedingHistory);
+            console.log('✅ 먹이 기록 복사 완료');
+          }
+          if (rootData.kingLetter) {
+            await window.dbSet(window.dbRef(window.database, `users/${newUser.uid}/kingLetter`), rootData.kingLetter);
+            console.log('✅ 왕의 편지 복사 완료');
+          }
+          if (rootData.hasReadKingLetter) {
+            await window.dbSet(window.dbRef(window.database, `users/${newUser.uid}/hasReadKingLetter`), rootData.hasReadKingLetter);
+            console.log('✅ 편지 읽음 상태 복사 완료');
+          }
+          if (rootData.customFishNames) {
+            await window.dbSet(window.dbRef(window.database, `users/${newUser.uid}/customFishNames`), rootData.customFishNames);
+            console.log('✅ 물고기 이름 복사 완료');
+          }
+        }
+        console.log('🎉 데이터 마이그레이션 완료!');
+      } catch (error) {
+        console.log('마이그레이션 에러 (정상일 수 있음):', error);
+      }
     }
     
     setMode('intro');
