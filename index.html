@@ -908,145 +908,219 @@ if (!user || mode === 'auth') {
       }
 
       
-      if (mode === 'admin') {
-        const totalDays = getTotalDays();
-        const canEditKingLetter = totalDays >= 30 && hasReadKingLetter;
-        const hasKingLetter = !!kingLetterContent;
+   if (mode === 'admin') {
+  const totalDays = getTotalDays();
+  const canEditKingLetter = totalDays >= 30 && hasReadKingLetter;
+  const hasKingLetter = !!kingLetterContent;
 
-        return (
-          <div className="fixed inset-0 bg-gray-100 overflow-hidden">
-            <div className="h-full overflow-y-auto">
-              <div className="max-w-4xl mx-auto p-6 pb-20">
-                <div className="flex justify-between items-center mb-6">
-                  <div>
-                    <h2 className="text-3xl font-bold">관리자 모드</h2>
-                    {firebaseConnected && <p className="text-sm text-green-600">🔥 실시간 동기화 중</p>}
-                  </div>
-                  <button onClick={() => setMode('intro')} className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
-                    나가기
-                  </button>
-                </div>
+  const tabs = [
+    { id: 'mail', label: '📬 편지함' },
+    { id: 'fish', label: '🐟 이름 설정' },
+    { id: 'king', label: '👑 왕의 편지' },
+    { id: 'pw',   label: '🔒 비밀번호' },
+  ];
+  const [activeTab, setActiveTab] = React.useState('mail');
+  const [openSections, setOpenSections] = React.useState({ main: true });
 
-                {/* 비밀번호 변경 */}
-                <div className="bg-red-50 border-2 border-red-300 rounded-lg p-6 mb-6">
-                  <h3 className="text-xl font-bold mb-4">🔒 관리자 비밀번호 변경</h3>
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-sm font-bold mb-1">새 비밀번호 (4자 이상)</label>
-                      <input
-                        type="password"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        placeholder="새 비밀번호 입력"
-                        className="w-full border-2 border-gray-300 rounded-lg p-3"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-bold mb-1">비밀번호 확인</label>
-                      <input
-                        type="password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        placeholder="비밀번호 다시 입력"
-                        className="w-full border-2 border-gray-300 rounded-lg p-3"
-                      />
-                    </div>
-                    <button
-                      onClick={changePassword}
-                      className="w-full bg-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-700 transition"
-                    >
-                      비밀번호 변경
-                    </button>
-                  </div>
-                </div>
+  const toggleSection = (key) =>
+    setOpenSections(prev => ({ ...prev, [key]: !prev[key] }));
 
-                {/* 물고기 이름 설정 */}
-                <FishNameEditor 
-                  defaultFishes={defaultFishes}
-                  customFishNames={customFishNames}
-                  onSave={saveFishNames}
-                />
+  const Section = ({ id, title, badge, children }) => {
+    const open = openSections[id] !== false;
+    return (
+      <div style={{
+        background: 'var(--color-background-primary)',
+        border: '0.5px solid var(--color-border-tertiary)',
+        borderRadius: 'var(--border-radius-lg)',
+        overflow: 'hidden',
+        marginBottom: '12px'
+      }}>
+        <button onClick={() => toggleSection(id)} style={{
+          width: '100%', display: 'flex', justifyContent: 'space-between',
+          alignItems: 'center', padding: '14px 16px',
+          background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left'
+        }}>
+          <span style={{ fontWeight: 500, fontSize: '15px', color: 'var(--color-text-primary)' }}>
+            {title}
+            {badge != null && (
+              <span style={{
+                fontSize: '12px', background: '#dbeafe', color: '#1d4ed8',
+                padding: '2px 8px', borderRadius: '99px', marginLeft: '8px'
+              }}>{badge}</span>
+            )}
+          </span>
+          <span style={{
+            color: 'var(--color-text-secondary)', fontSize: '12px',
+            transform: open ? 'rotate(0deg)' : 'rotate(180deg)',
+            transition: 'transform 0.2s', display: 'inline-block'
+          }}>▲</span>
+        </button>
+        {open && <div style={{ padding: '0 16px 16px' }}>{children}</div>}
+      </div>
+    );
+  };
 
-                {/* 물고기 왕의 편지 */}
-                <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-6 mb-6">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Crown />
-                    <h3 className="text-xl font-bold">물고기 왕의 편지</h3>
-                  </div>
-                  
-                  <div className="bg-white rounded-lg p-4 mb-4 border-2 border-yellow-200">
-                    <p className="text-sm font-bold mb-2">📊 현재 상태:</p>
-                    <p className="text-gray-700">• 달성 일수: {totalDays}/30일</p>
-                    <p className="text-gray-700">• 저장된 편지: {hasKingLetter ? '있음' : '없음'}</p>
-                    <p className="text-gray-700">• 아이가 읽음: {hasReadKingLetter ? '예' : '아니오'}</p>
-                    {totalDays >= 30 && !hasReadKingLetter && hasKingLetter && (
-                      <p className="text-green-600 font-bold mt-2">✅ 아이가 편지를 받을 수 있습니다!</p>
-                    )}
-                  </div>
+  return (
+    <div className="fixed inset-0 bg-gray-100 overflow-hidden">
+      <div className="h-full overflow-y-auto">
+        <div style={{ maxWidth: '680px', margin: '0 auto', padding: '1.5rem 1rem 5rem' }}>
 
-                  {(!hasKingLetter || canEditKingLetter) ? (
-                    <>
-                      <textarea
-                        value={parentLetter}
-                        onChange={(e) => setParentLetter(e.target.value)}
-                        placeholder="아이에게 보낼 격려의 편지를 작성하세요..."
-                        className="w-full border-2 border-gray-300 rounded-lg p-3 mb-3 h-32"
-                        maxLength={300}
-                      />
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">{parentLetter.length}/300자</span>
-                        <button
-                          onClick={saveKingLetter}
-                          className="bg-yellow-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-yellow-600"
-                        >
-                          편지 저장
-                        </button>
-                      </div>
-                    </>
-                  ) : (
-                    <div className="bg-yellow-100 border-2 border-yellow-400 rounded-lg p-4">
-                      <p className="text-sm font-bold mb-2 text-yellow-800">💌 현재 저장된 편지:</p>
-                      <p className="text-gray-700 whitespace-pre-wrap mb-3">{kingLetterContent}</p>
-                      <p className="text-sm text-yellow-700">
-                        ℹ️ 아이가 30일을 달성하고 편지를 읽으면 새로운 편지를 작성할 수 있습니다.
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                {/* 수신 편지함 */}
-                <div className="bg-white rounded-lg shadow-lg p-6">
-                  <h3 className="text-2xl font-bold mb-4 flex items-center gap-2">
-                    <Mail />
-                    수신 편지함 ({messages.length}개)
-                  </h3>
-                  
-                  {messages.length === 0 ? (
-                    <p className="text-gray-500 text-center py-8">아직 받은 편지가 없습니다.</p>
-                  ) : (
-                    <div className="space-y-4">
-                      {messages.slice().reverse().map((msg) => (
-                        <div key={msg.id} className="border-2 border-gray-200 rounded-lg p-4 hover:border-blue-300 transition">
-                          <div className="flex justify-between items-start mb-2">
-                            <span className="font-bold text-lg">{msg.fish} 물고기</span>
-                            <span className="text-sm text-gray-500">{msg.date}</span>
-                          </div>
-                          <p className="text-gray-700 whitespace-pre-wrap">{msg.content}</p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                
-                <div className="text-center text-gray-500 text-xs mt-8 pb-4">
-                  <p>© 2024 Grace. All rights reserved.</p>
-                  <p className="mt-1">마음 어항 v1.0</p>
-                </div>
-              </div>
+          {/* 헤더 */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+            <div>
+              <span style={{ fontSize: '20px', fontWeight: 500 }}>관리자 모드</span>
+              {firebaseConnected && <div style={{ fontSize: '12px', color: '#16a34a', marginTop: '2px' }}>🔥 실시간 동기화 중</div>}
             </div>
+            <button onClick={() => setMode('intro')} style={{
+              fontSize: '13px', padding: '6px 14px',
+              borderRadius: 'var(--border-radius-md)',
+              border: '0.5px solid var(--color-border-secondary)',
+              background: 'var(--color-background-secondary)',
+              cursor: 'pointer'
+            }}>나가기</button>
           </div>
-        );
-      }
+
+          {/* 탭 */}
+          <div style={{ display: 'flex', gap: '4px', borderBottom: '1px solid var(--color-border-tertiary)', marginBottom: '1.5rem' }}>
+            {tabs.map(t => (
+              <button key={t.id} onClick={() => setActiveTab(t.id)} style={{
+                padding: '8px 14px', fontSize: '13px', border: 'none', background: 'none',
+                borderBottom: activeTab === t.id ? '2px solid #3b82f6' : '2px solid transparent',
+                color: activeTab === t.id ? '#3b82f6' : 'var(--color-text-secondary)',
+                fontWeight: activeTab === t.id ? 500 : 400,
+                cursor: 'pointer', marginBottom: '-1px'
+              }}>{t.label}</button>
+            ))}
+          </div>
+
+          {/* 📬 편지함 */}
+          {activeTab === 'mail' && (
+            <Section id="mail" title="수신 편지함" badge={`${messages.length}개`}>
+              {messages.length === 0 ? (
+                <p style={{ color: 'var(--color-text-secondary)', fontSize: '14px', textAlign: 'center', padding: '16px 0' }}>아직 받은 편지가 없습니다.</p>
+              ) : (
+                messages.slice().reverse().map(msg => (
+                  <div key={msg.id} style={{
+                    border: '0.5px solid var(--color-border-tertiary)',
+                    borderRadius: 'var(--border-radius-md)',
+                    padding: '12px', marginBottom: '8px'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                      <span style={{ fontWeight: 500, fontSize: '14px' }}>{msg.fish} 물고기</span>
+                      <span style={{ fontSize: '11px', color: 'var(--color-text-secondary)' }}>{msg.date}</span>
+                    </div>
+                    <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', margin: 0, whiteSpace: 'pre-wrap' }}>{msg.content}</p>
+                  </div>
+                ))
+              )}
+            </Section>
+          )}
+
+          {/* 🐟 이름 설정 */}
+          {activeTab === 'fish' && (
+            <Section id="fish" title="물고기 이름 설정">
+              <FishNameEditor
+                defaultFishes={defaultFishes}
+                customFishNames={customFishNames}
+                onSave={saveFishNames}
+              />
+            </Section>
+          )}
+
+          {/* 👑 왕의 편지 */}
+          {activeTab === 'king' && (
+            <Section id="king" title="물고기 왕의 편지">
+              <div style={{
+                background: 'var(--color-background-secondary)',
+                borderRadius: 'var(--border-radius-md)',
+                padding: '10px', marginBottom: '12px', fontSize: '13px',
+                color: 'var(--color-text-secondary)'
+              }}>
+                달성: {totalDays}/30일 · 저장된 편지: {hasKingLetter ? '있음' : '없음'} · 읽음: {hasReadKingLetter ? '예' : '아니오'}
+                {totalDays >= 30 && !hasReadKingLetter && hasKingLetter && (
+                  <span style={{ color: '#16a34a', fontWeight: 500, display: 'block', marginTop: '4px' }}>✅ 아이가 편지를 받을 수 있습니다!</span>
+                )}
+              </div>
+              {(!hasKingLetter || canEditKingLetter) ? (
+                <>
+                  <textarea
+                    value={parentLetter}
+                    onChange={(e) => setParentLetter(e.target.value)}
+                    placeholder="아이에게 보낼 격려의 편지를 작성하세요..."
+                    maxLength={300}
+                    style={{
+                      width: '100%', height: '100px', boxSizing: 'border-box',
+                      border: '0.5px solid var(--color-border-secondary)',
+                      borderRadius: 'var(--border-radius-md)',
+                      padding: '10px', fontSize: '13px', resize: 'none'
+                    }}
+                  />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
+                    <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>{parentLetter.length}/300자</span>
+                    <button onClick={saveKingLetter} style={{
+                      padding: '7px 18px', background: '#f59e0b', color: 'white',
+                      border: 'none', borderRadius: 'var(--border-radius-md)',
+                      fontSize: '13px', fontWeight: 500, cursor: 'pointer'
+                    }}>편지 저장</button>
+                  </div>
+                </>
+              ) : (
+                <div style={{
+                  background: '#fffbeb', border: '0.5px solid #fcd34d',
+                  borderRadius: 'var(--border-radius-md)', padding: '12px'
+                }}>
+                  <p style={{ fontSize: '13px', fontWeight: 500, color: '#92400e', marginBottom: '6px' }}>💌 저장된 편지:</p>
+                  <p style={{ fontSize: '13px', whiteSpace: 'pre-wrap', marginBottom: '8px' }}>{kingLetterContent}</p>
+                  <p style={{ fontSize: '12px', color: '#b45309' }}>ℹ️ 아이가 30일 달성 후 편지를 읽으면 새 편지를 작성할 수 있습니다.</p>
+                </div>
+              )}
+            </Section>
+          )}
+
+          {/* 🔒 비밀번호 */}
+          {activeTab === 'pw' && (
+            <Section id="pw" title="관리자 비밀번호 변경">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="새 비밀번호 (4자 이상)"
+                  style={{
+                    padding: '9px 12px', fontSize: '13px',
+                    border: '0.5px solid var(--color-border-secondary)',
+                    borderRadius: 'var(--border-radius-md)'
+                  }}
+                />
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="비밀번호 확인"
+                  style={{
+                    padding: '9px 12px', fontSize: '13px',
+                    border: '0.5px solid var(--color-border-secondary)',
+                    borderRadius: 'var(--border-radius-md)'
+                  }}
+                />
+                <button onClick={changePassword} style={{
+                  padding: '9px', background: '#ef4444', color: 'white',
+                  border: 'none', borderRadius: 'var(--border-radius-md)',
+                  fontSize: '13px', fontWeight: 500, cursor: 'pointer'
+                }}>비밀번호 변경</button>
+              </div>
+            </Section>
+          )}
+
+          <div style={{ textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: '11px', marginTop: '2rem' }}>
+            <p>© 2024 Grace. All rights reserved.</p>
+            <p>마음 어항 v1.0</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
       if (mode === 'letter' && selectedFish) {
         return (
