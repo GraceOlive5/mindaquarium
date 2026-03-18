@@ -493,7 +493,7 @@ const fishes = defaultFishes.map(fish => ({
       };
 
       const handleAdminLogin = () => {
-        if (password === 'adminPassword') {
+        if (password === adminPassword) {
           setMode('admin');
           setPassword('');
         } else {
@@ -625,26 +625,28 @@ await window.signInWithEmailAndPassword(window.auth, email, password);
 const handleGoogleSignIn = async () => {
   setLoading(true);
   try {
-    const provider = new GoogleAuthProvider();
-    const result = await signInWithPopup(window.auth, provider);
+    const provider = new window.GoogleAuthProvider();
+    const result = await window.signInWithPopup(window.auth, provider);
     const newUser = result.user;
-    
-    // 프로필이 없으면 생성
+
     const profileRef = window.dbRef(window.database, `users/${newUser.uid}/profile`);
-    const profileSnapshot = await new Promise(resolve => {
+    const profileSnapshot = await new Promise((resolve) => {
       window.dbOnValue(profileRef, resolve, { onlyOnce: true });
     });
-    
+
     if (!profileSnapshot.val()) {
       await window.dbSet(profileRef, {
         email: newUser.email,
         childName: '아이',
         createdAt: new Date().toISOString()
       });
-      await window.dbSet(window.dbRef(window.database, `users/${newUser.uid}/adminPassword`), '1234');
-      
-      
-    
+
+      await window.dbSet(
+        window.dbRef(window.database, `users/${newUser.uid}/adminPassword`),
+        '1234'
+      );
+    }
+
     setMode('intro');
   } catch (error) {
     console.error('Google SignIn error:', error);
