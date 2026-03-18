@@ -110,7 +110,8 @@
   });
   window._db  = getDatabase(app);
   window._auth = getAuth(app);
-  window._fa = { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, ref, set, onValue };
+  window._fa = { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInWithPopup, ref, set, onValue };
+  window._GoogleAuthProvider = GoogleAuthProvider;
 </script>
 
 <script type="text/babel">
@@ -286,8 +287,8 @@ function AuthScreen({ onSuccess }) {
   const googleSignIn = async () => {
     setBusy(true);
     try {
-      const Provider = fa().GoogleAuthProvider;
-      const provider = new Provider();
+      const GAP = window._GoogleAuthProvider;
+      const provider = new GAP();
       const result = await fa().signInWithPopup(auth(), provider);
       const uid = result.user.uid;
       const snap = await new Promise(r => fa().onValue(fa().ref(db(),`users/${uid}/profile`), r, {onlyOnce:true}));
