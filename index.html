@@ -744,14 +744,16 @@ function App() {
   const [messages, setMessages] = useState([]);
   const [feedingHistory, setFeedingHistory] = useState({});
   const [goalCount, setGoalCount] = useState(30);
-  const [cycleCount, setCycleCount] = useState(0);
   const [pendingKingLetter, setPendingKingLetter] = useState('');
   const [kingLetterHistory, setKingLetterHistory] = useState([]);
   const [adminPassword, setAdminPassword] = useState('1234');
   const [customFishNames, setCustomFishNames] = useState(null);
   const [selectedFish, setSelectedFish] = useState(null);
-  // 왕의 편지 읽기용: 팝업에서 읽기 누를 때 보여줄 내용 임시 저장
   const [kingLetterToShow, setKingLetterToShow] = useState('');
+
+  // cycleCount: 발송된 편지 수 * goalCount 이후 나머지로 계산
+  const sentCount = kingLetterHistory.length;
+  const cycleCount = messages.length - (sentCount * goalCount);
 
   const fishes = DEFAULT_FISHES.map(f => ({ ...f, name: customFishNames?.[f.id] || f.defaultName }));
 
@@ -772,7 +774,6 @@ function App() {
     listen('messages', d => setMessages(Array.isArray(d) ? d.filter(m=>m&&m.id) : Object.values(d).filter(m=>m&&m.id)));
     listen('feedingHistory', setFeedingHistory);
     listen('goalCount', setGoalCount);
-    listen('cycleCount', setCycleCount);
     listen('pendingKingLetter', setPendingKingLetter);
     listen('kingLetterHistory', d => {
       if (Array.isArray(d)) setKingLetterHistory(d.filter(Boolean));
@@ -781,31 +782,15 @@ function App() {
     listen('adminPassword', setAdminPassword);
     listen('customFishNames', setCustomFishNames);
 
-    // ── 마이그레이션: v2migrated 플래그가 없을 때 딱 한 번만 실행 ──
+    // ── 마이그레이션: 구버전 kingLetter → 새 구조로 한 번만 실행 ──
     fa().onValue(fa().ref(db(), `users/${user.uid}/v2migrated`), snap => {
-      if (snap.val()) return; // 이미 마이그레이션 완료
-
-      // 필요한 데이터를 한 번에 읽어서 처리
+      if (snap.val()) return;
       const uid = user.uid;
       Promise.all([
-        new Promise(r => fa().onValue(fa().ref(db(), `users/${uid}/messages`),      s => r(s.val()), { onlyOnce:true })),
-        new Promise(r => fa().onValue(fa().ref(db(), `users/${uid}/goalCount`),     s => r(s.val()), { onlyOnce:true })),
-        new Promise(r => fa().onValue(fa().ref(db(), `users/${uid}/cycleCount`),    s => r(s.val()), { onlyOnce:true })),
-        new Promise(r => fa().onValue(fa().ref(db(), `users/${uid}/kingLetter`),    s => r(s.val()), { onlyOnce:true })),
-        new Promise(r => fa().onValue(fa().ref(db(), `users/${uid}/hasReadKingLetter`), s => r(s.val()), { onlyOnce:true })),
-      ]).then(([msgs, goal, cycle, oldKingLetter, hasRead]) => {
-        const updates = {};
-        const g = goal || 30;
-
-        // cycleCount 없으면 messages 수 기반으로 초기화
-        if (cycle === null || cycle === undefined) {
-          const rawCount = msgs
-            ? (Array.isArray(msgs) ? msgs.filter(m=>m&&m.id).length : Object.values(msgs).filter(m=>m&&m.id).length)
-            : 0;
-          updates['cycleCount'] = rawCount % g;
-        }
-
-        // 구버전 kingLetter → 새 구조로 이동
+        new Promise(r => fa().onValue(fa().ref(db(), `users/${uid}/kingLetter`),         s => r(s.val()), { onlyOnce:true })),
+        new Promise(r => fa().onValue(fa().ref(db(), `users/${uid}/hasReadKingLetter`),  s => r(s.val()), { onlyOnce:true })),
+      ]).then(([oldKingLetter, hasRead]) => {
+        const updates = { v2migrated: true };
         if (oldKingLetter) {
           if (hasRead) {
             updates['kingLetterHistory'] = [{ content: oldKingLetter, sentAt: '(이전 기록)' }];
@@ -814,17 +799,9 @@ function App() {
             updates['pendingKingLetter'] = oldKingLetter;
           }
         }
-
-        // 마이그레이션 플래그 저장
-        updates['v2migrated'] = true;
-
-        // 한 번에 저장
         Object.entries(updates).forEach(([k, v]) =>
           fa().set(fa().ref(db(), `users/${uid}/${k}`), v)
         );
-
-        // cycleCount 업데이트가 있으면 로컬 state도 반영
-        if (updates['cycleCount'] !== undefined) setCycleCount(updates['cycleCount']);
         if (updates['pendingKingLetter'] !== undefined) setPendingKingLetter(updates['pendingKingLetter']);
       });
     }, { onlyOnce: true });
@@ -845,7 +822,7 @@ function App() {
     await fa().signOut(auth());
     setMessages([]); setFeedingHistory({});
     setPendingKingLetter(''); setKingLetterHistory([]);
-    setCycleCount(0); setCustomFishNames(null);
+    setCustomFishNames(null);
     setMode('auth');
   };
 
@@ -855,22 +832,18 @@ function App() {
   };
 
   const feedFish = async (text) => {
-    // 편지 저장
     const updated = [...messages, { id:Date.now(), fish:selectedFish.name, content:text, date:new Date().toLocaleString('ko-KR') }];
     const today = new Date().toISOString().split('T')[0];
     const updatedHistory = { ...feedingHistory, [today]: true };
-    const newCycle = cycleCount + 1;
 
     await saveToFirebase('messages', updated);
     await saveToFirebase('feedingHistory', updatedHistory);
-    await saveToFirebase('cycleCount', newCycle);
     setMessages(updated);
     setFeedingHistory(updatedHistory);
-    setCycleCount(newCycle);
     setMode('aquarium');
   };
 
-  // 왕의 편지 읽기: 발송 처리 + 기록 저장 + 리셋
+  // 왕의 편지 읽기: 발송 처리 + 기록 저장
   const readKingLetter = async () => {
     const sentLetter = pendingKingLetter;
     setKingLetterToShow(sentLetter);
@@ -880,14 +853,11 @@ function App() {
       sentAt: new Date().toLocaleString('ko-KR')
     }];
 
-    // Firebase 업데이트: 기록에 추가, pendingKingLetter 삭제, cycleCount 리셋
     await saveToFirebase('kingLetterHistory', newHistory);
     await saveToFirebase('pendingKingLetter', '');
-    await saveToFirebase('cycleCount', 0);
 
     setKingLetterHistory(newHistory);
     setPendingKingLetter('');
-    setCycleCount(0);
     setMode('kingLetter');
   };
 
