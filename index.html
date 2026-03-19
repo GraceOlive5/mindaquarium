@@ -1064,6 +1064,74 @@ function TutorialScreen({ shyFish, onComplete, onSendLetter }) {
   );
 }
 
+function AquariumScreen({ fishes, cycleCount, goalCount, pendingKingLetter, messages, onFishClick, onReadKingLetter, onBack }) {
+  const [showPopup, setShowPopup] = useState(false);
+
+  useEffect(() => {
+    if (cycleCount >= goalCount && pendingKingLetter) {
+      const t = setTimeout(() => setShowPopup(true), 600);
+      return () => clearTimeout(t);
+    }
+  }, [cycleCount, goalCount, pendingKingLetter]);
+
+  return (
+    <div className="relative min-h-screen overflow-hidden"
+      style={{ backgroundImage:'url(mindaquarium_bg.png)', backgroundSize:'cover', backgroundPosition:'center' }}>
+      <Bubbles n={25} />
+
+      {/* 왕의 편지 팝업 */}
+      {showPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6"
+          style={{ background:'rgba(0,0,0,0.6)' }}>
+          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center">
+            <div className="text-5xl mb-3">👑</div>
+            <h3 className="text-2xl font-bold mb-2">물고기 왕이 편지를 보냈어요!</h3>
+            <p className="text-gray-500 text-sm mb-6">마음을 {goalCount}번 나눠줬어요 🎉</p>
+            <button onClick={() => { setShowPopup(false); onReadKingLetter(); }}
+              className="w-full bg-yellow-400 text-gray-800 py-3 rounded-xl font-bold text-lg hover:bg-yellow-500 transition mb-3">
+              편지 읽기 💌
+            </button>
+            <button onClick={() => setShowPopup(false)}
+              className="w-full text-gray-400 text-sm hover:text-gray-600 transition">
+              나중에 읽기
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="relative z-20 text-center pt-4 pb-2">
+        <div className="bg-white/90 rounded-lg p-3 inline-block mx-auto max-w-xs">
+          <p className="text-xs text-gray-600 mb-1">물고기에게 나눠준 마음의 기록</p>
+          <p className="text-3xl font-bold text-blue-600">{messages.length}번</p>
+        </div>
+      </div>
+
+      {cycleCount >= goalCount && pendingKingLetter && !showPopup && (
+        <div className="relative z-20 px-6 mb-4">
+          <button onClick={onReadKingLetter}
+            className="w-full max-w-2xl mx-auto block bg-yellow-400 text-gray-800 py-4 rounded-lg font-bold text-lg hover:bg-yellow-500 transition flex items-center justify-center gap-3 animate-pulse shadow-xl">
+            👑 <span>물고기 왕이 편지를 보냈어요! 📬</span>
+          </button>
+        </div>
+      )}
+
+      <div className="relative w-full h-screen">
+        {fishes.map((fish, i) =>
+          <SwimmingFish key={fish.id} fish={fish} index={i} onClick={() => onFishClick(fish)} />
+        )}
+      </div>
+      <div className="fixed top-6 left-6 z-20">
+        <button onClick={onBack} className="bg-white/90 text-blue-600 px-4 py-2 rounded-lg font-bold hover:bg-white transition shadow-lg text-sm">
+          ← 처음으로
+        </button>
+      </div>
+      <div className="fixed bottom-8 left-0 right-0 z-10 text-center pointer-events-none">
+        <p className="text-white/50 text-xs">© 2024 hhappyfamilydais</p>
+      </div>
+    </div>
+  );
+}
+
 /* ══════════════════════════════════════
    앱 루트: mode state + Firebase만 관리
 ══════════════════════════════════════ */
