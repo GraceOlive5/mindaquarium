@@ -194,6 +194,13 @@
       content: '▌';
       animation: blinkCursor 0.8s step-end infinite;
     }
+    @keyframes countPop {
+      0%   { transform: scale(0.5); opacity: 0; }
+      60%  { transform: scale(1.3); opacity: 1; }
+      80%  { transform: scale(0.95); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .count-pop { animation: countPop 0.5s cubic-bezier(.34,1.56,.64,1) both; }
   </style>
 </head>
 <body>
@@ -272,8 +279,24 @@ function SwimmingFish({ fish, onClick, index }) {
       <div style={{ transform:`scaleX(${dir})`, width:'100%', height:'100%', position:'relative' }}>
         <div className="fish-click-area" onClick={onClick} />
         <img src={fish.image} alt={fish.name} style={{userSelect:'none'}} />
-        <div className="absolute top-1/2 left-1/2 pointer-events-none" style={{ transform:`translate(-50%,-50%) scaleX(${dir})` }}>
-          <span className="text-white text-sm font-bold" style={{ textShadow:'2px 2px 4px rgba(0,0,0,0.8),-1px -1px 2px rgba(0,0,0,0.5)' }}>
+        <div className="absolute pointer-events-none" style={{
+          bottom: '-10px',
+          left: '50%',
+          transform: `translateX(-50%) scaleX(${dir})`,
+          whiteSpace: 'nowrap'
+        }}>
+          <span style={{
+            display: 'inline-block',
+            background: 'rgba(255,255,255,0.92)',
+            color: '#333',
+            fontSize: '13px',
+            fontWeight: 700,
+            padding: '3px 10px',
+            borderRadius: '20px',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.25)',
+            border: '1.5px solid rgba(255,255,255,0.8)',
+            letterSpacing: '0.02em'
+          }}>
             {fish.name}
           </span>
         </div>
@@ -1030,9 +1053,26 @@ function AquariumScreen({ fishes, cycleCount, goalCount, pendingKingLetter, mess
       )}
 
       <div className="relative z-20 text-center pt-4 pb-2">
-        <div className="bg-white/90 rounded-lg p-3 inline-block mx-auto max-w-xs">
-          <p className="text-xs text-gray-600 mb-1">물고기에게 나눠준 마음의 기록</p>
-          <p className="text-3xl font-bold text-blue-600">{messages.length}번</p>
+        <div style={{
+          display: 'inline-block',
+          background: 'rgba(255,255,255,0.92)',
+          borderRadius: '20px',
+          padding: '10px 24px 12px',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+          minWidth: '140px'
+        }}>
+          <p style={{ fontSize: '11px', color: '#6b7280', marginBottom: '2px', fontWeight: 500 }}>
+            물고기에게 나눠준 마음의 기록
+          </p>
+          <p key={messages.length} className="count-pop" style={{
+            fontSize: '36px',
+            fontWeight: 800,
+            color: '#38bdf8',
+            lineHeight: 1.2,
+            margin: 0
+          }}>
+            {messages.length}<span style={{ fontSize: '18px', fontWeight: 700, marginLeft: '2px' }}>번</span>
+          </p>
         </div>
       </div>
 
