@@ -15,6 +15,7 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
 
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Roboto',sans-serif; -webkit-font-smoothing:antialiased; overflow:hidden; }
 
@@ -88,6 +89,111 @@
     .lcard:hover { border-color:#93c5fd; }
     .badge { font-size:11px; background:#dbeafe; color:#1d4ed8; padding:2px 8px; border-radius:99px; margin-left:8px; }
     .sbar { background:#f9fafb; border:1px solid #e5e7eb; border-radius:8px; padding:10px 12px; margin-bottom:12px; font-size:13px; color:#6b7280; }
+    /* ── 튜토리얼 레트로 스타일 ── */
+    .retro { font-family: 'Press Start 2P', monospace; }
+
+    @keyframes fishBounce {
+      0%,100% { transform: translateY(0) scaleX(-1); }
+      50%      { transform: translateY(-18px) scaleX(-1); }
+    }
+    @keyframes fishSpin {
+      0%   { transform: rotate(0deg) scale(1); }
+      40%  { transform: rotate(200deg) scale(1.2); }
+      70%  { transform: rotate(340deg) scale(1.1); }
+      100% { transform: rotate(360deg) scaleX(-1); }
+    }
+    @keyframes popIn {
+      0%   { transform: scale(0.7); opacity:0; }
+      80%  { transform: scale(1.05); }
+      100% { transform: scale(1); opacity:1; }
+    }
+    @keyframes blinkCursor {
+      0%,100% { opacity:1; } 50% { opacity:0; }
+    }
+    @keyframes counterPop {
+      0%   { transform: scale(1); }
+      50%  { transform: scale(2.2); }
+      100% { transform: scale(1.4); }
+    }
+    @keyframes silhouetteFloat {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-12px); }
+    }
+
+    .tut-fish-bounce { animation: fishBounce 1.4s ease-in-out infinite; }
+    .tut-fish-spin   { animation: fishSpin 0.7s ease-in-out forwards; }
+    .tut-pop-in      { animation: popIn 0.35s cubic-bezier(.34,1.56,.64,1) both; }
+    .tut-counter-pop { animation: counterPop 0.6s ease-out forwards; }
+    .tut-silhouette  { animation: silhouetteFloat 2s ease-in-out infinite; filter: brightness(0); }
+
+    .pixel-box {
+      image-rendering: pixelated;
+      border: 4px solid #fff;
+      box-shadow:
+        0 0 0 4px #1a1a2e,
+        6px 6px 0 4px #1a1a2e,
+        inset 0 0 0 2px rgba(255,255,255,0.15);
+      background: rgba(10,10,30,0.92);
+      border-radius: 4px;
+    }
+    .pixel-btn {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 11px;
+      background: #f59e0b;
+      color: #1a1a2e;
+      border: 3px solid #fff;
+      box-shadow: 4px 4px 0 #1a1a2e;
+      border-radius: 3px;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: transform 0.08s, box-shadow 0.08s;
+      letter-spacing: 0.05em;
+    }
+    .pixel-btn:active {
+      transform: translate(3px, 3px);
+      box-shadow: 1px 1px 0 #1a1a2e;
+    }
+    .pixel-btn-blue {
+      background: #38bdf8;
+      color: #1a1a2e;
+    }
+    .pixel-btn-green {
+      background: #4ade80;
+      color: #1a1a2e;
+    }
+    .pixel-input {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 13px;
+      background: rgba(255,255,255,0.1);
+      border: 3px solid #fff;
+      box-shadow: 3px 3px 0 #1a1a2e;
+      color: #fff;
+      border-radius: 3px;
+      padding: 10px 14px;
+      outline: none;
+      width: 100%;
+      box-sizing: border-box;
+      text-align: center;
+    }
+    .pixel-input::placeholder { color: rgba(255,255,255,0.4); font-size:10px; }
+    .pixel-textarea {
+      font-family: -apple-system, sans-serif;
+      font-size: 15px;
+      background: rgba(255,255,255,0.95);
+      border: 3px solid #fff;
+      box-shadow: 3px 3px 0 #1a1a2e;
+      color: #1a1a2e;
+      border-radius: 3px;
+      padding: 12px;
+      outline: none;
+      width: 100%;
+      box-sizing: border-box;
+      resize: none;
+    }
+    .cursor-blink::after {
+      content: '▌';
+      animation: blinkCursor 0.8s step-end infinite;
+    }
   </style>
 </head>
 <body>
@@ -661,7 +767,233 @@ function KingLetterScreen({ content, goalCount, onBack }) {
   );
 }
 
-function AquariumScreen({ fishes, cycleCount, goalCount, pendingKingLetter, messages, onFishClick, onReadKingLetter, onBack }) {
+/* ══════════════════════════════════════
+   튜토리얼 화면 (레트로 다마고치 스타일)
+══════════════════════════════════════ */
+function TypeWriter({ text, speed=40, onDone }) {
+  const [displayed, setDisplayed] = useState('');
+  const [done, setDone] = useState(false);
+  useEffect(() => {
+    setDisplayed('');
+    setDone(false);
+    let i = 0;
+    const id = setInterval(() => {
+      i++;
+      setDisplayed(text.slice(0, i));
+      if (i >= text.length) { clearInterval(id); setDone(true); if(onDone) onDone(); }
+    }, speed);
+    return () => clearInterval(id);
+  }, [text]);
+  return <span>{displayed}{!done && <span className="cursor-blink" />}</span>;
+}
+
+function TutorialScreen({ shyFish, onComplete, onSendLetter }) {
+  const [scene, setScene] = useState(1);
+  const [childName, setChildName] = useState('');
+  const [letterText, setLetterText] = useState('');
+  const [spinning, setSpinning] = useState(false);
+  const [showBadge, setShowBadge] = useState(false);
+  const [msgDone, setMsgDone] = useState(false);
+  const [counterPop, setCounterPop] = useState(false);
+
+  const goNext = (n) => { setScene(n); setMsgDone(false); };
+
+  const handleSpin = () => {
+    setSpinning(true);
+    setTimeout(() => { setSpinning(false); setShowBadge(true); }, 750);
+  };
+
+  useEffect(() => {
+    if (scene === 3 && !spinning && !showBadge) handleSpin();
+  }, [scene]);
+
+  useEffect(() => {
+    if (scene === 5) setTimeout(() => setCounterPop(true), 400);
+  }, [scene]);
+
+  const SCENES = {
+    1: {
+      msg: `안녕! 나는 마음을 먹고 자라는 물고기야.\n너의 이름을 알려줄래?`,
+    },
+    2: {
+      msg: `반가워, ${childName}야!\n우리 어항엔 친구들이 많은데\n우리에게 마음을 나눠줄\n주인이 필요해.\n\n기쁜 일, 슬픈 일,\n어쩌면 지루한 날이라도\n마음을 나눠줄 수 있을까?`,
+    },
+    3: {
+      msg: showBadge
+        ? `부끄러운 마음이 들었다면\n이렇게 '부끄러움'이라고\n써있는 나를 선택하는 거야!`
+        : '',
+    },
+    4: {
+      msg: `지금 생각나는\n부끄러웠던 마음을\n한번 적어볼래?`,
+    },
+    5: {
+      msg: `고마워! 정말 든든하다!\n네가 나눠준 마음은\n저기에 차곡차곡 쌓일 거야.`,
+    },
+    6: {
+      msg: `마음을 많이 나눠준다면\n우리 물고기 왕이\n깜짝 편지를 보내기도 해!\n잘 관찰해봐.\n\n앞으로도 잘 부탁해~!`,
+    },
+  };
+
+  const fishClass = spinning ? 'tut-fish-spin' : 'tut-fish-bounce';
+
+  return (
+    <div className="fixed inset-0 overflow-hidden"
+      style={{ backgroundImage:'url(mindaquarium_bg.png)', backgroundSize:'cover', backgroundPosition:'center' }}>
+      <Bubbles n={20} />
+
+      <div className="relative z-10 h-full flex flex-col items-center justify-center px-4" style={{ gap:'0' }}>
+
+        {/* 물고기 영역 */}
+        <div style={{ marginBottom:'24px', position:'relative', display:'flex', flexDirection:'column', alignItems:'center' }}>
+
+          {/* 씬 6: 실루엣 왕 물고기 */}
+          {scene === 6 && (
+            <img src="mindaquarium_happy.png" alt="왕의 물고기"
+              className="tut-silhouette"
+              style={{ width:'80px', height:'80px', objectFit:'contain', position:'absolute', top:'-70px', left:'50%', transform:'translateX(-50%)' }} />
+          )}
+
+          {/* 메인 물고기 (부끄러움) */}
+          <div style={{ position:'relative' }}>
+            <img src={shyFish.image} alt="부끄러움 물고기"
+              className={fishClass}
+              style={{ width:'min(140px,32vw)', height:'min(140px,32vw)', objectFit:'contain',
+                filter:'drop-shadow(0 8px 24px rgba(0,0,0,0.4))',
+                transformOrigin: 'center center' }} />
+
+            {/* 씬 3: 이름 배지 */}
+            {scene === 3 && showBadge && (
+              <div className="tut-pop-in retro" style={{
+                position:'absolute', top:'50%', left:'50%',
+                transform:'translate(-50%,-50%)',
+                background:'rgba(10,10,30,0.9)',
+                border:'3px solid #f9a8d4',
+                borderRadius:'4px',
+                padding:'6px 12px',
+                color:'#f9a8d4',
+                fontSize:'10px',
+                whiteSpace:'nowrap',
+                boxShadow:'3px 3px 0 #1a1a2e'
+              }}>
+                {shyFish.name}
+              </div>
+            )}
+
+            {/* 씬 5: 카운터 강조 */}
+            {scene === 5 && (
+              <div className={`retro ${counterPop ? 'tut-counter-pop' : ''}`} style={{
+                position:'absolute', top:'-30px', right:'-30px',
+                background:'#38bdf8', color:'#1a1a2e',
+                border:'3px solid #fff',
+                boxShadow:'3px 3px 0 #1a1a2e',
+                borderRadius:'4px',
+                padding:'6px 10px',
+                fontSize:'14px',
+                fontWeight:700
+              }}>1</div>
+            )}
+          </div>
+        </div>
+
+        {/* 말풍선 */}
+        {scene !== 4 && SCENES[scene]?.msg && (
+          <div className="pixel-box tut-pop-in" key={`box-${scene}-${showBadge}`}
+            style={{ maxWidth:'360px', width:'100%', padding:'20px 22px', marginBottom:'20px' }}>
+            <p className="retro" style={{ color:'#fff', fontSize:'9px', lineHeight:'2', whiteSpace:'pre-line', margin:0 }}>
+              <TypeWriter key={`tw-${scene}-${showBadge}`}
+                text={SCENES[scene].msg}
+                speed={45}
+                onDone={() => setMsgDone(true)} />
+            </p>
+          </div>
+        )}
+
+        {/* 씬 4: 편지 쓰기 */}
+        {scene === 4 && (
+          <div className="pixel-box tut-pop-in" style={{ maxWidth:'360px', width:'100%', padding:'20px', marginBottom:'20px' }}>
+            <p className="retro" style={{ color:'#f9a8d4', fontSize:'9px', lineHeight:'2', marginBottom:'14px' }}>
+              <TypeWriter key="tw-4" text={SCENES[4].msg} speed={45} onDone={() => setMsgDone(true)} />
+            </p>
+            <textarea
+              value={letterText}
+              onChange={e => setLetterText(e.target.value)}
+              placeholder="마음을 적어봐..."
+              maxLength={100}
+              rows={4}
+              className="pixel-textarea"
+            />
+            <p style={{ color:'rgba(255,255,255,0.4)', fontSize:'10px', textAlign:'right', marginTop:'4px', fontFamily:'monospace' }}>
+              {letterText.length}/100
+            </p>
+          </div>
+        )}
+
+        {/* 씬 1: 이름 입력 */}
+        {scene === 1 && msgDone && (
+          <div className="tut-pop-in" style={{ maxWidth:'360px', width:'100%', marginBottom:'16px' }}>
+            <input
+              type="text" maxLength={6}
+              value={childName}
+              onChange={e => setChildName(e.target.value)}
+              onKeyPress={e => e.key === 'Enter' && childName.trim() && goNext(2)}
+              placeholder="이름을 입력해봐"
+              className="pixel-input"
+            />
+          </div>
+        )}
+
+        {/* 액션 버튼 */}
+        <div className="tut-pop-in" style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:'10px' }}>
+          {scene === 1 && msgDone && (
+            <button className="pixel-btn pixel-btn-blue"
+              onClick={() => childName.trim() && goNext(2)}
+              disabled={!childName.trim()}>
+              ▶ 다음
+            </button>
+          )}
+          {scene === 2 && msgDone && (
+            <button className="pixel-btn"
+              onClick={() => goNext(3)}>
+              ▶ 그래 좋아! 어떻게 하는건데?
+            </button>
+          )}
+          {scene === 3 && showBadge && msgDone && (
+            <button className="pixel-btn pixel-btn-blue"
+              onClick={() => goNext(4)}>
+              ▶ 해볼게!
+            </button>
+          )}
+          {scene === 4 && msgDone && (
+            <button className="pixel-btn pixel-btn-green"
+              onClick={async () => {
+                if (!letterText.trim()) return;
+                await onSendLetter(letterText, shyFish.name);
+                goNext(5);
+              }}
+              disabled={!letterText.trim()}>
+              ❤️ 먹이 주기
+            </button>
+          )}
+          {scene === 5 && msgDone && (
+            <button className="pixel-btn pixel-btn-blue"
+              onClick={() => goNext(6)}>
+              ▶ 다음
+            </button>
+          )}
+          {scene === 6 && msgDone && (
+            <button className="pixel-btn pixel-btn-green"
+              onClick={onComplete}>
+              ▶ 앞으로 잘 부탁해~! 🐟
+            </button>
+          )}
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+({ fishes, cycleCount, goalCount, pendingKingLetter, messages, onFishClick, onReadKingLetter, onBack }) {
   const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
@@ -750,6 +1082,7 @@ function App() {
   const [customFishNames, setCustomFishNames] = useState(null);
   const [selectedFish, setSelectedFish] = useState(null);
   const [kingLetterToShow, setKingLetterToShow] = useState('');
+  const [tutorialDone, setTutorialDone] = useState(null); // null=로딩중
 
   // cycleCount: 발송된 편지 수 * goalCount 이후 나머지로 계산
   const sentCount = kingLetterHistory.length;
@@ -781,6 +1114,14 @@ function App() {
     });
     listen('adminPassword', setAdminPassword);
     listen('customFishNames', setCustomFishNames);
+
+    // 튜토리얼 완료 여부
+    fa().onValue(fa().ref(db(), `users/${user.uid}/tutorialDone`), snap => {
+      const done = !!snap.val();
+      setTutorialDone(done);
+      // 튜토리얼 안 했으면 tutorial 모드로
+      if (!done) setMode('tutorial');
+    }, { onlyOnce: true });
 
     // ── 마이그레이션: 구버전 kingLetter → 새 구조로 한 번만 실행 ──
     fa().onValue(fa().ref(db(), `users/${user.uid}/v2migrated`), snap => {
@@ -826,6 +1167,27 @@ function App() {
     setMode('auth');
   };
 
+  const completeTutorial = async () => {
+    await saveToFirebase('tutorialDone', true);
+    setTutorialDone(true);
+    setMode('intro');
+  };
+
+  const sendTutorialLetter = async (text, fishName) => {
+    const updated = [...messages, {
+      id: Date.now(),
+      fish: fishName,
+      content: text,
+      date: new Date().toLocaleString('ko-KR')
+    }];
+    const today = new Date().toISOString().split('T')[0];
+    const updatedHistory = { ...feedingHistory, [today]: true };
+    await saveToFirebase('messages', updated);
+    await saveToFirebase('feedingHistory', updatedHistory);
+    setMessages(updated);
+    setFeedingHistory(updatedHistory);
+  };
+
   const handleAdminLogin = (pw) => {
     if (pw === adminPassword) setMode('admin');
     else alert('비밀번호가 틀렸습니다.');
@@ -867,6 +1229,13 @@ function App() {
     <>
       {saving && <SavingOverlay />}
       {mode === 'auth'       && <AuthScreen onSuccess={() => setMode('intro')} />}
+      {mode === 'tutorial'   && (
+        <TutorialScreen
+          shyFish={fishes.find(f => f.id === 'shy')}
+          onComplete={completeTutorial}
+          onSendLetter={sendTutorialLetter}
+        />
+      )}
       {mode === 'intro'      && <IntroScreen userEmail={user?.email} onStart={() => setMode('aquarium')} onAdmin={() => setMode('adminLogin')} onSignOut={signOut} />}
       {mode === 'adminLogin' && <AdminLoginScreen onSuccess={handleAdminLogin} onBack={() => setMode('intro')} />}
       {mode === 'admin'      && (
