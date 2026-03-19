@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="마음 어항">
@@ -216,7 +216,7 @@
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
   import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup }
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, OAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult }
     from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
   const app = initializeApp({
@@ -230,8 +230,9 @@
   });
   window._db  = getDatabase(app);
   window._auth = getAuth(app);
-  window._fa = { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInWithPopup, ref, set, onValue };
+  window._fa = { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInWithPopup, signInWithRedirect, getRedirectResult, ref, set, onValue };
   window._GoogleAuthProvider = GoogleAuthProvider;
+  window._OAuthProvider = OAuthProvider;
 </script>
 
 <script type="text/babel">
@@ -409,16 +410,19 @@ function AuthScreen({ onSuccess }) {
     try {
       const GAP = window._GoogleAuthProvider;
       const provider = new GAP();
-      const result = await fa().signInWithPopup(auth(), provider);
-      const uid = result.user.uid;
-      const snap = await new Promise(r => fa().onValue(fa().ref(db(),`users/${uid}/profile`), r, {onlyOnce:true}));
-      if (!snap.val()) {
-        await fa().set(fa().ref(db(),`users/${uid}/profile`), { email: result.user.email, childName:'아이', createdAt: new Date().toISOString() });
-        await fa().set(fa().ref(db(),`users/${uid}/adminPassword`), '1234');
-      }
-      onSuccess();
-    } catch(e) { alert('Google 로그인 실패: '+e.message); }
-    finally { setBusy(false); }
+      await fa().signInWithRedirect(auth(), provider);
+    } catch(e) { alert('Google 로그인 실패: '+e.message); setBusy(false); }
+  };
+
+  const appleSignIn = async () => {
+    setBusy(true);
+    try {
+      const provider = new window._OAuthProvider('apple.com');
+      provider.addScope('email');
+      provider.addScope('name');
+      provider.setCustomParameters({ locale: 'ko' });
+      await fa().signInWithRedirect(auth(), provider);
+    } catch(e) { alert('Apple 로그인 실패: '+e.message); setBusy(false); }
   };
 
   return (
@@ -460,6 +464,15 @@ function AuthScreen({ onSuccess }) {
             <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-300"/></div>
             <div className="relative flex justify-center text-sm"><span className="px-2 bg-white text-gray-500">또는</span></div>
           </div>
+          {/* Apple 로그인 */}
+          <button onClick={appleSignIn}
+            className="w-full bg-black text-white py-3 rounded-lg font-bold hover:bg-gray-900 transition flex items-center justify-center gap-2">
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="white">
+              <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+            </svg>
+            Apple로 계속하기
+          </button>
+          {/* Google 로그인 */}
           <button onClick={googleSignIn}
             className="w-full bg-white border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-bold hover:bg-gray-50 transition flex items-center justify-center gap-2">
             <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -1136,6 +1149,23 @@ function App() {
   const cycleCount = messages.length - (sentCount * goalCount);
 
   const fishes = DEFAULT_FISHES.map(f => ({ ...f, name: customFishNames?.[f.id] || f.defaultName }));
+
+  // Google/Apple 리다이렉트 로그인 결과 처리
+  useEffect(() => {
+    fa().getRedirectResult(auth()).then(async result => {
+      if (!result || !result.user) return;
+      const uid = result.user.uid;
+      const snap = await new Promise(r => fa().onValue(fa().ref(db(),`users/${uid}/profile`), r, {onlyOnce:true}));
+      if (!snap.val()) {
+        await fa().set(fa().ref(db(),`users/${uid}/profile`), {
+          email: result.user.email || '',
+          childName: result.user.displayName || '아이',
+          createdAt: new Date().toISOString()
+        });
+        await fa().set(fa().ref(db(),`users/${uid}/adminPassword`), '1234');
+      }
+    }).catch(() => {});
+  }, []);
 
   useEffect(() => {
     fa().onAuthStateChanged(auth(), u => {
