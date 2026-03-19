@@ -853,15 +853,32 @@ function TutorialScreen({ shyFish, onComplete, onSendLetter }) {
         {/* 물고기 영역 */}
         <div style={{ marginBottom:'24px', position:'relative', display:'flex', flexDirection:'column', alignItems:'center' }}>
 
-          {/* 씬 6: 실루엣 왕 물고기 */}
+          {/* 씬 6: 실루엣 왕 물고기 — 분홍 물고기 뒤 레이어 */}
           {scene === 6 && (
-            <img src="mindaquarium_happy.png" alt="왕의 물고기"
-              className="tut-silhouette"
-              style={{ width:'80px', height:'80px', objectFit:'contain', position:'absolute', top:'-70px', left:'50%', transform:'translateX(-50%)' }} />
+            <div style={{
+              position:'absolute',
+              top:'-200px',
+              left:'50%',
+              transform:'translateX(-50%)',
+              zIndex: 0,
+              pointerEvents: 'none',
+            }}>
+              <img src="mindaquarium_happy.png" alt="왕의 물고기"
+                className="tut-silhouette"
+                style={{
+                  width:'min(420px,90vw)',
+                  height:'min(420px,90vw)',
+                  objectFit:'contain',
+                  opacity: 0.55,
+                  filter:'brightness(0) blur(2px)',
+                  maskImage:'radial-gradient(ellipse 70% 70% at 50% 50%, black 40%, transparent 100%)',
+                  WebkitMaskImage:'radial-gradient(ellipse 70% 70% at 50% 50%, black 40%, transparent 100%)',
+                }} />
+            </div>
           )}
 
-          {/* 메인 물고기 (부끄러움) */}
-          <div style={{ position:'relative' }}>
+          {/* 메인 물고기 (부끄러움) — 왕 실루엣 앞 레이어 */}
+          <div style={{ position:'relative', zIndex: 1 }}>
             <img src={shyFish.image} alt="부끄러움 물고기"
               className={fishClass}
               style={{ width:'min(140px,32vw)', height:'min(140px,32vw)', objectFit:'contain',
