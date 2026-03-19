@@ -1131,7 +1131,8 @@ function App() {
   useEffect(() => {
     fa().onAuthStateChanged(auth(), u => {
       setUser(u);
-      setMode(u ? 'intro' : 'auth');
+      if (!u) setMode('auth');
+      // 로그인 시엔 loading 유지 — tutorialDone 확인 후 mode 결정
     });
   }, []);
 
@@ -1153,12 +1154,11 @@ function App() {
     listen('adminPassword', setAdminPassword);
     listen('customFishNames', setCustomFishNames);
 
-    // 튜토리얼 완료 여부
+    // 튜토리얼 완료 여부 확인 후 mode 결정
     fa().onValue(fa().ref(db(), `users/${user.uid}/tutorialDone`), snap => {
       const done = !!snap.val();
       setTutorialDone(done);
-      // 튜토리얼 안 했으면 tutorial 모드로
-      if (!done) setMode('tutorial');
+      setMode(done ? 'intro' : 'tutorial');
     }, { onlyOnce: true });
 
     // ── 마이그레이션: 구버전 kingLetter → 새 구조로 한 번만 실행 ──
