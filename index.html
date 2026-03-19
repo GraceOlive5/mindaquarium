@@ -6,6 +6,13 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="마음 어항">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#4BA3C3">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-180.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
+  <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
   <meta name="copyright" content="Copyright 2024 hhappyfamilydais. All rights reserved.">
   <meta name="author" content="hhappyfamilydais">
   <meta name="description" content="아이들의 감정 표현을 돕는 감정 어항 앱 - Mind Aquarium">
@@ -1312,5 +1319,12 @@ function App() {
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);
 </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+      });
+    }
+  </script>
 </body>
 </html>
