@@ -285,14 +285,20 @@ const DEFAULT_FISHES = [
 ];
 
 /* ── 공통 컴포넌트 ── */
-function Bubble({ delay, left, size }) {
-  return <div className="bubble" style={{ left:`${left}%`, width:`${size}px`, height:`${size}px`, animationDelay:`${delay}s`, animationDuration:`${8+Math.random()*4}s` }} />;
+function Bubble({ delay, left, size, duration }) {
+  return <div className="bubble" style={{ left:`${left}%`, width:`${size}px`, height:`${size}px`, animationDelay:`${delay}s`, animationDuration:`${duration}s` }} />;
 }
 
 function Bubbles({ n=25 }) {
-  return Array.from({length:n}).map((_,i) =>
-    <Bubble key={i} delay={i*0.8} left={Math.random()*100} size={15+Math.random()*25} />
-  );
+  const bubbles = React.useMemo(() =>
+    Array.from({length:n}).map((_,i) => ({
+      delay: i*0.8,
+      left: Math.random()*100,
+      size: 15+Math.random()*25,
+      duration: 8+Math.random()*4
+    }))
+  , [n]);
+  return bubbles.map((b,i) => <Bubble key={i} {...b} />);
 }
 
 function SwimmingFish({ fish, onClick, index }) {
@@ -1136,42 +1142,8 @@ function TutorialScreen({ shyFish, onComplete, onSendLetter }) {
         {/* 물고기 영역 */}
         <div style={{ marginBottom:'24px', display:'flex', flexDirection:'column', alignItems:'center' }}>
 
-          {/* 물고기 + 왕 그림자 공통 컨테이너 */}
+          {/* 물고기 컨테이너 */}
           <div style={{ position:'relative', width:'min(140px,32vw)', height:'min(140px,32vw)' }}>
-
-            {/* 씬 6: 실루엣 왕 물고기 - 물고기와 같은 크기 기준으로 3배 크게 */}
-            {scene === 6 && (
-              <div className="tut-silhouette" style={{
-                position:'absolute',
-                top:'50%', left:'50%',
-                transform:'translate(-50%, -50%)',
-                width:'420px', height:'420px',
-                maxWidth:'90vw', maxHeight:'90vw',
-                zIndex: 0,
-                pointerEvents: 'none',
-              }}>
-                {/* 왕관 - 물고기 이마(오른쪽 상단)에 기울여서 */}
-                <div style={{
-                  position:'absolute',
-                  top:'22%', left:'60%',
-                  transform:'rotate(20deg)',
-                  fontSize:'52px',
-                  lineHeight:1,
-                  zIndex: 2,
-                  opacity: 0.6,
-                }}>👑</div>
-                {/* 물고기 실루엣 */}
-                <img src="mindaquarium_happy.png" alt="왕의 물고기"
-                  style={{
-                    width:'100%', height:'100%',
-                    objectFit:'contain',
-                    opacity: 0.6,
-                    filter:'brightness(0) blur(3px)',
-                    maskImage:'radial-gradient(ellipse 70% 70% at 50% 50%, black 40%, transparent 100%)',
-                    WebkitMaskImage:'radial-gradient(ellipse 70% 70% at 50% 50%, black 40%, transparent 100%)',
-                  }} />
-              </div>
-            )}
 
             {/* 메인 물고기 (부끄러움) */}
             <div style={{ position:'relative', zIndex: 1, width:'100%', height:'100%' }}>
