@@ -1144,9 +1144,18 @@ function TutorialScreen({ shyFish, onComplete, onSendLetter }) {
               transform:'translate(-50%, -50%)',
               zIndex: 0,
               pointerEvents: 'none',
-              width:'500px', height:'500px',
-              maxWidth:'95vw', maxHeight:'95vw',
+              width:'250px', height:'250px',
+              maxWidth:'70vw', maxHeight:'70vw',
             }}>
+              {/* 왕관 */}
+              <div style={{
+                position:'absolute',
+                top:'-28px', left:'50%',
+                transform:'translateX(-50%)',
+                fontSize:'36px',
+                filter:'drop-shadow(0 2px 6px rgba(0,0,0,0.5))',
+                zIndex: 2,
+              }}>👑</div>
               <img src="mindaquarium_happy.png" alt="왕의 물고기"
                 className="tut-silhouette"
                 style={{
