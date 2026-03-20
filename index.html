@@ -259,14 +259,16 @@ const db = () => window._db;
 const auth = () => window._auth;
 
 const DEFAULT_FISHES = [
-  { id:'worry',  defaultName:'걱정',    color:'노란색', image:'mindaquarium_worry.png' },
-  { id:'fear',   defaultName:'무서움',  color:'파란색', image:'mindaquarium_fear.png' },
-  { id:'anger',  defaultName:'화남',    color:'빨간색', image:'mindaquarium_angry.png' },
-  { id:'secret', defaultName:'비밀',    color:'보라색', image:'mindaquarium_secret.png' },
-  { id:'fun',    defaultName:'재미',    color:'초록색', image:'mindaquarium_fun.png' },
-  { id:'shy',    defaultName:'부끄러움',color:'핑크색', image:'mindaquarium_shy.png' },
-  { id:'happy',  defaultName:'행복',    color:'하얀색', image:'mindaquarium_happy.png' },
-  { id:'love',   defaultName:'사랑',    color:'주황색', image:'mindaquarium_love.png' },
+  // 기본 분양 4마리 (항상 어항에 있음)
+  { id:'happy',  defaultName:'행복',    color:'하얀색', image:'mindaquarium_happy.png',  alwaysShow: true },
+  { id:'shy',    defaultName:'슬픔',    color:'파란색', image:'mindaquarium_fear.png',   alwaysShow: true },
+  { id:'anger',  defaultName:'화남',    color:'빨간색', image:'mindaquarium_angry.png',  alwaysShow: true },
+  { id:'worry',  defaultName:'부끄러움',color:'핑크색', image:'mindaquarium_shy.png',    alwaysShow: true },
+  // 추가 분양 4마리 (이름 입력 시에만 어항에 나옴)
+  { id:'fun',    defaultName:'',        color:'초록색', image:'mindaquarium_fun.png',    alwaysShow: false },
+  { id:'secret', defaultName:'',        color:'보라색', image:'mindaquarium_secret.png', alwaysShow: false },
+  { id:'fear',   defaultName:'',        color:'노란색', image:'mindaquarium_worry.png',  alwaysShow: false },
+  { id:'love',   defaultName:'',        color:'주황색', image:'mindaquarium_love.png',   alwaysShow: false },
 ];
 
 /* ── 공통 컴포넌트 ── */
@@ -281,8 +283,8 @@ function Bubbles({ n=25 }) {
 }
 
 function SwimmingFish({ fish, onClick, index }) {
-  const SCREEN_BOTTOM_LIMIT = 0.68; // 화면 68% 아래로 내려가지 않음
-  const speeds = [0.25, 0.30, 0.22, 0.28, 0.32, 0.24, 0.27, 0.23];
+  const SCREEN_BOTTOM_LIMIT = 0.62; // 화면 68% 아래로 내려가지 않음
+  const speeds = [0.18, 0.22, 0.16, 0.20, 0.24, 0.17, 0.19, 0.15];
   const initPositions = [
     {x:0.10, y:0.15}, {x:0.80, y:0.18}, {x:0.50, y:0.30},
     {x:0.15, y:0.45}, {x:0.70, y:0.45}, {x:0.35, y:0.60},
@@ -346,7 +348,7 @@ function SwimmingFish({ fish, onClick, index }) {
     return () => cancelAnimationFrame(animRef.current);
   }, []);
 
-  const size = 'min(110px, 22vw)';
+  const size = 'min(165px, 33vw)';
 
   return (
     <div ref={ref} style={{
@@ -403,33 +405,91 @@ function FishNameEditor({ customFishNames, onSave }) {
   const change = (id, v) => { if (v.length <= 4) setNames(n => ({...n, [id]:v})); };
   const val = (f) => names[f.id] !== undefined ? names[f.id] : f.defaultName;
 
+  const basicFishes = DEFAULT_FISHES.filter(f => f.alwaysShow);
+  const extraFishes = DEFAULT_FISHES.filter(f => !f.alwaysShow);
+
+  const handleSave = () => {
+    // 기본 4마리 중 이름이 비어있는 게 있는지 체크
+    const emptyBasic = basicFishes.filter(f => val(f).trim() === '');
+    if (emptyBasic.length > 0) {
+      alert('어항에 최소 4마리는 있어야 해요.\n기본 물고기 이름을 모두 입력해주세요.');
+      return;
+    }
+    // 전체 이름 있는 물고기가 4마리 미만인지 체크
+    const allNamed = DEFAULT_FISHES.filter(f => val(f).trim() !== '');
+    if (allNamed.length < 4) {
+      alert('어항에 최소 4마리는 있어야 해요.');
+      return;
+    }
+    onSave(names);
+  };
+
+  const FishCard = (f) => (
+    <div key={f.id} style={{
+      display:'flex', flexDirection:'column', alignItems:'center',
+      background: f.alwaysShow ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.07)',
+      borderRadius:'12px', padding:'10px 6px',
+      border: f.alwaysShow ? '1px solid rgba(255,255,255,0.25)' : '1px dashed rgba(255,255,255,0.2)'
+    }}>
+      <img src={f.image} alt={f.color} style={{ width:'48px', height:'48px', objectFit:'contain', marginBottom:'4px',
+        opacity: val(f).trim() === '' && !f.alwaysShow ? 0.4 : 1
+      }} />
+      <p style={{ fontSize:'10px', color:'rgba(255,255,255,0.6)', margin:'0 0 6px', textAlign:'center' }}>{f.color}</p>
+      <input type="text" maxLength={4}
+        value={val(f)}
+        onChange={e => change(f.id, e.target.value)}
+        placeholder={f.alwaysShow ? '필수' : '이름 입력'}
+        style={{
+          width:'100%', padding:'5px 4px', fontSize:'13px', fontWeight:700,
+          textAlign:'center', borderRadius:'6px',
+          border: val(f).trim() === '' && f.alwaysShow
+            ? '1px solid rgba(255,100,100,0.6)'
+            : val(f).trim() === '' && !f.alwaysShow
+            ? '1px dashed rgba(255,255,255,0.3)'
+            : '1px solid rgba(255,255,255,0.2)',
+          background:'rgba(255,255,255,0.15)', color:'#fff', outline:'none', boxSizing:'border-box'
+        }} />
+      <p style={{ fontSize:'10px', color:'rgba(255,255,255,0.4)', margin:'3px 0 0' }}>
+        {val(f).length}/4
+      </p>
+    </div>
+  );
+
+  const activeExtra = extraFishes.filter(f => val(f).trim() !== '').length;
+
   return (
     <div>
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:'8px', marginBottom:'14px' }}>
-        {DEFAULT_FISHES.map(f => (
-          <div key={f.id} style={{
-            display:'flex', flexDirection:'column', alignItems:'center',
-            background:'rgba(255,255,255,0.1)', borderRadius:'12px', padding:'10px 6px',
-            border:'1px solid rgba(255,255,255,0.15)'
-          }}>
-            <img src={f.image} alt={f.color} style={{ width:'48px', height:'48px', objectFit:'contain', marginBottom:'4px' }} />
-            <p style={{ fontSize:'10px', color:'rgba(255,255,255,0.6)', margin:'0 0 6px', textAlign:'center' }}>{f.color}</p>
-            <input type="text" maxLength={4}
-              value={val(f)}
-              onChange={e => change(f.id, e.target.value)}
-              style={{
-                width:'100%', padding:'5px 4px', fontSize:'13px', fontWeight:700,
-                textAlign:'center', borderRadius:'6px', border:'1px solid rgba(255,255,255,0.2)',
-                background:'rgba(255,255,255,0.15)', color:'#fff', outline:'none', boxSizing:'border-box'
-              }} />
-            <p style={{ fontSize:'10px', color:'rgba(255,255,255,0.4)', margin:'3px 0 0' }}>
-              {val(f).length}/4
-            </p>
-          </div>
-        ))}
+      {/* 기본 분양 */}
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'6px' }}>
+        <p style={{ fontSize:'13px', color:'rgba(255,255,255,0.9)', fontWeight:600, margin:0 }}>
+          기본 물고기 (필수 4마리)
+        </p>
+        <span style={{ fontSize:'11px', color:'rgba(255,255,255,0.5)' }}>이름 변경 가능</span>
       </div>
+      <p style={{ fontSize:'12px', color:'rgba(255,255,255,0.55)', marginBottom:'10px', lineHeight:'1.6' }}>
+        어항에는 항상 최소 4마리가 있어야 해요. 이름을 바꾸면 오늘부터의 기록은 새 이름으로 쌓여요.
+      </p>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:'8px', marginBottom:'20px' }}>
+        {basicFishes.map(f => FishCard(f))}
+      </div>
+
+      {/* 추가 분양 */}
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'6px' }}>
+        <p style={{ fontSize:'13px', color:'rgba(255,255,255,0.9)', fontWeight:600, margin:0 }}>
+          추가 분양 물고기 ({activeExtra}/4)
+        </p>
+        <span style={{ fontSize:'11px', color:'rgba(255,255,255,0.5)' }}>최대 8마리까지</span>
+      </div>
+      <p style={{ fontSize:'12px', color:'rgba(255,255,255,0.55)', marginBottom:'10px', lineHeight:'1.6' }}>
+        어항에는 최대 8마리까지 키울 수 있어요. 처음엔 4마리로 시작하고, 이름을 입력하면 어항에 새로 분양돼요.<br/>
+        아이에게 자주 나타나는 감정으로 이름을 지어주세요. 이름을 지웠다가 새로 입력하면 새 감정 물고기로 재분양됩니다.
+      </p>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:'8px', marginBottom:'14px' }}>
+        {extraFishes.map(f => FishCard(f))}
+      </div>
+
       <div style={{ display:'flex', gap:'8px' }}>
-        <button onClick={() => onSave(names)} className="a-btn btn-blue" style={{ flex:1 }}>이름 저장</button>
+        <button onClick={handleSave} className="a-btn btn-blue" style={{ flex:1 }}>이름 저장</button>
         <button onClick={() => { setNames({}); onSave({}); }} className="a-btn btn-gray">기본값으로</button>
       </div>
     </div>
@@ -1519,7 +1579,10 @@ function App() {
   const sentCount = kingLetterHistory.length;
   const cycleCount = messages.length - (sentCount * goalCount);
 
-  const fishes = DEFAULT_FISHES.map(f => ({ ...f, name: customFishNames?.[f.id] || f.defaultName }));
+  const fishes = DEFAULT_FISHES.map(f => ({
+    ...f,
+    name: customFishNames?.[f.id] !== undefined ? customFishNames[f.id] : f.defaultName
+  })).filter(f => f.alwaysShow || f.name.trim() !== '');
 
   useEffect(() => {
     fa().onAuthStateChanged(auth(), u => {
