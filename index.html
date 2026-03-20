@@ -72,34 +72,42 @@
     .fish-swimming:has(.fish-click-area:hover) { filter:drop-shadow(0 12px 24px rgba(0,0,0,0.6)) brightness(1.1); transform:scale(1.1); }
 
     /* Admin */
-    .admin-wrap { position:fixed; inset:0; background:#f3f4f6; overflow:hidden; }
+    .admin-wrap { position:fixed; inset:0; overflow:hidden; background: linear-gradient(160deg, #0a3d6b 0%, #0d5c8a 40%, #1a7a6e 100%); }
     .admin-scroll { height:100%; overflow-y:auto; }
     .admin-inner { max-width:680px; margin:0 auto; padding:1.5rem 1rem 5rem; }
-    .admin-tab-bar { display:grid; grid-template-columns:repeat(4,1fr); gap:4px; margin-bottom:1.5rem; }
-    .admin-tab { padding:8px 4px; font-size:11px; border:none; border-radius:10px; color:#6b7280; background:#f3f4f6; cursor:pointer; white-space:normal; text-align:center; line-height:1.4; transition:all 0.15s; }
-    .admin-tab.on { font-weight:700; color:#fff; }
-    .admin-tab[data-id='mail'].on { background:#3b82f6; }
-    .admin-tab[data-id='fish'].on { background:#10b981; }
-    .admin-tab[data-id='king'].on { background:#f59e0b; }
-    .admin-tab[data-id='pw'].on   { background:#ef4444; }
-    .sec-card { background:#fff; border:1px solid #e5e7eb; border-radius:12px; overflow:hidden; margin-bottom:12px; }
+    .admin-tab-bar { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-bottom:1.5rem; }
+    .admin-tab {
+      padding:10px 4px; font-size:11px; border:none; border-radius:12px;
+      color:rgba(255,255,255,0.6); background:rgba(255,255,255,0.1);
+      cursor:pointer; white-space:pre-line; text-align:center; line-height:1.5;
+      transition:all 0.15s; border:1px solid rgba(255,255,255,0.15);
+      backdrop-filter:blur(8px);
+    }
+    .admin-tab.on { color:#fff; background:rgba(255,255,255,0.25); border-color:rgba(255,255,255,0.4); font-weight:700; }
+    .sec-card {
+      background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2);
+      border-radius:16px; overflow:hidden; margin-bottom:12px;
+      backdrop-filter:blur(12px);
+    }
     .sec-head { width:100%; display:flex; justify-content:space-between; align-items:center; padding:14px 16px; background:none; border:none; cursor:pointer; text-align:left; }
     .sec-body { padding:0 16px 16px; }
-    .sec-arrow { color:#9ca3af; font-size:12px; display:inline-block; transition:transform 0.2s; }
-    .a-input { width:100%; padding:9px 12px; font-size:13px; border:1px solid #d1d5db; border-radius:8px; box-sizing:border-box; outline:none; }
-    .a-input:focus { border-color:#3b82f6; }
-    .a-textarea { width:100%; padding:10px 12px; font-size:13px; border:1px solid #d1d5db; border-radius:8px; box-sizing:border-box; resize:none; outline:none; }
-    .a-textarea:focus { border-color:#3b82f6; }
+    .sec-arrow { color:rgba(255,255,255,0.5); font-size:12px; display:inline-block; transition:transform 0.2s; }
+    .a-input { width:100%; padding:9px 12px; font-size:13px; border:1px solid rgba(255,255,255,0.2); border-radius:8px; box-sizing:border-box; outline:none; background:rgba(255,255,255,0.15); color:#fff; }
+    .a-input::placeholder { color:rgba(255,255,255,0.4); }
+    .a-input:focus { border-color:rgba(255,255,255,0.5); }
+    .a-textarea { width:100%; padding:10px 12px; font-size:13px; border:1px solid rgba(255,255,255,0.2); border-radius:8px; box-sizing:border-box; resize:none; outline:none; background:rgba(255,255,255,0.15); color:#fff; }
+    .a-textarea::placeholder { color:rgba(255,255,255,0.4); }
+    .a-textarea:focus { border-color:rgba(255,255,255,0.5); }
     .a-btn { padding:9px 18px; border:none; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; }
     .a-btn:hover { opacity:0.85; }
-    .btn-blue { background:#3b82f6; color:#fff; }
-    .btn-red  { background:#ef4444; color:#fff; }
-    .btn-amber{ background:#f59e0b; color:#fff; }
-    .btn-gray { background:#e5e7eb; color:#374151; }
-    .lcard { border:1px solid #e5e7eb; border-radius:8px; padding:12px; margin-bottom:8px; }
-    .lcard:hover { border-color:#93c5fd; }
-    .badge { font-size:11px; background:#dbeafe; color:#1d4ed8; padding:2px 8px; border-radius:99px; margin-left:8px; }
-    .sbar { background:#f9fafb; border:1px solid #e5e7eb; border-radius:8px; padding:10px 12px; margin-bottom:12px; font-size:13px; color:#6b7280; }
+    .btn-blue { background:rgba(59,130,246,0.8); color:#fff; }
+    .btn-red  { background:rgba(239,68,68,0.8); color:#fff; }
+    .btn-amber{ background:rgba(245,158,11,0.8); color:#fff; }
+    .btn-gray { background:rgba(255,255,255,0.2); color:#fff; border:1px solid rgba(255,255,255,0.3); }
+    .lcard { border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:12px; margin-bottom:8px; background:rgba(255,255,255,0.08); }
+    .lcard:hover { border-color:rgba(255,255,255,0.3); }
+    .badge { font-size:11px; background:rgba(255,255,255,0.2); color:#fff; padding:2px 8px; border-radius:99px; margin-left:8px; }
+    .sbar { background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); border-radius:8px; padding:10px 12px; margin-bottom:12px; font-size:13px; color:rgba(255,255,255,0.8); }
     /* ── 튜토리얼 레트로 스타일 ── */
     .retro { font-family: 'Press Start 2P', monospace; }
 
@@ -279,8 +287,9 @@ function SwimmingFish({ fish, onClick, index }) {
     const id = setInterval(() => {
       if (!ref.current) return;
       const r = ref.current.getBoundingClientRect();
-      if (r.left <= 10) setDir(1);
-      else if (r.right >= window.innerWidth - 10) setDir(-1);
+      const centerX = r.left + r.width / 2;
+      if (centerX <= r.width / 2 + 20) setDir(1);
+      else if (centerX >= window.innerWidth - r.width / 2 - 20) setDir(-1);
     }, 80);
     return () => clearInterval(id);
   }, []);
@@ -288,26 +297,23 @@ function SwimmingFish({ fish, onClick, index }) {
   return (
     <div ref={ref} className="fish-swimming absolute" style={{
       ...starts[index], animation:`swim${index+1} ${durations[index]}s ease-in-out infinite`,
-      width:'min(120px,25vw)', height:'min(120px,25vw)', zIndex:30
+      width:'min(120px,25vw)', height:'min(120px,25vw)', zIndex:30,
+      position:'absolute'
     }}>
-      {/* 물고기 이미지만 방향 전환 */}
+      {/* 물고기 이미지 - 방향 전환 */}
       <div style={{ width:'100%', height:'100%', position:'relative', transform:`scaleX(${dir})` }}>
         <div className="fish-click-area" onClick={onClick} />
         <img src={fish.image} alt={fish.name} style={{userSelect:'none', width:'100%', height:'100%', objectFit:'contain'}} />
       </div>
-      {/* 이름표는 항상 정방향 - 물고기 아래 */}
-      <div className="absolute pointer-events-none" style={{
-        bottom: '-18px', left: '50%', transform: 'translateX(-50%)', whiteSpace: 'nowrap'
+      {/* 이름 - 몸통 중앙, 항상 정방향 */}
+      <div style={{
+        position:'absolute', top:'50%', left:'50%',
+        transform:'translate(-50%,-50%)',
+        pointerEvents:'none', whiteSpace:'nowrap'
       }}>
         <span style={{
-          display: 'inline-block',
-          background: 'rgba(255,255,255,0.92)',
-          color: '#333',
-          fontSize: '12px',
-          fontWeight: 700,
-          padding: '2px 10px',
-          borderRadius: '20px',
-          boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+          color:'white', fontSize:'13px', fontWeight:700,
+          textShadow:'2px 2px 4px rgba(0,0,0,0.8),-1px -1px 2px rgba(0,0,0,0.5)'
         }}>
           {fish.name}
         </span>
@@ -322,7 +328,7 @@ function AdminSection({ title, badge, children, defaultOpen=true }) {
   return (
     <div className="sec-card">
       <button className="sec-head" onClick={() => setOpen(v => !v)}>
-        <span style={{ fontWeight:600, fontSize:'15px', color:'#111827' }}>
+        <span style={{ fontWeight:600, fontSize:'15px', color:'#fff' }}>
           {title}{badge != null && <span className="badge">{badge}</span>}
         </span>
         <span className="sec-arrow" style={{ transform: open ? 'rotate(0deg)' : 'rotate(180deg)' }}>▲</span>
@@ -337,23 +343,30 @@ function FishNameEditor({ customFishNames, onSave }) {
   const [names, setNames] = useState({});
   useEffect(() => { if (customFishNames) setNames(customFishNames); }, [customFishNames]);
   const change = (id, v) => { if (v.length <= 4) setNames(n => ({...n, [id]:v})); };
+  const val = (f) => names[f.id] !== undefined ? names[f.id] : f.defaultName;
+
   return (
     <div>
-      <p style={{ fontSize:'13px', color:'#9ca3af', marginBottom:'12px' }}>각 물고기 이름을 최대 4글자로 설정하세요.</p>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:'8px', marginBottom:'14px' }}>
         {DEFAULT_FISHES.map(f => (
-          <div key={f.id} style={{ border:'1px solid #e5e7eb', borderRadius:'8px', padding:'10px', display:'flex', alignItems:'center', gap:'10px' }}>
-            <img src={f.image} alt={f.color} style={{ width:'44px', height:'44px', objectFit:'contain' }} />
-            <div style={{ flex:1 }}>
-              <p style={{ fontSize:'11px', color:'#9ca3af', margin:'0 0 3px' }}>{f.color}</p>
-              <input type="text" maxLength={4}
-                value={names[f.id] !== undefined ? names[f.id] : f.defaultName}
-                onChange={e => change(f.id, e.target.value)}
-                className="a-input" style={{ padding:'5px 8px', fontSize:'14px', fontWeight:600 }} />
-              <p style={{ fontSize:'10px', color:'#d1d5db', margin:'2px 0 0' }}>
-                {(names[f.id] !== undefined ? names[f.id] : f.defaultName).length}/4
-              </p>
-            </div>
+          <div key={f.id} style={{
+            display:'flex', flexDirection:'column', alignItems:'center',
+            background:'rgba(255,255,255,0.1)', borderRadius:'12px', padding:'10px 6px',
+            border:'1px solid rgba(255,255,255,0.15)'
+          }}>
+            <img src={f.image} alt={f.color} style={{ width:'48px', height:'48px', objectFit:'contain', marginBottom:'4px' }} />
+            <p style={{ fontSize:'10px', color:'rgba(255,255,255,0.6)', margin:'0 0 6px', textAlign:'center' }}>{f.color}</p>
+            <input type="text" maxLength={4}
+              value={val(f)}
+              onChange={e => change(f.id, e.target.value)}
+              style={{
+                width:'100%', padding:'5px 4px', fontSize:'13px', fontWeight:700,
+                textAlign:'center', borderRadius:'6px', border:'1px solid rgba(255,255,255,0.2)',
+                background:'rgba(255,255,255,0.15)', color:'#fff', outline:'none', boxSizing:'border-box'
+              }} />
+            <p style={{ fontSize:'10px', color:'rgba(255,255,255,0.4)', margin:'3px 0 0' }}>
+              {val(f).length}/4
+            </p>
           </div>
         ))}
       </div>
@@ -516,58 +529,46 @@ function IntroScreen({ userEmail, onStart, onAdmin, onSignOut }) {
       style={{ backgroundImage:'url(mindaquarium_bg.png)', backgroundSize:'cover', backgroundPosition:'center' }}>
       <Bubbles n={30} />
 
-      <div className="relative h-screen flex flex-col items-center justify-center py-4 px-4">
-        <div className="relative flex flex-col items-center">
-          <img src="mindaquarium_intro.png" alt="인트로" className="w-full max-w-xs md:max-w-md lg:max-w-xl"
+      <div className="relative flex flex-col items-center px-4" style={{ paddingTop: '5vh', paddingBottom: '80px' }}>
+        {/* 캐릭터 + 로고 */}
+        <div className="relative flex flex-col items-center" style={{ marginBottom: '60px' }}>
+          <img src="mindaquarium_intro.png" alt="인트로" className="w-full max-w-xs md:max-w-md"
             style={{ objectFit:'contain', filter:'drop-shadow(0 10px 30px rgba(0,0,0,0.3))' }} />
           <div className="absolute left-1/2 pointer-events-none"
-            style={{ bottom:'-48px', transform:'translateX(-50%)', width:'100vw', display:'flex', justifyContent:'center' }}>
-            <img src="mindaquarium_logo.png" alt="로고" className="w-[68vw] max-w-[820px] md:w-[55vw] lg:w-[48vw]" />
+            style={{ bottom:'-44px', transform:'translateX(-50%)', width:'100vw', display:'flex', justifyContent:'center' }}>
+            <img src="mindaquarium_logo.png" alt="로고" className="w-[65vw] max-w-[700px] md:w-[50vw]" />
           </div>
         </div>
-        <div className="h-[72px]" />
-        <div className="relative z-20 flex flex-col items-center w-full max-w-xs mt-4 md:mt-6">
-          <div className="bg-blue-900/60 rounded-2xl px-6 py-3 mb-5 backdrop-blur-md border border-blue-400/30 w-full">
-            <p className="text-white text-center text-base font-medium leading-relaxed">
-              마음 속 감정을 마음 어항 속<br/>물고기 친구들에게 나누어주세요
-            </p>
-          </div>
 
-          {/* 내 마음 어항 돌보기 - 100% */}
+        {/* 설명 문구 */}
+        <div className="bg-blue-900/60 rounded-2xl px-6 py-3 mb-5 backdrop-blur-md border border-blue-400/30 w-full max-w-xs">
+          <p className="text-white text-center text-base font-medium leading-relaxed">
+            마음 속 감정을 마음 어항 속<br/>물고기 친구들에게 나누어주세요
+          </p>
+        </div>
+
+        {/* CTA 버튼들 */}
+        <div style={{ width: '100%', maxWidth: '320px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
           <button onClick={onStart} style={{
             width: '100%',
-            background: 'white',
-            color: '#2563eb',
-            padding: '16px',
-            borderRadius: '999px',
-            fontSize: '18px',
-            fontWeight: 800,
+            background: 'white', color: '#2563eb',
+            padding: '16px', borderRadius: '999px',
+            fontSize: '18px', fontWeight: 800,
             boxShadow: '0 8px 30px rgba(0,0,0,0.2)',
-            border: 'none',
-            cursor: 'pointer',
-            marginBottom: '12px',
-            transition: 'transform 0.15s',
+            border: 'none', cursor: 'pointer',
           }}>
             내 마음 어항 돌보기 🐠
           </button>
-
-          {/* 어항 관리센터 - 50% */}
-          <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-            <button onClick={onAdmin} style={{
-              width: '50%',
-              background: '#7c3aed',
-              color: 'white',
-              padding: '11px 16px',
-              borderRadius: '999px',
-              fontSize: '13px',
-              fontWeight: 700,
-              border: 'none',
-              cursor: 'pointer',
-              boxShadow: '0 4px 16px rgba(124,58,237,0.4)',
-            }}>
-              🔑 어항 관리센터
-            </button>
-          </div>
+          <button onClick={onAdmin} style={{
+            width: '50%',
+            background: '#7c3aed', color: 'white',
+            padding: '11px 16px', borderRadius: '999px',
+            fontSize: '13px', fontWeight: 700,
+            border: 'none', cursor: 'pointer',
+            boxShadow: '0 4px 16px rgba(124,58,237,0.4)',
+          }}>
+            🔑 어항 관리센터
+          </button>
         </div>
       </div>
 
@@ -597,20 +598,46 @@ function IntroScreen({ userEmail, onStart, onAdmin, onSignOut }) {
 function AdminLoginScreen({ onSuccess, onBack, onResetPw }) {
   const [pw, setPw] = useState('');
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
-      <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
-        <h2 className="text-2xl font-bold mb-6 text-center">🐠 어항 관리센터</h2>
+    <div className="min-h-screen flex items-center justify-center p-6"
+      style={{ background:'linear-gradient(160deg, #0a3d6b 0%, #0d5c8a 40%, #1a7a6e 100%)' }}>
+      <div style={{
+        background:'rgba(255,255,255,0.12)', backdropFilter:'blur(16px)',
+        border:'1px solid rgba(255,255,255,0.25)', borderRadius:'24px',
+        padding:'36px 28px', maxWidth:'360px', width:'100%',
+        boxShadow:'0 20px 60px rgba(0,0,0,0.3)'
+      }}>
+        <div style={{ textAlign:'center', marginBottom:'28px' }}>
+          <div style={{ fontSize:'40px', marginBottom:'10px' }}>🐠</div>
+          <h2 style={{ fontSize:'22px', fontWeight:800, color:'#fff', letterSpacing:'-0.3px' }}>어항 관리센터</h2>
+          <p style={{ fontSize:'13px', color:'rgba(255,255,255,0.6)', marginTop:'6px' }}>관리자만 입장할 수 있어요</p>
+        </div>
         <input type="password" value={pw} onChange={e=>setPw(e.target.value)}
           onKeyPress={e=>e.key==='Enter'&&onSuccess(pw)}
           placeholder="비밀번호 입력"
-          className="w-full border-2 border-gray-300 rounded-lg p-3 mb-4" />
-        <button onClick={() => onSuccess(pw)} className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition mb-3">
-          입장하기
+          style={{
+            width:'100%', padding:'14px', fontSize:'16px', textAlign:'center',
+            letterSpacing:'6px', borderRadius:'12px', border:'1px solid rgba(255,255,255,0.25)',
+            background:'rgba(255,255,255,0.15)', color:'#fff', outline:'none',
+            boxSizing:'border-box', marginBottom:'12px'
+          }} />
+        <button onClick={() => onSuccess(pw)} style={{
+          width:'100%', background:'rgba(255,255,255,0.9)', color:'#0a3d6b',
+          padding:'14px', borderRadius:'12px', fontSize:'16px', fontWeight:800,
+          border:'none', cursor:'pointer', marginBottom:'10px'
+        }}>
+          관리센터 출근하기 🐟
         </button>
-        <button onClick={onBack} className="w-full bg-gray-300 text-gray-700 py-3 rounded-lg font-bold hover:bg-gray-400 transition mb-3">
+        <button onClick={onBack} style={{
+          width:'100%', background:'rgba(255,255,255,0.1)', color:'rgba(255,255,255,0.8)',
+          padding:'12px', borderRadius:'12px', fontSize:'14px', fontWeight:600,
+          border:'1px solid rgba(255,255,255,0.2)', cursor:'pointer', marginBottom:'8px'
+        }}>
           돌아가기
         </button>
-        <button onClick={onResetPw} className="w-full text-gray-400 text-sm hover:text-gray-600 transition py-2">
+        <button onClick={onResetPw} style={{
+          width:'100%', background:'none', border:'none',
+          color:'rgba(255,255,255,0.4)', fontSize:'12px', cursor:'pointer', padding:'6px'
+        }}>
           🔑 비밀번호를 잊으셨나요?
         </button>
       </div>
@@ -628,10 +655,10 @@ function AdminScreen({ messages, goalCount, cycleCount, pendingKingLetter, kingL
   const [confirmPw, setConfirmPw] = useState('');
 
   const TABS = [
-    { id:'mail', label:'🐚\n마음 수신함' },
-    { id:'fish', label:'🐠\n물고기 도감' },
-    { id:'king', label:'👑\n왕의 우체국' },
-    { id:'pw',   label:'🔑\n잠금 설정' },
+    { id:'mail', label:'마음\n수신함' },
+    { id:'fish', label:'물고기\n도감' },
+    { id:'king', label:'왕의\n우체국' },
+    { id:'pw',   label:'잠금\n설정' },
   ];
 
   // 왕의 편지 저장 (새로 작성 or 수정)
@@ -668,17 +695,30 @@ function AdminScreen({ messages, goalCount, cycleCount, pendingKingLetter, kingL
       <div className="admin-scroll">
         <div className="admin-inner">
           {/* 헤더 */}
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'1.5rem' }}>
-            <div style={{ flex:1, marginRight:'12px' }}>
-              <span style={{ fontSize:'20px', fontWeight:700 }}>🐠 어항 관리센터</span>
-              <p style={{ fontSize:'12px', color:'#6b7280', marginTop:'6px', lineHeight:'1.6' }}>
+          <div style={{ marginBottom:'1.5rem' }}>
+            {/* 제목 박스 */}
+            <div style={{
+              background:'rgba(255,255,255,0.15)', backdropFilter:'blur(12px)',
+              border:'1px solid rgba(255,255,255,0.25)', borderRadius:'16px',
+              padding:'16px 20px', marginBottom:'12px', textAlign:'center'
+            }}>
+              <h1 style={{ fontSize:'24px', fontWeight:800, color:'#fff', margin:0, letterSpacing:'-0.3px' }}>
+                🐠 어항 관리센터
+              </h1>
+            </div>
+            {/* 설명 + 퇴근 버튼 */}
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:'12px' }}>
+              <p style={{ fontSize:'15px', color:'rgba(255,255,255,0.8)', lineHeight:'1.7', flex:1, margin:0 }}>
                 아이의 마음을 살며시 살펴봐 주세요.<br/>
                 자주 들여다보되, 아이가 스스로 마음을 다루는 힘을 믿어주는 것이 가장 좋은 돌봄이에요.<br/>
-                아이가 마음을 10번 나눠주는 동안 관리센터에 들러주세요.<br/>
                 관리센터에 출근만 하셔도 어항은 맑게 정화된답니다 🐠
               </p>
+              <button onClick={onExit} style={{
+                background:'rgba(255,255,255,0.15)', border:'1px solid rgba(255,255,255,0.3)',
+                color:'#fff', borderRadius:'10px', padding:'8px 14px',
+                fontSize:'13px', fontWeight:600, cursor:'pointer', flexShrink:0, whiteSpace:'nowrap'
+              }}>퇴근하기 🐟</button>
             </div>
-            <button onClick={onExit} className="a-btn btn-gray" style={{ flexShrink:0 }}>어항으로 🐟</button>
           </div>
 
           {/* 탭 */}
@@ -694,16 +734,16 @@ function AdminScreen({ messages, goalCount, cycleCount, pendingKingLetter, kingL
 
           {/* 📬 편지함 */}
           {tab === 'mail' && (
-            <AdminSection title="아이가 보낸 마음들" badge={`${messages.length}개`}>
+            <AdminSection title="아이가 보낸 마음들" badge={`${messages.length}개`} defaultOpen={false}>
               {messages.length === 0
-                ? <p style={{ color:'#9ca3af', textAlign:'center', padding:'16px 0', fontSize:'14px' }}>아직 받은 편지가 없습니다.</p>
+                ? <p style={{ color:'rgba(255,255,255,0.5)', textAlign:'center', padding:'16px 0', fontSize:'14px' }}>아직 받은 편지가 없습니다.</p>
                 : messages.slice().reverse().map(msg => (
                   <div key={msg.id} className="lcard">
                     <div style={{ display:'flex', justifyContent:'space-between', marginBottom:'4px' }}>
                       <span style={{ fontWeight:600, fontSize:'14px' }}>{msg.fish} 물고기</span>
-                      <span style={{ fontSize:'11px', color:'#9ca3af' }}>{msg.date}</span>
+                      <span style={{ fontSize:'11px', color:'rgba(255,255,255,0.5)' }}>{msg.date}</span>
                     </div>
-                    <p style={{ fontSize:'13px', color:'#6b7280', margin:0, whiteSpace:'pre-wrap' }}>{msg.content}</p>
+                    <p style={{ fontSize:'13px', color:'rgba(255,255,255,0.7)', margin:0, whiteSpace:'pre-wrap' }}>{msg.content}</p>
                   </div>
                 ))
               }
@@ -731,7 +771,7 @@ function AdminScreen({ messages, goalCount, cycleCount, pendingKingLetter, kingL
               <div style={{ display:'flex', gap:'8px', alignItems:'center' }}>
                 <input type="number" min="1" value={goalInput} onChange={e=>setGoalInput(e.target.value)}
                   className="a-input" style={{ maxWidth:'100px' }} />
-                <span style={{ fontSize:'13px', color:'#6b7280' }}>번마다 왕의 편지 발송</span>
+                <span style={{ fontSize:'13px', color:'rgba(255,255,255,0.7)' }}>번마다 왕의 편지 발송</span>
                 <button onClick={saveGoal} className="a-btn btn-blue" style={{ marginLeft:'auto' }}>저장</button>
               </div>
             </AdminSection>
@@ -744,7 +784,7 @@ function AdminScreen({ messages, goalCount, cycleCount, pendingKingLetter, kingL
                       <span style={{ fontSize:'13px', fontWeight:600, color:'#92400e' }}>💌 저장된 편지 (미발송)</span>
                       <span style={{ fontSize:'11px', background:'#fef3c7', color:'#d97706', padding:'2px 8px', borderRadius:'99px' }}>대기 중</span>
                     </div>
-                    <p style={{ fontSize:'13px', whiteSpace:'pre-wrap', color:'#374151', marginBottom:'10px' }}>{pendingKingLetter}</p>
+                    <p style={{ fontSize:'13px', whiteSpace:'pre-wrap', color:'rgba(255,255,255,0.9)', marginBottom:'10px' }}>{pendingKingLetter}</p>
                     <button onClick={() => { setDraftLetter(pendingKingLetter); setEditingLetter(true); }}
                       className="a-btn btn-amber" style={{ width:'100%' }}>✏️ 수정하기</button>
                   </div>
@@ -762,7 +802,7 @@ function AdminScreen({ messages, goalCount, cycleCount, pendingKingLetter, kingL
                     className="a-textarea" style={{ height:'110px', marginBottom:'8px' }}
                   />
                   <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-                    <span style={{ fontSize:'12px', color:'#9ca3af' }}>{draftLetter.length}/300자</span>
+                    <span style={{ fontSize:'12px', color:'rgba(255,255,255,0.5)' }}>{draftLetter.length}/300자</span>
                     <div style={{ display:'flex', gap:'8px' }}>
                       {editingLetter && (
                         <button onClick={() => { setDraftLetter(''); setEditingLetter(false); }} className="a-btn btn-gray">취소</button>
@@ -779,14 +819,14 @@ function AdminScreen({ messages, goalCount, cycleCount, pendingKingLetter, kingL
             {/* 발송 기록 */}
             <AdminSection title="보낸 편지 보관함" badge={`${history.length}개`} defaultOpen={false}>
               {history.length === 0
-                ? <p style={{ color:'#9ca3af', textAlign:'center', padding:'12px 0', fontSize:'13px' }}>아직 발송된 편지가 없습니다.</p>
+                ? <p style={{ color:'rgba(255,255,255,0.5)', textAlign:'center', padding:'12px 0', fontSize:'13px' }}>아직 발송된 편지가 없습니다.</p>
                 : history.slice().reverse().map((h, i) => (
                   <div key={i} className="lcard" style={{ background:'#f9fafb' }}>
                     <div style={{ display:'flex', justifyContent:'space-between', marginBottom:'4px' }}>
-                      <span style={{ fontSize:'12px', fontWeight:600, color:'#6b7280' }}>#{history.length - i}번째 발송</span>
-                      <span style={{ fontSize:'11px', color:'#9ca3af' }}>{h.sentAt}</span>
+                      <span style={{ fontSize:'12px', fontWeight:600, color:'rgba(255,255,255,0.7)' }}>#{history.length - i}번째 발송</span>
+                      <span style={{ fontSize:'11px', color:'rgba(255,255,255,0.5)' }}>{h.sentAt}</span>
                     </div>
-                    <p style={{ fontSize:'13px', whiteSpace:'pre-wrap', color:'#374151', margin:0 }}>{h.content}</p>
+                    <p style={{ fontSize:'13px', whiteSpace:'pre-wrap', color:'rgba(255,255,255,0.9)', margin:0 }}>{h.content}</p>
                   </div>
                 ))
               }
@@ -825,7 +865,7 @@ function LetterScreen({ fish, onSend, onCancel }) {
           </div>
           <p className="text-gray-600 text-center mb-4 text-sm">오늘의 마음을 편지로 써보세요</p>
           <textarea value={text} onChange={e=>setText(e.target.value)}
-            placeholder={`${fish.name} 물고기에게 하고 싶은 이야기를 써주세요...`}
+            placeholder={`${fish.name} 물고기에게 하고 싶은 이야기를 써주세요.`}
             className="w-full border-2 border-gray-300 rounded-lg p-3 mb-3 h-32 text-base" maxLength={100} />
           <div className="text-right text-sm text-gray-600 mb-4">{text.length}/100자</div>
           <div className="flex gap-3">
