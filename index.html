@@ -281,8 +281,8 @@ function Bubbles({ n=25 }) {
 }
 
 function SwimmingFish({ fish, onClick, index }) {
-  const SCREEN_BOTTOM_LIMIT = 0.82; // 화면 82% 아래로 내려가지 않음
-  const speeds = [0.6, 0.8, 0.5, 0.7, 0.9, 0.6, 0.75, 0.65];
+  const SCREEN_BOTTOM_LIMIT = 0.68; // 화면 68% 아래로 내려가지 않음
+  const speeds = [0.25, 0.30, 0.22, 0.28, 0.32, 0.24, 0.27, 0.23];
   const initPositions = [
     {x:0.10, y:0.15}, {x:0.80, y:0.18}, {x:0.50, y:0.30},
     {x:0.15, y:0.45}, {x:0.70, y:0.45}, {x:0.35, y:0.60},
@@ -336,7 +336,7 @@ function SwimmingFish({ fish, onClick, index }) {
 
       // 가끔 방향 살짝 바꿈
       if (Math.random() < 0.005) p.vy += (Math.random() - 0.5) * 0.1;
-      p.vy = Math.max(-0.4, Math.min(0.4, p.vy));
+      p.vy = Math.max(-0.15, Math.min(0.15, p.vy));
 
       setRenderPos({ x: p.x, y: p.y });
       animRef.current = requestAnimationFrame(tick);
@@ -493,24 +493,37 @@ function AuthScreen({ onSuccess }) {
     } finally { setBusy(false); }
   };
 
-  const googleSignIn = async () => {
+  const handleSocialSignIn = async (provider) => {
     setBusy(true);
     try {
-      const GAP = window._GoogleAuthProvider;
-      const provider = new GAP();
-      await fa().signInWithRedirect(auth(), provider);
-    } catch(e) { alert('Google 로그인 실패: '+e.message); setBusy(false); }
+      const result = await fa().signInWithPopup(auth(), provider);
+      const uid = result.user.uid;
+      const snap = await new Promise(r => fa().onValue(fa().ref(db(),`users/${uid}/profile`), r, {onlyOnce:true}));
+      if (!snap.val()) {
+        await fa().set(fa().ref(db(),`users/${uid}/profile`), {
+          email: result.user.email || '',
+          childName: result.user.displayName || '아이',
+          createdAt: new Date().toISOString()
+        });
+      }
+    } catch(e) {
+      if (e.code !== 'auth/popup-closed-by-user') {
+        alert('로그인 실패: ' + e.message);
+      }
+    } finally { setBusy(false); }
   };
 
-  const appleSignIn = async () => {
-    setBusy(true);
-    try {
-      const provider = new window._OAuthProvider('apple.com');
-      provider.addScope('email');
-      provider.addScope('name');
-      provider.setCustomParameters({ locale: 'ko' });
-      await fa().signInWithRedirect(auth(), provider);
-    } catch(e) { alert('Apple 로그인 실패: '+e.message); setBusy(false); }
+  const googleSignIn = () => {
+    const GAP = window._GoogleAuthProvider;
+    handleSocialSignIn(new GAP());
+  };
+
+  const appleSignIn = () => {
+    const provider = new window._OAuthProvider('apple.com');
+    provider.addScope('email');
+    provider.addScope('name');
+    provider.setCustomParameters({ locale: 'ko' });
+    handleSocialSignIn(provider);
   };
 
   return (
@@ -558,7 +571,7 @@ function AuthScreen({ onSuccess }) {
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="white">
               <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
             </svg>
-            Apple로 계속하기
+            Apple로 로그인
           </button>
           {/* Google 로그인 */}
           <button onClick={googleSignIn}
@@ -569,7 +582,7 @@ function AuthScreen({ onSuccess }) {
               <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
             </svg>
-            Google로 계속하기
+            Google로 로그인
           </button>
           <button onClick={() => setIsSignUp(v=>!v)} className="w-full text-blue-600 py-2 text-sm hover:underline">
             {isSignUp ? '이미 계정이 있으신가요? 로그인' : '계정이 없으신가요? 회원가입'}
@@ -584,7 +597,7 @@ function AuthScreen({ onSuccess }) {
 function IntroScreen({ userEmail, onStart, onAdmin, onSignOut }) {
   return (
     <div className="relative min-h-screen overflow-hidden"
-      style={{ backgroundImage:'url(mindaquarium_bg.png)', backgroundSize:'cover', backgroundPosition:'center' }}>
+      style={{ backgroundImage:'url(mindaquarium_bg.png)', backgroundSize:'cover', backgroundPosition:'center bottom' }}>
       <Bubbles n={30} />
 
       <div className="relative flex flex-col items-center px-4" style={{ paddingTop: '5vh', paddingBottom: '80px' }}>
@@ -1042,7 +1055,7 @@ function TutorialScreen({ shyFish, onComplete, onSendLetter }) {
 
   return (
     <div className="fixed inset-0 overflow-hidden"
-      style={{ backgroundImage:'url(mindaquarium_bg.png)', backgroundSize:'cover', backgroundPosition:'center' }}>
+      style={{ backgroundImage:'url(mindaquarium_bg.png)', backgroundSize:'cover', backgroundPosition:'center bottom' }}>
       <Bubbles n={20} />
 
       <div className="relative z-10 h-full flex flex-col items-center justify-center px-4" style={{ gap:'0' }}>
@@ -1230,8 +1243,8 @@ function AquariumScreen({ fishes, cycleCount, goalCount, pendingKingLetter, mess
   }, [cycleCount, goalCount, pendingKingLetter]);
 
   return (
-    <div className="relative min-h-screen overflow-hidden"
-      style={{ backgroundImage:'url(mindaquarium_bg.png)', backgroundSize:'cover', backgroundPosition:'center' }}>
+    <div className="relative overflow-hidden" 
+      style={{ backgroundImage:'url(mindaquarium_bg.png)', backgroundSize:'cover', backgroundPosition:'center bottom', height:'100vh', width:'100vw', position:'fixed', inset:0 }}>
       <Bubbles n={25} />
 
       {/* 왕의 편지 팝업 */}
@@ -1507,23 +1520,6 @@ function App() {
   const cycleCount = messages.length - (sentCount * goalCount);
 
   const fishes = DEFAULT_FISHES.map(f => ({ ...f, name: customFishNames?.[f.id] || f.defaultName }));
-
-  // Google/Apple 리다이렉트 로그인 결과 처리
-  useEffect(() => {
-    fa().getRedirectResult(auth()).then(async result => {
-      if (!result || !result.user) return;
-      const uid = result.user.uid;
-      const snap = await new Promise(r => fa().onValue(fa().ref(db(),`users/${uid}/profile`), r, {onlyOnce:true}));
-      if (!snap.val()) {
-        await fa().set(fa().ref(db(),`users/${uid}/profile`), {
-          email: result.user.email || '',
-          childName: result.user.displayName || '아이',
-          createdAt: new Date().toISOString()
-        });
-        await fa().set(fa().ref(db(),`users/${uid}/adminPassword`), '1234');
-      }
-    }).catch(() => {});
-  }, []);
 
   useEffect(() => {
     fa().onAuthStateChanged(auth(), u => {
