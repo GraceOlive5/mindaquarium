@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
@@ -26,188 +27,191 @@
   <style>
     body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Roboto',sans-serif; -webkit-font-smoothing:antialiased; overflow:hidden; }
 
-    @keyframes swim1 {
-      0%{transform:translate(0,0) rotate(0deg)} 14%{transform:translate(20vw,8vh) rotate(3deg)} 28%{transform:translate(35vw,15vh) rotate(-2deg)}
-      42%{transform:translate(40vw,5vh) rotate(3deg)} 56%{transform:translate(30vw,12vh) rotate(-2deg)} 70%{transform:translate(15vw,18vh) rotate(2deg)}
-      85%{transform:translate(8vw,10vh) rotate(-2deg)} 100%{transform:translate(0,0) rotate(0deg)}
-    }
-    @keyframes swim2 {
-      0%{transform:translate(0,0) rotate(0deg)} 15%{transform:translate(-25vw,-5vh) rotate(-3deg)} 30%{transform:translate(-40vw,10vh) rotate(2deg)}
-      45%{transform:translate(-35vw,20vh) rotate(-3deg)} 60%{transform:translate(-20vw,15vh) rotate(2deg)} 75%{transform:translate(-10vw,8vh) rotate(-2deg)}
-      90%{transform:translate(-5vw,3vh) rotate(2deg)} 100%{transform:translate(0,0) rotate(0deg)}
-    }
-    @keyframes swim3 {
-      0%{transform:translate(0,0) rotate(0deg)} 12%{transform:translate(-15vw,12vh) rotate(-2deg)} 25%{transform:translate(-28vw,8vh) rotate(3deg)}
-      38%{transform:translate(-35vw,15vh) rotate(-3deg)} 50%{transform:translate(-30vw,20vh) rotate(2deg)} 62%{transform:translate(-18vw,18vh) rotate(-2deg)}
-      75%{transform:translate(-10vw,10vh) rotate(3deg)} 88%{transform:translate(-5vw,5vh) rotate(-2deg)} 100%{transform:translate(0,0) rotate(0deg)}
-    }
-    @keyframes swim4 {
-      0%{transform:translate(0,0) rotate(0deg)} 16%{transform:translate(18vw,-8vh) rotate(3deg)} 32%{transform:translate(30vw,5vh) rotate(-2deg)}
-      48%{transform:translate(35vw,-3vh) rotate(3deg)} 64%{transform:translate(25vw,8vh) rotate(-2deg)} 80%{transform:translate(12vw,-5vh) rotate(2deg)}
-      100%{transform:translate(0,0) rotate(0deg)}
-    }
-    @keyframes swim5 {
-      0%{transform:translate(0,0) rotate(0deg)} 13%{transform:translate(-20vw,10vh) rotate(-3deg)} 26%{transform:translate(-32vw,-5vh) rotate(2deg)}
-      39%{transform:translate(-38vw,8vh) rotate(-3deg)} 52%{transform:translate(-30vw,15vh) rotate(2deg)} 65%{transform:translate(-22vw,-3vh) rotate(-2deg)}
-      78%{transform:translate(-12vw,12vh) rotate(3deg)} 91%{transform:translate(-6vw,5vh) rotate(-2deg)} 100%{transform:translate(0,0) rotate(0deg)}
-    }
-    @keyframes swim6 {
-      0%{transform:translate(0,0) rotate(0deg)} 17%{transform:translate(12vw,-10vh) rotate(2deg)} 34%{transform:translate(22vw,-5vh) rotate(-3deg)}
-      51%{transform:translate(28vw,5vh) rotate(3deg)} 68%{transform:translate(20vw,-8vh) rotate(-2deg)} 85%{transform:translate(10vw,3vh) rotate(2deg)}
-      100%{transform:translate(0,0) rotate(0deg)}
-    }
-    @keyframes swim7 {
-      0%{transform:translate(0,0) rotate(0deg)} 14%{transform:translate(-18vw,-12vh) rotate(-3deg)} 28%{transform:translate(-30vw,-5vh) rotate(2deg)}
-      42%{transform:translate(-35vw,8vh) rotate(-3deg)} 56%{transform:translate(-28vw,-8vh) rotate(2deg)} 70%{transform:translate(-15vw,5vh) rotate(-2deg)}
-      85%{transform:translate(-8vw,-3vh) rotate(3deg)} 100%{transform:translate(0,0) rotate(0deg)}
-    }
-    @keyframes bubble {
-      0%{transform:translateY(0) scale(0.9);opacity:0.9} 50%{transform:translateY(-50vh) scale(1.1);opacity:0.7} 100%{transform:translateY(-100vh) scale(1.3);opacity:0}
-    }
-    .bubble { position:absolute; bottom:-20px; background:radial-gradient(circle at 30% 30%,rgba(255,255,255,0.9),rgba(200,230,255,0.6)); border-radius:50%; animation:bubble linear infinite; box-shadow:inset -2px -2px 4px rgba(255,255,255,0.5); }
-    .fish-swimming { cursor:pointer; transition:all 0.3s ease; filter:drop-shadow(0 4px 8px rgba(0,0,0,0.2)); user-select:none; pointer-events:none; }
-    .fish-swimming img { pointer-events:none; width:100%; height:100%; object-fit:contain; }
-    .fish-click-area { position:absolute; top:25%; left:25%; width:50%; height:50%; cursor:pointer; pointer-events:auto; z-index:1; transition:all 0.3s ease; }
-    .fish-click-area:hover { transform:scale(1.05); }
-    .fish-swimming:has(.fish-click-area:hover) { filter:drop-shadow(0 12px 24px rgba(0,0,0,0.6)) brightness(1.1); transform:scale(1.1); }
+```
+@keyframes swim1 {
+  0%{transform:translate(0,0) rotate(0deg)} 14%{transform:translate(20vw,8vh) rotate(3deg)} 28%{transform:translate(35vw,15vh) rotate(-2deg)}
+  42%{transform:translate(40vw,5vh) rotate(3deg)} 56%{transform:translate(30vw,12vh) rotate(-2deg)} 70%{transform:translate(15vw,18vh) rotate(2deg)}
+  85%{transform:translate(8vw,10vh) rotate(-2deg)} 100%{transform:translate(0,0) rotate(0deg)}
+}
+@keyframes swim2 {
+  0%{transform:translate(0,0) rotate(0deg)} 15%{transform:translate(-25vw,-5vh) rotate(-3deg)} 30%{transform:translate(-40vw,10vh) rotate(2deg)}
+  45%{transform:translate(-35vw,20vh) rotate(-3deg)} 60%{transform:translate(-20vw,15vh) rotate(2deg)} 75%{transform:translate(-10vw,8vh) rotate(-2deg)}
+  90%{transform:translate(-5vw,3vh) rotate(2deg)} 100%{transform:translate(0,0) rotate(0deg)}
+}
+@keyframes swim3 {
+  0%{transform:translate(0,0) rotate(0deg)} 12%{transform:translate(-15vw,12vh) rotate(-2deg)} 25%{transform:translate(-28vw,8vh) rotate(3deg)}
+  38%{transform:translate(-35vw,15vh) rotate(-3deg)} 50%{transform:translate(-30vw,20vh) rotate(2deg)} 62%{transform:translate(-18vw,18vh) rotate(-2deg)}
+  75%{transform:translate(-10vw,10vh) rotate(3deg)} 88%{transform:translate(-5vw,5vh) rotate(-2deg)} 100%{transform:translate(0,0) rotate(0deg)}
+}
+@keyframes swim4 {
+  0%{transform:translate(0,0) rotate(0deg)} 16%{transform:translate(18vw,-8vh) rotate(3deg)} 32%{transform:translate(30vw,5vh) rotate(-2deg)}
+  48%{transform:translate(35vw,-3vh) rotate(3deg)} 64%{transform:translate(25vw,8vh) rotate(-2deg)} 80%{transform:translate(12vw,-5vh) rotate(2deg)}
+  100%{transform:translate(0,0) rotate(0deg)}
+}
+@keyframes swim5 {
+  0%{transform:translate(0,0) rotate(0deg)} 13%{transform:translate(-20vw,10vh) rotate(-3deg)} 26%{transform:translate(-32vw,-5vh) rotate(2deg)}
+  39%{transform:translate(-38vw,8vh) rotate(-3deg)} 52%{transform:translate(-30vw,15vh) rotate(2deg)} 65%{transform:translate(-22vw,-3vh) rotate(-2deg)}
+  78%{transform:translate(-12vw,12vh) rotate(3deg)} 91%{transform:translate(-6vw,5vh) rotate(-2deg)} 100%{transform:translate(0,0) rotate(0deg)}
+}
+@keyframes swim6 {
+  0%{transform:translate(0,0) rotate(0deg)} 17%{transform:translate(12vw,-10vh) rotate(2deg)} 34%{transform:translate(22vw,-5vh) rotate(-3deg)}
+  51%{transform:translate(28vw,5vh) rotate(3deg)} 68%{transform:translate(20vw,-8vh) rotate(-2deg)} 85%{transform:translate(10vw,3vh) rotate(2deg)}
+  100%{transform:translate(0,0) rotate(0deg)}
+}
+@keyframes swim7 {
+  0%{transform:translate(0,0) rotate(0deg)} 14%{transform:translate(-18vw,-12vh) rotate(-3deg)} 28%{transform:translate(-30vw,-5vh) rotate(2deg)}
+  42%{transform:translate(-35vw,8vh) rotate(-3deg)} 56%{transform:translate(-28vw,-8vh) rotate(2deg)} 70%{transform:translate(-15vw,5vh) rotate(-2deg)}
+  85%{transform:translate(-8vw,-3vh) rotate(3deg)} 100%{transform:translate(0,0) rotate(0deg)}
+}
+@keyframes bubble {
+  0%{transform:translateY(0) scale(0.9);opacity:0.9} 50%{transform:translateY(-50vh) scale(1.1);opacity:0.7} 100%{transform:translateY(-100vh) scale(1.3);opacity:0}
+}
+.bubble { position:absolute; bottom:-20px; background:radial-gradient(circle at 30% 30%,rgba(255,255,255,0.9),rgba(200,230,255,0.6)); border-radius:50%; animation:bubble linear infinite; box-shadow:inset -2px -2px 4px rgba(255,255,255,0.5); }
+.fish-swimming { cursor:pointer; transition:all 0.3s ease; filter:drop-shadow(0 4px 8px rgba(0,0,0,0.2)); user-select:none; pointer-events:none; }
+.fish-swimming img { pointer-events:none; width:100%; height:100%; object-fit:contain; }
+.fish-click-area { position:absolute; top:25%; left:25%; width:50%; height:50%; cursor:pointer; pointer-events:auto; z-index:1; transition:all 0.3s ease; }
+.fish-click-area:hover { transform:scale(1.05); }
+.fish-swimming:has(.fish-click-area:hover) { filter:drop-shadow(0 12px 24px rgba(0,0,0,0.6)) brightness(1.1); transform:scale(1.1); }
 
-    /* Admin */
-    .admin-wrap { position:fixed; inset:0; background:#f3f4f6; overflow:hidden; }
-    .admin-scroll { height:100%; overflow-y:auto; }
-    .admin-inner { max-width:680px; margin:0 auto; padding:1.5rem 1rem 5rem; }
-    .admin-tab-bar { display:flex; gap:2px; border-bottom:1px solid #e5e7eb; margin-bottom:1.5rem; overflow-x:auto; }
-    .admin-tab { padding:10px 16px; font-size:13px; border:none; background:none; border-bottom:2px solid transparent; color:#6b7280; cursor:pointer; white-space:nowrap; transition:all 0.15s; margin-bottom:-1px; }
-    .admin-tab.on { border-bottom:2px solid #3b82f6; color:#3b82f6; font-weight:600; }
-    .sec-card { background:#fff; border:1px solid #e5e7eb; border-radius:12px; overflow:hidden; margin-bottom:12px; }
-    .sec-head { width:100%; display:flex; justify-content:space-between; align-items:center; padding:14px 16px; background:none; border:none; cursor:pointer; text-align:left; }
-    .sec-body { padding:0 16px 16px; }
-    .sec-arrow { color:#9ca3af; font-size:12px; display:inline-block; transition:transform 0.2s; }
-    .a-input { width:100%; padding:9px 12px; font-size:13px; border:1px solid #d1d5db; border-radius:8px; box-sizing:border-box; outline:none; }
-    .a-input:focus { border-color:#3b82f6; }
-    .a-textarea { width:100%; padding:10px 12px; font-size:13px; border:1px solid #d1d5db; border-radius:8px; box-sizing:border-box; resize:none; outline:none; }
-    .a-textarea:focus { border-color:#3b82f6; }
-    .a-btn { padding:9px 18px; border:none; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; }
-    .a-btn:hover { opacity:0.85; }
-    .btn-blue { background:#3b82f6; color:#fff; }
-    .btn-red  { background:#ef4444; color:#fff; }
-    .btn-amber{ background:#f59e0b; color:#fff; }
-    .btn-gray { background:#e5e7eb; color:#374151; }
-    .lcard { border:1px solid #e5e7eb; border-radius:8px; padding:12px; margin-bottom:8px; }
-    .lcard:hover { border-color:#93c5fd; }
-    .badge { font-size:11px; background:#dbeafe; color:#1d4ed8; padding:2px 8px; border-radius:99px; margin-left:8px; }
-    .sbar { background:#f9fafb; border:1px solid #e5e7eb; border-radius:8px; padding:10px 12px; margin-bottom:12px; font-size:13px; color:#6b7280; }
-    /* ── 튜토리얼 레트로 스타일 ── */
-    .retro { font-family: 'Press Start 2P', monospace; }
+/* Admin */
+.admin-wrap { position:fixed; inset:0; background:#f3f4f6; overflow:hidden; }
+.admin-scroll { height:100%; overflow-y:auto; }
+.admin-inner { max-width:680px; margin:0 auto; padding:1.5rem 1rem 5rem; }
+.admin-tab-bar { display:flex; gap:2px; border-bottom:1px solid #e5e7eb; margin-bottom:1.5rem; overflow-x:auto; }
+.admin-tab { padding:10px 16px; font-size:13px; border:none; background:none; border-bottom:2px solid transparent; color:#6b7280; cursor:pointer; white-space:nowrap; transition:all 0.15s; margin-bottom:-1px; }
+.admin-tab.on { border-bottom:2px solid #3b82f6; color:#3b82f6; font-weight:600; }
+.sec-card { background:#fff; border:1px solid #e5e7eb; border-radius:12px; overflow:hidden; margin-bottom:12px; }
+.sec-head { width:100%; display:flex; justify-content:space-between; align-items:center; padding:14px 16px; background:none; border:none; cursor:pointer; text-align:left; }
+.sec-body { padding:0 16px 16px; }
+.sec-arrow { color:#9ca3af; font-size:12px; display:inline-block; transition:transform 0.2s; }
+.a-input { width:100%; padding:9px 12px; font-size:13px; border:1px solid #d1d5db; border-radius:8px; box-sizing:border-box; outline:none; }
+.a-input:focus { border-color:#3b82f6; }
+.a-textarea { width:100%; padding:10px 12px; font-size:13px; border:1px solid #d1d5db; border-radius:8px; box-sizing:border-box; resize:none; outline:none; }
+.a-textarea:focus { border-color:#3b82f6; }
+.a-btn { padding:9px 18px; border:none; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; }
+.a-btn:hover { opacity:0.85; }
+.btn-blue { background:#3b82f6; color:#fff; }
+.btn-red  { background:#ef4444; color:#fff; }
+.btn-amber{ background:#f59e0b; color:#fff; }
+.btn-gray { background:#e5e7eb; color:#374151; }
+.lcard { border:1px solid #e5e7eb; border-radius:8px; padding:12px; margin-bottom:8px; }
+.lcard:hover { border-color:#93c5fd; }
+.badge { font-size:11px; background:#dbeafe; color:#1d4ed8; padding:2px 8px; border-radius:99px; margin-left:8px; }
+.sbar { background:#f9fafb; border:1px solid #e5e7eb; border-radius:8px; padding:10px 12px; margin-bottom:12px; font-size:13px; color:#6b7280; }
+/* ── 튜토리얼 레트로 스타일 ── */
+.retro { font-family: 'Press Start 2P', monospace; }
 
-    @keyframes fishBounce {
-      0%,100% { transform: translateY(0) scaleX(-1); }
-      50%      { transform: translateY(-18px) scaleX(-1); }
-    }
-    @keyframes fishSpin {
-      0%   { transform: rotate(0deg) scale(1); }
-      40%  { transform: rotate(200deg) scale(1.2); }
-      70%  { transform: rotate(340deg) scale(1.1); }
-      100% { transform: rotate(360deg) scaleX(-1); }
-    }
-    @keyframes popIn {
-      0%   { transform: scale(0.7); opacity:0; }
-      80%  { transform: scale(1.05); }
-      100% { transform: scale(1); opacity:1; }
-    }
-    @keyframes blinkCursor {
-      0%,100% { opacity:1; } 50% { opacity:0; }
-    }
-    @keyframes counterPop {
-      0%   { transform: scale(1); }
-      50%  { transform: scale(2.2); }
-      100% { transform: scale(1.4); }
-    }
-    @keyframes silhouetteFloat {
-      0%,100% { transform: translateY(0); }
-      50%      { transform: translateY(-12px); }
-    }
+@keyframes fishBounce {
+  0%,100% { transform: translateY(0) scaleX(-1); }
+  50%      { transform: translateY(-18px) scaleX(-1); }
+}
+@keyframes fishSpin {
+  0%   { transform: rotate(0deg) scale(1); }
+  40%  { transform: rotate(200deg) scale(1.2); }
+  70%  { transform: rotate(340deg) scale(1.1); }
+  100% { transform: rotate(360deg) scaleX(-1); }
+}
+@keyframes popIn {
+  0%   { transform: scale(0.7); opacity:0; }
+  80%  { transform: scale(1.05); }
+  100% { transform: scale(1); opacity:1; }
+}
+@keyframes blinkCursor {
+  0%,100% { opacity:1; } 50% { opacity:0; }
+}
+@keyframes counterPop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(2.2); }
+  100% { transform: scale(1.4); }
+}
+@keyframes silhouetteFloat {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-12px); }
+}
 
-    .tut-fish-bounce { animation: fishBounce 1.4s ease-in-out infinite; }
-    .tut-fish-spin   { animation: fishSpin 0.7s ease-in-out forwards; }
-    .tut-pop-in      { animation: popIn 0.35s cubic-bezier(.34,1.56,.64,1) both; }
-    .tut-counter-pop { animation: counterPop 0.6s ease-out forwards; }
-    .tut-silhouette  { animation: silhouetteFloat 2s ease-in-out infinite; filter: brightness(0); }
+.tut-fish-bounce { animation: fishBounce 1.4s ease-in-out infinite; }
+.tut-fish-spin   { animation: fishSpin 0.7s ease-in-out forwards; }
+.tut-pop-in      { animation: popIn 0.35s cubic-bezier(.34,1.56,.64,1) both; }
+.tut-counter-pop { animation: counterPop 0.6s ease-out forwards; }
+.tut-silhouette  { animation: silhouetteFloat 2s ease-in-out infinite; filter: brightness(0); }
 
-    .pixel-box {
-      image-rendering: pixelated;
-      border: 4px solid #fff;
-      box-shadow:
-        0 0 0 4px #1a1a2e,
-        6px 6px 0 4px #1a1a2e,
-        inset 0 0 0 2px rgba(255,255,255,0.15);
-      background: rgba(10,10,30,0.92);
-      border-radius: 4px;
-    }
-    .pixel-btn {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 11px;
-      background: #f59e0b;
-      color: #1a1a2e;
-      border: 3px solid #fff;
-      box-shadow: 4px 4px 0 #1a1a2e;
-      border-radius: 3px;
-      padding: 10px 20px;
-      cursor: pointer;
-      transition: transform 0.08s, box-shadow 0.08s;
-      letter-spacing: 0.05em;
-    }
-    .pixel-btn:active {
-      transform: translate(3px, 3px);
-      box-shadow: 1px 1px 0 #1a1a2e;
-    }
-    .pixel-btn-blue {
-      background: #38bdf8;
-      color: #1a1a2e;
-    }
-    .pixel-btn-green {
-      background: #4ade80;
-      color: #1a1a2e;
-    }
-    .pixel-input {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 13px;
-      background: rgba(255,255,255,0.1);
-      border: 3px solid #fff;
-      box-shadow: 3px 3px 0 #1a1a2e;
-      color: #fff;
-      border-radius: 3px;
-      padding: 10px 14px;
-      outline: none;
-      width: 100%;
-      box-sizing: border-box;
-      text-align: center;
-    }
-    .pixel-input::placeholder { color: rgba(255,255,255,0.4); font-size:10px; }
-    .pixel-textarea {
-      font-family: -apple-system, sans-serif;
-      font-size: 15px;
-      background: rgba(255,255,255,0.95);
-      border: 3px solid #fff;
-      box-shadow: 3px 3px 0 #1a1a2e;
-      color: #1a1a2e;
-      border-radius: 3px;
-      padding: 12px;
-      outline: none;
-      width: 100%;
-      box-sizing: border-box;
-      resize: none;
-    }
-    .cursor-blink::after {
-      content: '▌';
-      animation: blinkCursor 0.8s step-end infinite;
-    }
-    @keyframes countPop {
-      0%   { transform: scale(0.5); opacity: 0; }
-      60%  { transform: scale(1.3); opacity: 1; }
-      80%  { transform: scale(0.95); }
-      100% { transform: scale(1); opacity: 1; }
-    }
-    .count-pop { animation: countPop 0.5s cubic-bezier(.34,1.56,.64,1) both; }
+.pixel-box {
+  image-rendering: pixelated;
+  border: 4px solid #fff;
+  box-shadow:
+    0 0 0 4px #1a1a2e,
+    6px 6px 0 4px #1a1a2e,
+    inset 0 0 0 2px rgba(255,255,255,0.15);
+  background: rgba(10,10,30,0.92);
+  border-radius: 4px;
+}
+.pixel-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  background: #f59e0b;
+  color: #1a1a2e;
+  border: 3px solid #fff;
+  box-shadow: 4px 4px 0 #1a1a2e;
+  border-radius: 3px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: transform 0.08s, box-shadow 0.08s;
+  letter-spacing: 0.05em;
+}
+.pixel-btn:active {
+  transform: translate(3px, 3px);
+  box-shadow: 1px 1px 0 #1a1a2e;
+}
+.pixel-btn-blue {
+  background: #38bdf8;
+  color: #1a1a2e;
+}
+.pixel-btn-green {
+  background: #4ade80;
+  color: #1a1a2e;
+}
+.pixel-input {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 13px;
+  background: rgba(255,255,255,0.1);
+  border: 3px solid #fff;
+  box-shadow: 3px 3px 0 #1a1a2e;
+  color: #fff;
+  border-radius: 3px;
+  padding: 10px 14px;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+}
+.pixel-input::placeholder { color: rgba(255,255,255,0.4); font-size:10px; }
+.pixel-textarea {
+  font-family: -apple-system, sans-serif;
+  font-size: 15px;
+  background: rgba(255,255,255,0.95);
+  border: 3px solid #fff;
+  box-shadow: 3px 3px 0 #1a1a2e;
+  color: #1a1a2e;
+  border-radius: 3px;
+  padding: 12px;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  resize: none;
+}
+.cursor-blink::after {
+  content: '▌';
+  animation: blinkCursor 0.8s step-end infinite;
+}
+@keyframes countPop {
+  0%   { transform: scale(0.5); opacity: 0; }
+  60%  { transform: scale(1.3); opacity: 1; }
+  80%  { transform: scale(0.95); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.count-pop { animation: countPop 0.5s cubic-bezier(.34,1.56,.64,1) both; }
+```
+
   </style>
 </head>
 <body>
@@ -531,7 +535,7 @@ function IntroScreen({ userEmail, onStart, onAdmin, onSignOut }) {
   );
 }
 
-function AdminLoginScreen({ onSuccess, onBack }) {
+function AdminLoginScreen({ onSuccess, onBack, onResetPw }) {
   const [pw, setPw] = useState('');
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
@@ -542,10 +546,13 @@ function AdminLoginScreen({ onSuccess, onBack }) {
           placeholder="비밀번호 입력"
           className="w-full border-2 border-gray-300 rounded-lg p-3 mb-4" />
         <button onClick={() => onSuccess(pw)} className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition mb-3">
-          로그인
+          입장하기
         </button>
-        <button onClick={onBack} className="w-full bg-gray-300 text-gray-700 py-3 rounded-lg font-bold hover:bg-gray-400 transition">
+        <button onClick={onBack} className="w-full bg-gray-300 text-gray-700 py-3 rounded-lg font-bold hover:bg-gray-400 transition mb-3">
           돌아가기
+        </button>
+        <button onClick={onResetPw} className="w-full text-gray-400 text-sm hover:text-gray-600 transition py-2">
+          🔑 비밀번호를 잊으셨나요?
         </button>
       </div>
     </div>
@@ -606,9 +613,10 @@ function AdminScreen({ messages, goalCount, cycleCount, pendingKingLetter, kingL
             <div style={{ flex:1, marginRight:'12px' }}>
               <span style={{ fontSize:'20px', fontWeight:700 }}>🐠 어항 관리센터</span>
               <p style={{ fontSize:'12px', color:'#6b7280', marginTop:'6px', lineHeight:'1.6' }}>
-                관리자페이지는 아이의 마음 어항을 살펴보고 필요한 정보를 조정하는 공간이에요.<br/>
-                아이들이 남긴 마음은 양육자만 살며시 읽고, 알은 체 말아주세요.<br/>
-                아이들이 눈치 보지 않고 자유롭게 마음을 가꿀 수 있도록 도와주세요.
+                아이의 마음을 살며시 살펴봐 주세요.<br/>
+                자주 들여다보되, 아이가 스스로 마음을 다루는 힘을 믿어주는 것이 가장 좋은 돌봄이에요.<br/>
+                아이가 마음을 10번 나눠주는 동안 관리센터에 들러주세요.<br/>
+                관리센터에 출근만 하셔도 어항은 맑게 정화된답니다 🐠
               </p>
             </div>
             <button onClick={onExit} className="a-btn btn-gray" style={{ flexShrink:0 }}>어항으로 🐟</button>
@@ -1039,8 +1047,11 @@ function TutorialScreen({ shyFish, onComplete, onSendLetter }) {
 }
 
 
-function AquariumScreen({ fishes, cycleCount, goalCount, pendingKingLetter, messages, onFishClick, onReadKingLetter, onBack }) {
+function AquariumScreen({ fishes, cycleCount, goalCount, pendingKingLetter, messages, lastAdminVisitCount, onFishClick, onReadKingLetter, onBack }) {
   const [showPopup, setShowPopup] = useState(false);
+
+  // 어항 탁함: 마지막 관리자 방문 이후 편지가 10개 이상 쌓이면
+  const isDirty = (messages.length - (lastAdminVisitCount || 0)) >= 10;
 
   useEffect(() => {
     if (cycleCount >= goalCount && pendingKingLetter) {
@@ -1072,6 +1083,15 @@ function AquariumScreen({ fishes, cycleCount, goalCount, pendingKingLetter, mess
             </button>
           </div>
         </div>
+      )}
+
+      {/* 탁함 오버레이 */}
+      {isDirty && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 5, pointerEvents: 'none',
+          background: 'linear-gradient(180deg, rgba(34,85,34,0.25) 0%, rgba(20,60,20,0.35) 100%)',
+          backdropFilter: 'blur(1.5px)',
+        }} />
       )}
 
       <div className="relative z-20 text-center pt-4 pb-2">
@@ -1107,18 +1127,144 @@ function AquariumScreen({ fishes, cycleCount, goalCount, pendingKingLetter, mess
         </div>
       )}
 
+      {/* 어항 탁함 배너 */}
+      {isDirty && (
+        <div className="relative z-20 px-6 mb-2">
+          <div className="w-full max-w-2xl mx-auto bg-green-800/80 text-white py-3 rounded-lg font-bold text-sm flex items-center justify-center gap-2 animate-pulse shadow-lg">
+            🧹 <span>어항 관리자의 어항 관리가 필요합니다!</span>
+          </div>
+        </div>
+      )}
+
       <div className="relative w-full h-screen">
         {fishes.map((fish, i) =>
           <SwimmingFish key={fish.id} fish={fish} index={i} onClick={() => onFishClick(fish)} />
         )}
       </div>
-      <div className="fixed top-6 left-6 z-20">
-        <button onClick={onBack} className="bg-white/90 text-blue-600 px-4 py-2 rounded-lg font-bold hover:bg-white transition shadow-lg text-sm">
-          ← 처음으로
+      <div className="fixed top-4 left-4 z-20">
+        <button onClick={onBack} className="bg-white/80 text-blue-600 px-3 py-1.5 rounded-lg font-bold hover:bg-white transition shadow-lg text-xs">
+          ← 어항 나가기
         </button>
       </div>
       <div className="fixed bottom-8 left-0 right-0 z-10 text-center pointer-events-none">
         <p className="text-white/50 text-xs">© 2024 hhappyfamilydais</p>
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════
+   관리자 온보딩 (첫 가입 시)
+══════════════════════════════════════ */
+function AdminOnboardingScreen({ onComplete }) {
+  const [step, setStep] = useState(1); // 1:세계관, 2:비번설정
+  const [pw, setPw] = useState('');
+  const [pwConfirm, setPwConfirm] = useState('');
+
+  const handleSetPw = async () => {
+    if (!pw.trim()) { alert('비밀번호를 입력해주세요.'); return; }
+    if (pw !== pwConfirm) { alert('비밀번호가 일치하지 않습니다.'); return; }
+    if (pw.length < 4) { alert('4자 이상 입력해주세요.'); return; }
+    onComplete(pw);
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+      <div style={{
+        background: '#fffdf5',
+        borderRadius: '16px',
+        maxWidth: '380px',
+        width: '100%',
+        padding: '32px 28px',
+        boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+        border: '2px solid #f0e6c8',
+        position: 'relative'
+      }}>
+        {/* 편지 장식 */}
+        <div style={{
+          position: 'absolute', top: '-18px', left: '50%', transform: 'translateX(-50%)',
+          background: '#f59e0b', color: 'white', borderRadius: '99px',
+          padding: '4px 16px', fontSize: '12px', fontWeight: 700,
+          boxShadow: '0 2px 8px rgba(245,158,11,0.4)'
+        }}>🐠 마음 어항 관리자에게</div>
+
+        {step === 1 && (<>
+          <div style={{ textAlign: 'center', marginBottom: '20px', marginTop: '8px' }}>
+            <div style={{ fontSize: '36px', marginBottom: '8px' }}>🏡</div>
+            <h2 style={{ fontSize: '17px', fontWeight: 700, color: '#374151', marginBottom: '12px' }}>
+              중요! 어항 관리자가 필요해요
+            </h2>
+          </div>
+          <div style={{
+            background: '#fef9ec', border: '1px solid #fde68a',
+            borderRadius: '12px', padding: '16px', marginBottom: '20px',
+            fontSize: '13px', lineHeight: '1.8', color: '#4b5563'
+          }}>
+            <p style={{ marginBottom: '10px' }}>
+              마음 어항은 아이의 감정이 자라는 공간이에요.
+            </p>
+            <p style={{ marginBottom: '10px' }}>
+              아이가 나눠준 소중한 마음은 물고기들이 먹고 자라며,
+              <strong> 어항 관리자</strong>도 어항을 아름답게 가꾸기 위해
+              함께 살펴보고 노력할 거예요.
+            </p>
+            <p>
+              아이의 어항을 <strong>정성스럽게 돌봐주실</strong> 어른 관리자가 필요해요. 🐟
+            </p>
+          </div>
+          <button onClick={() => setStep(2)} style={{
+            width: '100%', background: '#f59e0b', color: 'white',
+            border: 'none', borderRadius: '12px', padding: '14px',
+            fontSize: '15px', fontWeight: 700, cursor: 'pointer'
+          }}>
+            관리자로 시작하기 →
+          </button>
+        </>)}
+
+        {step === 2 && (<>
+          <div style={{ textAlign: 'center', marginBottom: '20px', marginTop: '8px' }}>
+            <div style={{ fontSize: '36px', marginBottom: '8px' }}>🔑</div>
+            <h2 style={{ fontSize: '17px', fontWeight: 700, color: '#374151', marginBottom: '6px' }}>
+              관리센터 비밀번호 설정
+            </h2>
+            <p style={{ fontSize: '12px', color: '#9ca3af' }}>
+              아이가 모르는 번호로 설정해주세요
+            </p>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '16px' }}>
+            <input
+              type="password" value={pw} onChange={e => setPw(e.target.value)}
+              placeholder="비밀번호 (4자 이상)"
+              style={{
+                padding: '12px', fontSize: '14px', borderRadius: '10px',
+                border: '1.5px solid #d1d5db', outline: 'none', textAlign: 'center',
+                letterSpacing: '4px'
+              }}
+            />
+            <input
+              type="password" value={pwConfirm} onChange={e => setPwConfirm(e.target.value)}
+              placeholder="비밀번호 확인"
+              style={{
+                padding: '12px', fontSize: '14px', borderRadius: '10px',
+                border: '1.5px solid #d1d5db', outline: 'none', textAlign: 'center',
+                letterSpacing: '4px'
+              }}
+            />
+          </div>
+          <button onClick={handleSetPw} style={{
+            width: '100%', background: '#3b82f6', color: 'white',
+            border: 'none', borderRadius: '12px', padding: '14px',
+            fontSize: '15px', fontWeight: 700, cursor: 'pointer', marginBottom: '8px'
+          }}>
+            설정 완료 ✓
+          </button>
+          <button onClick={() => setStep(1)} style={{
+            width: '100%', background: 'none', border: 'none',
+            color: '#9ca3af', fontSize: '13px', cursor: 'pointer', padding: '4px'
+          }}>
+            ← 이전으로
+          </button>
+        </>)}
       </div>
     </div>
   );
@@ -1142,7 +1288,9 @@ function App() {
   const [customFishNames, setCustomFishNames] = useState(null);
   const [selectedFish, setSelectedFish] = useState(null);
   const [kingLetterToShow, setKingLetterToShow] = useState('');
-  const [tutorialDone, setTutorialDone] = useState(null); // null=로딩중
+  const [tutorialDone, setTutorialDone] = useState(null);
+  const [adminSetupDone, setAdminSetupDone] = useState(null);
+  const [lastAdminVisitCount, setLastAdminVisitCount] = useState(0);
 
   // cycleCount: 발송된 편지 수 * goalCount 이후 나머지로 계산
   const sentCount = kingLetterHistory.length;
@@ -1192,13 +1340,19 @@ function App() {
     });
     listen('adminPassword', setAdminPassword);
     listen('customFishNames', setCustomFishNames);
+    listen('lastAdminVisitCount', v => setLastAdminVisitCount(v || 0));
 
-    // 튜토리얼 완료 여부 확인 후 mode 결정
-    fa().onValue(fa().ref(db(), `users/${user.uid}/tutorialDone`), snap => {
-      const done = !!snap.val();
-      setTutorialDone(done);
-      setMode(done ? 'intro' : 'tutorial');
-    }, { onlyOnce: true });
+    // 관리자 세팅 + 튜토리얼 완료 여부 확인 후 mode 결정
+    Promise.all([
+      new Promise(r => fa().onValue(fa().ref(db(), `users/${user.uid}/adminSetupDone`), s => r(s.val()), { onlyOnce: true })),
+      new Promise(r => fa().onValue(fa().ref(db(), `users/${user.uid}/tutorialDone`),   s => r(s.val()), { onlyOnce: true })),
+    ]).then(([adminDone, tutDone]) => {
+      setAdminSetupDone(!!adminDone);
+      setTutorialDone(!!tutDone);
+      if (!adminDone) setMode('adminOnboarding');
+      else if (!tutDone) setMode('tutorial');
+      else setMode('intro');
+    });
 
     // ── 마이그레이션: 구버전 kingLetter → 새 구조로 한 번만 실행 ──
     fa().onValue(fa().ref(db(), `users/${user.uid}/v2migrated`), snap => {
@@ -1244,6 +1398,15 @@ function App() {
     setMode('auth');
   };
 
+  const completeAdminOnboarding = async (pw) => {
+    await saveToFirebase('adminPassword', pw);
+    await saveToFirebase('adminSetupDone', true);
+    setAdminSetupDone(true);
+    setAdminPassword(pw);
+    // 세팅 완료 후 튜토리얼로
+    setMode('tutorial');
+  };
+
   const completeTutorial = async () => {
     await saveToFirebase('tutorialDone', true);
     setTutorialDone(true);
@@ -1265,9 +1428,15 @@ function App() {
     setFeedingHistory(updatedHistory);
   };
 
-  const handleAdminLogin = (pw) => {
-    if (pw === adminPassword) setMode('admin');
-    else alert('비밀번호가 틀렸습니다.');
+  const handleAdminLogin = async (pw) => {
+    if (pw === adminPassword) {
+      // 관리센터 출근 — 현재 편지 수 저장 (어항 정화)
+      await saveToFirebase('lastAdminVisitCount', messages.length);
+      setLastAdminVisitCount(messages.length);
+      setMode('admin');
+    } else {
+      alert('비밀번호가 틀렸습니다.');
+    }
   };
 
   const feedFish = async (text) => {
@@ -1305,8 +1474,9 @@ function App() {
   return (
     <>
       {saving && <SavingOverlay />}
-      {mode === 'auth'       && <AuthScreen onSuccess={() => setMode('intro')} />}
-      {mode === 'tutorial'   && (
+      {mode === 'auth'            && <AuthScreen onSuccess={() => setMode('loading')} />}
+      {mode === 'adminOnboarding' && <AdminOnboardingScreen onComplete={completeAdminOnboarding} />}
+      {mode === 'tutorial'        && (
         <TutorialScreen
           shyFish={fishes.find(f => f.id === 'shy')}
           onComplete={completeTutorial}
@@ -1314,7 +1484,13 @@ function App() {
         />
       )}
       {mode === 'intro'      && <IntroScreen userEmail={user?.email} onStart={() => setMode('aquarium')} onAdmin={() => setMode('adminLogin')} onSignOut={signOut} />}
-      {mode === 'adminLogin' && <AdminLoginScreen onSuccess={handleAdminLogin} onBack={() => setMode('intro')} />}
+      {mode === 'adminLogin' && <AdminLoginScreen onSuccess={handleAdminLogin} onBack={() => setMode('intro')} onResetPw={async () => {
+        if (confirm('비밀번호를 0000으로 초기화할까요?\n본인 확인을 위해 재로그인이 필요해요.')) {
+          await saveToFirebase('adminPassword', '0000');
+          setAdminPassword('0000');
+          alert('비밀번호가 0000으로 초기화되었습니다.');
+        }
+      }} />}
       {mode === 'admin'      && (
         <AdminScreen
           messages={messages}
@@ -1338,6 +1514,7 @@ function App() {
           cycleCount={cycleCount}
           goalCount={goalCount}
           pendingKingLetter={pendingKingLetter}
+          lastAdminVisitCount={lastAdminVisitCount}
           onFishClick={fish => { setSelectedFish(fish); setMode('letter'); }}
           onReadKingLetter={readKingLetter}
           onBack={() => setMode('intro')}
@@ -1349,6 +1526,7 @@ function App() {
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);
 </script>
+
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -1356,5 +1534,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(<App />);
       });
     }
   </script>
+
 </body>
 </html>
