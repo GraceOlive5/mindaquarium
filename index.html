@@ -267,35 +267,50 @@ function Bubbles({ n=25 }) {
 }
 
 function SwimmingFish({ fish, onClick, index }) {
-  const [dir, setDir] = useState(1);
+  const [dir, setDir] = useState(index % 2 === 0 ? 1 : -1);
   const ref = useRef(null);
   const durations = [18,15,20,17,14,19,16];
   const starts = [
     {top:'15%',left:'10%'},{top:'15%',right:'10%'},{top:'30%',left:'50%'},
     {top:'45%',left:'15%'},{top:'45%',right:'15%'},{top:'60%',left:'35%'},{top:'60%',right:'30%'}
   ];
+
   useEffect(() => {
     const id = setInterval(() => {
       if (!ref.current) return;
       const r = ref.current.getBoundingClientRect();
-      if (r.left <= 0) setDir(1);
-      else if (r.right >= window.innerWidth) setDir(-1);
-    }, 100);
+      if (r.left <= 10) setDir(1);
+      else if (r.right >= window.innerWidth - 10) setDir(-1);
+    }, 80);
     return () => clearInterval(id);
   }, []);
+
   return (
     <div ref={ref} className="fish-swimming absolute" style={{
       ...starts[index], animation:`swim${index+1} ${durations[index]}s ease-in-out infinite`,
       width:'min(120px,25vw)', height:'min(120px,25vw)', zIndex:30
     }}>
-      <div style={{ transform:`scaleX(${dir})`, width:'100%', height:'100%', position:'relative' }}>
+      {/* 물고기 이미지만 방향 전환 */}
+      <div style={{ width:'100%', height:'100%', position:'relative', transform:`scaleX(${dir})` }}>
         <div className="fish-click-area" onClick={onClick} />
-        <img src={fish.image} alt={fish.name} style={{userSelect:'none'}} />
-        <div className="absolute top-1/2 left-1/2 pointer-events-none" style={{ transform:`translate(-50%,-50%) scaleX(${dir})` }}>
-          <span className="text-white text-sm font-bold" style={{ textShadow:'2px 2px 4px rgba(0,0,0,0.8),-1px -1px 2px rgba(0,0,0,0.5)' }}>
-            {fish.name}
-          </span>
-        </div>
+        <img src={fish.image} alt={fish.name} style={{userSelect:'none', width:'100%', height:'100%', objectFit:'contain'}} />
+      </div>
+      {/* 이름표는 항상 정방향 - 물고기 아래 */}
+      <div className="absolute pointer-events-none" style={{
+        bottom: '-18px', left: '50%', transform: 'translateX(-50%)', whiteSpace: 'nowrap'
+      }}>
+        <span style={{
+          display: 'inline-block',
+          background: 'rgba(255,255,255,0.92)',
+          color: '#333',
+          fontSize: '12px',
+          fontWeight: 700,
+          padding: '2px 10px',
+          borderRadius: '20px',
+          boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+        }}>
+          {fish.name}
+        </span>
       </div>
     </div>
   );
@@ -501,25 +516,6 @@ function IntroScreen({ userEmail, onStart, onAdmin, onSignOut }) {
       style={{ backgroundImage:'url(mindaquarium_bg.png)', backgroundSize:'cover', backgroundPosition:'center' }}>
       <Bubbles n={30} />
 
-      {/* 상단 계정 정보 */}
-      <div className="fixed top-0 left-0 right-0 z-30 flex justify-between items-center px-4 pt-4 pb-2">
-        <button onClick={onAdmin} style={{
-          background:'rgba(255,255,255,0.15)', backdropFilter:'blur(8px)',
-          border:'1px solid rgba(255,255,255,0.3)', borderRadius:'20px',
-          padding:'6px 14px', color:'white', fontSize:'12px', cursor:'pointer'
-        }}>
-          🔑 어항 관리센터
-        </button>
-        <button onClick={onSignOut} style={{
-          background:'rgba(255,255,255,0.15)', backdropFilter:'blur(8px)',
-          border:'1px solid rgba(255,255,255,0.3)', borderRadius:'20px',
-          padding:'6px 14px', color:'white', fontSize:'11px', cursor:'pointer',
-          maxWidth:'160px', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap'
-        }}>
-          {userEmail} · 로그아웃
-        </button>
-      </div>
-
       <div className="relative h-screen flex flex-col items-center justify-center py-4 px-4">
         <div className="relative flex flex-col items-center">
           <img src="mindaquarium_intro.png" alt="인트로" className="w-full max-w-xs md:max-w-md lg:max-w-xl"
@@ -530,18 +526,69 @@ function IntroScreen({ userEmail, onStart, onAdmin, onSignOut }) {
           </div>
         </div>
         <div className="h-[72px]" />
-        <div className="relative z-20 flex flex-col items-center w-full max-w-3xl mt-4 md:mt-6">
-          <div className="bg-blue-900/60 rounded-2xl px-6 py-3 mb-4 md:mb-6 backdrop-blur-md border border-blue-400/30">
-            <p className="text-white text-center text-base md:text-xl font-medium leading-relaxed">
+        <div className="relative z-20 flex flex-col items-center w-full max-w-xs mt-4 md:mt-6">
+          <div className="bg-blue-900/60 rounded-2xl px-6 py-3 mb-5 backdrop-blur-md border border-blue-400/30 w-full">
+            <p className="text-white text-center text-base font-medium leading-relaxed">
               마음 속 감정을 마음 어항 속<br/>물고기 친구들에게 나누어주세요
             </p>
           </div>
-          <button onClick={onStart}
-            className="bg-white text-blue-600 px-12 py-4 rounded-full text-xl md:text-2xl font-bold shadow-2xl hover:bg-blue-50 hover:scale-105 transition-all mb-3">
-            시작하기
+
+          {/* 내 마음 어항 돌보기 - 100% */}
+          <button onClick={onStart} style={{
+            width: '100%',
+            background: 'white',
+            color: '#2563eb',
+            padding: '16px',
+            borderRadius: '999px',
+            fontSize: '18px',
+            fontWeight: 800,
+            boxShadow: '0 8px 30px rgba(0,0,0,0.2)',
+            border: 'none',
+            cursor: 'pointer',
+            marginBottom: '12px',
+            transition: 'transform 0.15s',
+          }}>
+            내 마음 어항 돌보기 🐠
           </button>
-          <p className="text-white/40 text-xs mt-2">© 2024 hhappyfamilydais. All rights reserved.</p>
+
+          {/* 어항 관리센터 - 50% */}
+          <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+            <button onClick={onAdmin} style={{
+              width: '50%',
+              background: '#7c3aed',
+              color: 'white',
+              padding: '11px 16px',
+              borderRadius: '999px',
+              fontSize: '13px',
+              fontWeight: 700,
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: '0 4px 16px rgba(124,58,237,0.4)',
+            }}>
+              🔑 어항 관리센터
+            </button>
+          </div>
         </div>
+      </div>
+
+      {/* 하단 계정 정보 띠 */}
+      <div className="fixed bottom-0 left-0 right-0 z-30" style={{
+        background: 'rgba(0,0,0,0.85)',
+        padding: '10px 20px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+      }}>
+        <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '11px', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', maxWidth:'70%' }}>
+          {userEmail}
+        </span>
+        <button onClick={onSignOut} style={{
+          background: 'none', border: '1px solid rgba(255,255,255,0.3)',
+          color: 'rgba(255,255,255,0.7)', borderRadius: '6px',
+          padding: '4px 12px', fontSize: '11px', cursor: 'pointer'
+        }}>
+          로그아웃
+        </button>
       </div>
     </div>
   );
@@ -1108,7 +1155,7 @@ function AquariumScreen({ fishes, cycleCount, goalCount, pendingKingLetter, mess
         }} />
       )}
 
-      <div className="relative z-20 text-center pt-4 pb-2">
+      <div className="relative z-20 text-center" style={{ paddingTop: '80px', paddingBottom: '8px' }}>
         <div style={{
           display: 'inline-block',
           background: 'rgba(255,255,255,0.92)',
@@ -1121,15 +1168,23 @@ function AquariumScreen({ fishes, cycleCount, goalCount, pendingKingLetter, mess
             물고기에게 나눠준 마음의 기록
           </p>
           <p key={messages.length} className="count-pop" style={{
-            fontSize: '36px',
-            fontWeight: 800,
-            color: '#38bdf8',
-            lineHeight: 1.2,
-            margin: 0
+            fontSize: '36px', fontWeight: 800, color: '#38bdf8', lineHeight: 1.2, margin: 0
           }}>
             {messages.length}<span style={{ fontSize: '18px', fontWeight: 700, marginLeft: '2px' }}>번</span>
           </p>
         </div>
+      </div>
+
+      {/* 좌상단 나가기 버튼 */}
+      <div className="fixed top-4 left-4 z-30">
+        <button onClick={onBack} style={{
+          background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(8px)',
+          border: '1px solid rgba(255,255,255,0.2)', borderRadius: '20px',
+          padding: '7px 16px', color: 'rgba(255,255,255,0.85)',
+          fontSize: '12px', cursor: 'pointer'
+        }}>
+          ← 처음으로
+        </button>
       </div>
 
       {cycleCount >= goalCount && pendingKingLetter && !showPopup && (
@@ -1155,15 +1210,8 @@ function AquariumScreen({ fishes, cycleCount, goalCount, pendingKingLetter, mess
           <SwimmingFish key={fish.id} fish={fish} index={i} onClick={() => onFishClick(fish)} />
         )}
       </div>
-      <div className="fixed bottom-10 left-0 right-0 z-20 flex justify-center">
-        <button onClick={onBack} style={{
-          background:'rgba(0,0,0,0.35)', backdropFilter:'blur(8px)',
-          border:'1px solid rgba(255,255,255,0.2)', borderRadius:'20px',
-          padding:'8px 20px', color:'rgba(255,255,255,0.8)',
-          fontSize:'12px', cursor:'pointer', letterSpacing:'0.03em'
-        }}>
-          ← 처음으로
-        </button>
+      <div className="fixed bottom-8 left-0 right-0 z-10 text-center pointer-events-none">
+        <p className="text-white/50 text-xs">© 2024 hhappyfamilydais</p>
       </div>
       <div className="fixed bottom-8 left-0 right-0 z-10 text-center pointer-events-none">
         <p className="text-white/50 text-xs">© 2024 hhappyfamilydais</p>
