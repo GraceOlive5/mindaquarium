@@ -1131,16 +1131,16 @@ function TutorialScreen({ shyFish, onComplete, onSendLetter }) {
       style={{ backgroundImage:'url(mindaquarium_bg.png)', backgroundSize:'cover', backgroundPosition:'center bottom' }}>
       <Bubbles n={20} />
 
-      <div className="relative z-10 h-full flex flex-col items-center justify-center px-4" style={{ gap:'0' }}>
+      <div className="relative z-10 h-full flex flex-col items-center px-4">
 
-        {/* 물고기 영역 */}
-        <div style={{ marginBottom:'24px', position:'relative', display:'flex', flexDirection:'column', alignItems:'center' }}>
+        {/* 물고기 영역 - 상단 고정 */}
+        <div style={{ marginTop:'10vh', marginBottom:'20px', position:'relative', display:'flex', flexDirection:'column', alignItems:'center', flexShrink:0 }}>
 
           {/* 씬 6: 실루엣 왕 물고기 — 분홍 물고기 뒤 레이어 */}
           {scene === 6 && (
             <div style={{
               position:'absolute',
-              top:'-380px',
+              top:'-60px',
               left:'50%',
               transform:'translateX(-50%)',
               zIndex: 0,
@@ -1149,8 +1149,8 @@ function TutorialScreen({ shyFish, onComplete, onSendLetter }) {
               <img src="mindaquarium_happy.png" alt="왕의 물고기"
                 className="tut-silhouette"
                 style={{
-                  width:'min(840px,95vw)',
-                  height:'min(840px,95vw)',
+                  width:'min(500px,95vw)',
+                  height:'min(500px,95vw)',
                   objectFit:'contain',
                   opacity: 0.55,
                   filter:'brightness(0) blur(3px)',
@@ -1167,20 +1167,6 @@ function TutorialScreen({ shyFish, onComplete, onSendLetter }) {
               style={{ width:'min(140px,32vw)', height:'min(140px,32vw)', objectFit:'contain',
                 filter:'drop-shadow(0 8px 24px rgba(0,0,0,0.4))',
                 transformOrigin: 'center center' }} />
-
-            {/* 항상 몸통에 이름 표시 */}
-            <div style={{
-              position:'absolute', top:'50%', left:'50%',
-              transform:'translate(-50%,-50%)',
-              pointerEvents:'none', whiteSpace:'nowrap'
-            }}>
-              <span style={{
-                color:'white', fontSize:'13px', fontWeight:700,
-                textShadow:'2px 2px 4px rgba(0,0,0,0.8),-1px -1px 2px rgba(0,0,0,0.5)'
-              }}>
-                {shyFish.name}
-              </span>
-            </div>
 
             {/* 씬 3: 이름표 배지 (이름 강조용 추가 효과) */}
             {scene === 3 && showBadge && (
@@ -1217,10 +1203,13 @@ function TutorialScreen({ shyFish, onComplete, onSendLetter }) {
           </div>
         </div>
 
+        {/* 말풍선 + 버튼 영역 - 물고기 아래 자연스럽게 */}
+        <div style={{ width:'100%', maxWidth:'360px', display:'flex', flexDirection:'column', alignItems:'center' }}>
+
         {/* 말풍선 */}
         {scene !== 4 && SCENES[scene]?.msg && (
           <div className="pixel-box tut-pop-in" key={`box-${scene}-${showBadge}`}
-            style={{ maxWidth:'360px', width:'100%', padding:'20px 22px', marginBottom:'20px' }}>
+            style={{ width:'100%', padding:'20px 22px', marginBottom:'16px' }}>
             <p className="retro" style={{ color:'#fff', fontSize:'12px', lineHeight:'2', whiteSpace:'pre-line', margin:0 }}>
               <TypeWriter key={`tw-${scene}-${showBadge}`}
                 text={SCENES[scene].msg}
@@ -1232,7 +1221,7 @@ function TutorialScreen({ shyFish, onComplete, onSendLetter }) {
 
         {/* 씬 4: 편지 쓰기 */}
         {scene === 4 && (
-          <div className="pixel-box tut-pop-in" style={{ maxWidth:'360px', width:'100%', padding:'20px', marginBottom:'20px' }}>
+          <div className="pixel-box tut-pop-in" style={{ width:'100%', padding:'20px', marginBottom:'16px' }}>
             <p className="retro" style={{ color:'#f9a8d4', fontSize:'12px', lineHeight:'2', marginBottom:'14px' }}>
               <TypeWriter key="tw-4" text={SCENES[4].msg} speed={45} onDone={() => setMsgDone(true)} />
             </p>
@@ -1252,7 +1241,7 @@ function TutorialScreen({ shyFish, onComplete, onSendLetter }) {
 
         {/* 씬 1: 이름 입력 */}
         {scene === 1 && msgDone && (
-          <div className="tut-pop-in" style={{ maxWidth:'360px', width:'100%', marginBottom:'16px' }}>
+          <div className="tut-pop-in" style={{ width:'100%', marginBottom:'12px' }}>
             <input
               type="text" maxLength={6}
               value={childName}
@@ -1265,7 +1254,7 @@ function TutorialScreen({ shyFish, onComplete, onSendLetter }) {
         )}
 
         {/* 액션 버튼 */}
-        <div className="tut-pop-in" style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:'10px' }}>
+        <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:'10px' }}>
           {scene === 1 && msgDone && (
             <button className="pixel-btn pixel-btn-blue"
               onClick={() => childName.trim() && goNext(2)}
@@ -1310,6 +1299,7 @@ function TutorialScreen({ shyFish, onComplete, onSendLetter }) {
           )}
         </div>
 
+        </div> {/* 말풍선+버튼 래퍼 닫기 */}
       </div>
     </div>
   );
