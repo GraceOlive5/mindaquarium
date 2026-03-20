@@ -274,14 +274,14 @@ const auth = () => window._auth;
 const DEFAULT_FISHES = [
   // 기본 분양 4마리 (항상 어항에 있음)
   { id:'happy',  defaultName:'행복',    color:'하얀색', image:'mindaquarium_happy.png',  alwaysShow: true },
-  { id:'shy',    defaultName:'슬픔',    color:'파란색', image:'mindaquarium_fear.png',   alwaysShow: true },
+  { id:'sad',    defaultName:'슬픔',    color:'파란색', image:'mindaquarium_fear.png',   alwaysShow: true },
   { id:'anger',  defaultName:'화남',    color:'빨간색', image:'mindaquarium_angry.png',  alwaysShow: true },
-  { id:'worry',  defaultName:'부끄러움',color:'핑크색', image:'mindaquarium_shy.png',    alwaysShow: true },
+  { id:'shy',    defaultName:'부끄러움',color:'핑크색', image:'mindaquarium_shy.png',    alwaysShow: true },
   // 추가 분양 4마리 (이름 입력 시에만 어항에 나옴)
   { id:'fun',    defaultName:'',        color:'초록색', image:'mindaquarium_fun.png',    alwaysShow: false },
   { id:'secret', defaultName:'',        color:'보라색', image:'mindaquarium_secret.png', alwaysShow: false },
-  { id:'fear',   defaultName:'',        color:'노란색', image:'mindaquarium_worry.png',  alwaysShow: false },
-  { id:'love',   defaultName:'',        color:'주황색', image:'mindaquarium_love.png',   alwaysShow: false },
+  { id:'worry',  defaultName:'',        color:'노란색', image:'mindaquarium_worry.png',  alwaysShow: false },
+  { id:'love',   defaultName:'',        color:'주황색', image:'mindaquarium_new.png',   alwaysShow: false },
 ];
 
 /* ── 공통 컴포넌트 ── */
@@ -1140,7 +1140,7 @@ function TutorialScreen({ shyFish, onComplete, onSendLetter }) {
           {scene === 6 && (
             <div style={{
               position:'absolute',
-              top:'-200px',
+              top:'-380px',
               left:'50%',
               transform:'translateX(-50%)',
               zIndex: 0,
@@ -1149,11 +1149,11 @@ function TutorialScreen({ shyFish, onComplete, onSendLetter }) {
               <img src="mindaquarium_happy.png" alt="왕의 물고기"
                 className="tut-silhouette"
                 style={{
-                  width:'min(420px,90vw)',
-                  height:'min(420px,90vw)',
+                  width:'min(840px,95vw)',
+                  height:'min(840px,95vw)',
                   objectFit:'contain',
                   opacity: 0.55,
-                  filter:'brightness(0) blur(2px)',
+                  filter:'brightness(0) blur(3px)',
                   maskImage:'radial-gradient(ellipse 70% 70% at 50% 50%, black 40%, transparent 100%)',
                   WebkitMaskImage:'radial-gradient(ellipse 70% 70% at 50% 50%, black 40%, transparent 100%)',
                 }} />
@@ -1168,7 +1168,21 @@ function TutorialScreen({ shyFish, onComplete, onSendLetter }) {
                 filter:'drop-shadow(0 8px 24px rgba(0,0,0,0.4))',
                 transformOrigin: 'center center' }} />
 
-            {/* 씬 3: 이름표 배지 */}
+            {/* 항상 몸통에 이름 표시 */}
+            <div style={{
+              position:'absolute', top:'50%', left:'50%',
+              transform:'translate(-50%,-50%)',
+              pointerEvents:'none', whiteSpace:'nowrap'
+            }}>
+              <span style={{
+                color:'white', fontSize:'13px', fontWeight:700,
+                textShadow:'2px 2px 4px rgba(0,0,0,0.8),-1px -1px 2px rgba(0,0,0,0.5)'
+              }}>
+                {shyFish.name}
+              </span>
+            </div>
+
+            {/* 씬 3: 이름표 배지 (이름 강조용 추가 효과) */}
             {scene === 3 && showBadge && (
               <div className="tut-pop-in" style={{
                 position:'absolute', bottom:'-14px', left:'50%',
