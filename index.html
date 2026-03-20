@@ -673,7 +673,7 @@ function IntroScreen({ userEmail, onStart, onAdmin, onSignOut }) {
       style={{ backgroundImage:'url(mindaquarium_bg.png)', backgroundSize:'cover', backgroundPosition:'center bottom' }}>
       <Bubbles n={30} />
 
-      <div className="relative flex flex-col items-center px-4" style={{ paddingTop: '5vh', paddingBottom: '80px' }}>
+      <div className="relative flex flex-col items-center px-4" style={{ paddingTop: '12vh', paddingBottom: '80px' }}>
         {/* 캐릭터 + 로고 */}
         <div className="relative flex flex-col items-center" style={{ marginBottom: '60px' }}>
           <img src="mindaquarium_intro.png" alt="인트로" className="w-full max-w-xs md:max-w-md"
@@ -701,7 +701,7 @@ function IntroScreen({ userEmail, onStart, onAdmin, onSignOut }) {
             boxShadow: '0 8px 30px rgba(0,0,0,0.2)',
             border: 'none', cursor: 'pointer',
           }}>
-            내 마음 어항 돌보기 🐠
+            내 마음 어항 돌보기 →
           </button>
           <button onClick={onAdmin} style={{
             width: '50%',
