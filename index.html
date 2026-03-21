@@ -305,23 +305,22 @@
 </script>
 
 <script type="text/babel">
+/* --- iOS 앱에서 받은 정보를 '기억'하고 로그인 처리하는 함수 --- */
 window.nativeLoginSuccess = function(uid, email) {
-    console.log("📱 앱으로부터 로그인 정보 수신:", uid, email);
+    console.log("📱 앱으로부터 로그인 정보 수신 완료:", uid, email);
     
-    // 1. 세션 스토리지에 로그인 정보를 임시 저장 (웹이 기억하게 함)
+    // [핵심] 웹의 브라우저 저장소(SessionStorage)에 로그인 정보를 저장합니다.
+    // 이렇게 저장해둬야 새로고침 후에도 웹이 "아, 나 로그인 됐었지!"라고 기억합니다.
     sessionStorage.setItem('isLoggedIn', 'true');
     sessionStorage.setItem('userEmail', email);
     sessionStorage.setItem('userUid', uid);
 
-    // 2. 화면 강제 전환 (로그인 페이지를 건너뛰고 메인으로 이동)
-    // 이 부분은 현재 작성하신 React 구조에 따라 다르지만, 
-    // 가장 확실한 방법은 강제로 메인 경로로 보내거나 상태를 바꾸는 것입니다.
-    if (window.onNativeLogin) {
-        window.onNativeLogin(uid, email);
-    } else {
-        alert(email.split('@')[0] + "님, 환영합니다!");
-        window.location.reload(); 
-    }
+    // 사용자에게 알림을 띄워 확인시켜 줍니다.
+    const userName = email.split('@')[0];
+    alert(userName + "님, 환영합니다! 어항으로 입장합니다.");
+    
+    // 이제 새로고침을 하면, 웹 안의 React나 JS가 위의 저장된 정보를 읽고 메인으로 보내줍니다.
+    window.location.reload(); 
 };
   
 const { useState, useEffect, useRef } = React;
