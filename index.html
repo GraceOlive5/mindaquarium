@@ -28,14 +28,17 @@
 
     /* iOS Safe Area 대응 */
     :root {
-      --sat: env(safe-area-inset-top);
-      --sab: env(safe-area-inset-bottom);
-      --sal: env(safe-area-inset-left);
-      --sar: env(safe-area-inset-right);
+      --sat: env(safe-area-inset-top, 0px);
+      --sab: env(safe-area-inset-bottom, 0px);
     }
     #root {
-      padding-top: env(safe-area-inset-top);
-      padding-bottom: env(safe-area-inset-bottom);
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      height: 100%;
+    }
+    /* fixed 화면들도 safe area 적용 */
+    .fixed { 
+      padding-top: env(safe-area-inset-top, 0px) !important;
     }
 
     /* 세로 모드 고정 */
