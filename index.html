@@ -305,18 +305,25 @@
 </script>
 
 <script type="text/babel">
-  /* --- iOS 앱에서 로그인 정보를 받기 위한 함수 --- */
 window.nativeLoginSuccess = function(uid, email) {
     console.log("📱 앱으로부터 로그인 정보 수신:", uid, email);
     
-    // 이메일 주소에서 @ 앞부분만 가져와서 환영 메시지 띄우기
-    const userName = email.split('@')[0];
-    alert(userName + "님, 환영합니다! 어항으로 입장합니다.");
-    
-    // 앱이 로그인을 완료했으므로, 웹 화면을 새로고침하여 메인 화면으로 이동
-    window.location.reload(); 
+    // 1. 세션 스토리지에 로그인 정보를 임시 저장 (웹이 기억하게 함)
+    sessionStorage.setItem('isLoggedIn', 'true');
+    sessionStorage.setItem('userEmail', email);
+    sessionStorage.setItem('userUid', uid);
+
+    // 2. 화면 강제 전환 (로그인 페이지를 건너뛰고 메인으로 이동)
+    // 이 부분은 현재 작성하신 React 구조에 따라 다르지만, 
+    // 가장 확실한 방법은 강제로 메인 경로로 보내거나 상태를 바꾸는 것입니다.
+    if (window.onNativeLogin) {
+        window.onNativeLogin(uid, email);
+    } else {
+        alert(email.split('@')[0] + "님, 환영합니다!");
+        window.location.reload(); 
+    }
 };
-/* ------------------------------------------- */
+  
 const { useState, useEffect, useRef } = React;
 const fa = () => window._fa;
 const db = () => window._db;
