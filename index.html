@@ -278,50 +278,55 @@
   window._fa = { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInWithPopup, signInWithRedirect, getRedirectResult, ref, set, onValue };
   window._GoogleAuthProvider = GoogleAuthProvider;
   window._OAuthProvider = OAuthProvider;
+//---여기부터
+
   window.nativeLoginSuccess = async (uid, email) => {
-    console.log("앱으로부터 로그인 정보를 받았습니다:", uid, email);
+    // 1. 앱으로부터 신호가 왔는지 확인하는 알림 (성공하면 이게 폰에 뜹니다)
+    alert("환영합니다! 정보를 확인 중입니다.");
+    console.log("📱 앱 데이터 수신:", uid, email);
     
     try {
-      // 1. Firebase Auth 상태 업데이트 (앱에서 로그인했으므로 UID로 경로 참조)
-      const userRef = window._fa.ref(window._db, `users/${uid}/profile`);
-      
-      window._fa.onValue(userRef, (snapshot) => {
-        const profile = snapshot.val();
-        if (!profile) {
-          // 2. 프로필이 없다면(첫 로그인) 기본 정보 생성
-          window._fa.set(userRef, {
-            email: email,
-            childName: "우리 아이",
-            createdAt: new Date().toISOString()
-          });
-        }
-        // 3. 앱에서 0.5초 뒤에 리로드를 시키므로, 여기서는 별도 이동 없이 준비만 합니다.
-        console.log("로그인 데이터 처리 완료");
-      });
+        // 2. 브라우저 세션에 즉시 저장
+        sessionStorage.setItem('isLoggedIn', 'true');
+        sessionStorage.setItem('userEmail', email);
+        sessionStorage.setItem('userUid', uid);
+
+        // 3. Firebase 데이터 처리
+        const userRef = window._fa.ref(window._db, `users/${uid}/profile`);
+        
+        // 데이터 한 번만 읽고 처리 (onValue 대신 get 사용이 좋으나 기존 스타일 유지)
+        window._fa.onValue(userRef, (snapshot) => {
+            const profile = snapshot.val();
+            if (!profile) {
+                window._fa.set(userRef, {
+                    email: email,
+                    childName: "우리 아이",
+                    createdAt: new Date().toISOString()
+                });
+            }
+            
+            console.log("✅ Firebase 저장 완료 -> 화면 갱신");
+            
+            // 4. 모든 처리가 끝났으니 웹이 스스로 새로고침!
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
+        }, { onlyOnce: true });
+
     } catch (e) {
-      console.error("로그인 처리 에러:", e);
+        console.error("❌ 처리 에러:", e);
+        alert("로그인 처리 중 오류: " + e.message);
+        window.location.reload(); // 에러 나도 일단 시도
     }
-  };
-</script>
-
-<script type="text/babel">
-/* --- 여기부터 --- */
-/* --- iOS 앱과 이름을 똑같이 맞춰야 신호를 받습니다 --- */
-window.nativeLoginSuccess = function(uid, email) {
-    console.log("📱 앱 데이터 수신 성공:", uid, email);
-    
-    // 1. 정보를 브라우저에 저장 (새로고침해도 기억하게 함)
-    sessionStorage.setItem('isLoggedIn', 'true');
-    sessionStorage.setItem('userEmail', email);
-    sessionStorage.setItem('userUid', uid);
-
-    // 2. 신호를 받았는지 눈으로 확인하기 위한 팝업
-    alert(email.split('@')[0] + "님, 환영합니다! 어항으로 들어갑니다.");
-    
-    // 3. 페이지를 새로고침하여 로그인 상태 반영
-    window.location.reload(); 
 };
- // -------여기까지 ------ 
+
+
+  ///여기까지
+
+
+
+
+  
 const { useState, useEffect, useRef } = React;
 const fa = () => window._fa;
 const db = () => window._db;
