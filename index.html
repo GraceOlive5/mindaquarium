@@ -307,20 +307,22 @@
 <script type="text/babel">
 /* --- 여기부터 --- */
 window.nativeLoginSuccess = function(uid, email) {
-    console.log("📱 앱 데이터 도착:", uid, email);
+    // 1. 신호를 받자마자 팝업을 띄웁니다 (연결 확인용)
+    alert("앱으로부터 신호를 받았습니다: " + email);
     
-    // 1. 브라우저 저장소에 데이터 저장 (새로고침해도 살아남음)
+    console.log("📱 데이터 수신:", uid, email);
+    
+    // 2. 브라우저에 정보를 저장합니다
     sessionStorage.setItem('isLoggedIn', 'true');
     sessionStorage.setItem('userEmail', email);
     sessionStorage.setItem('userUid', uid);
 
-    // 2. React 상태를 즉시 변경할 수 있다면 실행
+    // 3. React가 메인으로 화면을 전환하게 하거나, 강제로 새로고침합니다
     if (window.onNativeLogin) {
         window.onNativeLogin(uid, email);
     } else {
-        // 3. React가 반응하지 않을 경우를 대비해 수동으로 메인 이동
-        alert(email.split('@')[0] + "님, 환영합니다!");
-        window.location.href = "/main"; // 혹은 메인 경로
+        // 저장 후 새로고침을 해야 웹이 바뀐 정보를 인식합니다
+        window.location.reload(); 
     }
 };
  // -------여기까지 ------ 
