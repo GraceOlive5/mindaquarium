@@ -310,16 +310,15 @@
 window.nativeLoginSuccess = function(uid, email) {
     console.log("📱 앱 데이터 수신 성공:", uid, email);
     
-    // 1. 브라우저 저장소에 데이터 저장 (새로고침 대비)
+    // 1. 정보를 브라우저에 저장 (새로고침해도 기억하게 함)
     sessionStorage.setItem('isLoggedIn', 'true');
     sessionStorage.setItem('userEmail', email);
     sessionStorage.setItem('userUid', uid);
 
-    // 2. 신호를 받았는지 확인하기 위해 팝업을 띄웁니다
-    const userName = email.split('@')[0];
-    alert(userName + "님, 환영합니다! 이제 어항으로 입장합니다.");
+    // 2. 신호를 받았는지 눈으로 확인하기 위한 팝업
+    alert(email.split('@')[0] + "님, 환영합니다! 어항으로 들어갑니다.");
     
-    // 3. 페이지를 새로고침하여 로그인 상태를 반영합니다
+    // 3. 페이지를 새로고침하여 로그인 상태 반영
     window.location.reload(); 
 };
  // -------여기까지 ------ 
