@@ -278,6 +278,30 @@
   window._fa = { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInWithPopup, signInWithRedirect, getRedirectResult, ref, set, onValue };
   window._GoogleAuthProvider = GoogleAuthProvider;
   window._OAuthProvider = OAuthProvider;
+  window.nativeLoginSuccess = async (uid, email) => {
+    console.log("앱으로부터 로그인 정보를 받았습니다:", uid, email);
+    
+    try {
+      // 1. Firebase Auth 상태 업데이트 (앱에서 로그인했으므로 UID로 경로 참조)
+      const userRef = window._fa.ref(window._db, `users/${uid}/profile`);
+      
+      window._fa.onValue(userRef, (snapshot) => {
+        const profile = snapshot.val();
+        if (!profile) {
+          // 2. 프로필이 없다면(첫 로그인) 기본 정보 생성
+          window._fa.set(userRef, {
+            email: email,
+            childName: "우리 아이",
+            createdAt: new Date().toISOString()
+          });
+        }
+        // 3. 앱에서 0.5초 뒤에 리로드를 시키므로, 여기서는 별도 이동 없이 준비만 합니다.
+        console.log("로그인 데이터 처리 완료");
+      });
+    } catch (e) {
+      console.error("로그인 처리 에러:", e);
+    }
+  };
 </script>
 
 <script type="text/babel">
