@@ -278,6 +278,31 @@
   window._fa = { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInWithPopup, signInWithRedirect, getRedirectResult, ref, set, onValue };
   window._GoogleAuthProvider = GoogleAuthProvider;
   window._OAuthProvider = OAuthProvider;
+// 앱 전용 로그인 함수 (이게 꼭 있어야 로그인이 됩니다!)
+  window.nativeLoginSuccess = async (uid, email) => {
+    alert("환영합니다! 정보를 확인 중입니다.");
+    try {
+        sessionStorage.setItem('isLoggedIn', 'true');
+        sessionStorage.setItem('userEmail', email);
+        sessionStorage.setItem('userUid', uid);
+
+        const userRef = window._fa.ref(window._db, `users/${uid}/profile`);
+        window._fa.onValue(userRef, (snapshot) => {
+            const profile = snapshot.val();
+            if (!profile) {
+                window._fa.set(userRef, {
+                    email: email,
+                    childName: "우리 아이",
+                    createdAt: new Date().toISOString()
+                });
+            }
+            setTimeout(() => { window.location.reload(); }, 500);
+        }, { onlyOnce: true });
+    } catch (e) {
+        alert("오류 발생: " + e.message);
+        window.location.reload();
+    }
+  };
 </script>
 
 <script type="text/babel">
