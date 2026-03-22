@@ -1586,25 +1586,40 @@ function App() {
       if (!u) setMode('auth');
     });
 
-    // 네이티브 브릿지 로그인 성공 콜백 - ID Token으로 웹 SDK 로그인
-    window.nativeLoginSuccess = async (idToken, email) => {
-      console.log('nativeLoginSuccess 호출됨, email:', email);
+    // 네이티브 로그인 직접 주입
+    window.__setNativeUser = (nativeUser) => {
+      console.log('__setNativeUser 실행:', nativeUser.uid);
+      const fakeUser = { uid: nativeUser.uid, email: nativeUser.email };
+      setUser(fakeUser);
+      setMode('loading');
+    };
+
+    // 네이티브 브릿지 로그인 성공 콜백
+    window.nativeLoginSuccess = async (idToken, email, uid) => {
+      console.log('nativeLoginSuccess 호출됨, uid:', uid);
       try {
-        const { signInWithCredential, GoogleAuthProvider, OAuthProvider } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js');
-        let credential;
-        if (email.includes('appleid.com') || email.includes('privaterelay') || email === '') {
-          console.log('Apple credential 시도');
-          const provider = new OAuthProvider('apple.com');
-          credential = provider.credential({ idToken });
-        } else {
-          console.log('Google credential 시도');
-          credential = GoogleAuthProvider.credential(idToken);
-        }
-        const result = await signInWithCredential(window._auth, credential);
-        console.log('signInWithCredential 성공:', result.user.uid);
+        // 프로필 확인 및 저장
+        const userRef = window._fa.ref(window._db, `users/${uid}/profile`);
+        window._fa.onValue(userRef, async (snap) => {
+          if (!snap.val()) {
+            await window._fa.set(userRef, {
+              email: email || '',
+              childName: '아이',
+              createdAt: new Date().toISOString()
+            });
+          }
+          // React App에 직접 uid 주입
+          if (window.__setNativeUser) {
+            console.log('✅ setNativeUser 호출');
+            window.__setNativeUser({ uid, email });
+          } else {
+            console.log('⚠️ setNativeUser 없음, 리로드');
+            setTimeout(() => window.location.reload(), 500);
+          }
+        }, { onlyOnce: true });
       } catch(e) {
         console.error('nativeLoginSuccess 에러:', e.code, e.message);
-        setTimeout(() => window.location.reload(), 300);
+        setTimeout(() => window.location.reload(), 500);
       }
     };
   }, []);
