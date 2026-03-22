@@ -1594,35 +1594,57 @@ function App() {
       setMode('loading');
     };
 
-    // 네이티브 브릿지 로그인 성공 콜백
-    window.nativeLoginSuccess = async (idToken, email, uid) => {
-      console.log('nativeLoginSuccess 호출됨, uid:', uid);
-      try {
-        // 프로필 확인 및 저장
-        const userRef = window._fa.ref(window._db, `users/${uid}/profile`);
-        window._fa.onValue(userRef, async (snap) => {
-          if (!snap.val()) {
-            await window._fa.set(userRef, {
-              email: email || '',
-              childName: '아이',
-              createdAt: new Date().toISOString()
-            });
-          }
-          // React App에 직접 uid 주입
-          if (window.__setNativeUser) {
-            console.log('✅ setNativeUser 호출');
-            window.__setNativeUser({ uid, email });
-          } else {
-            console.log('⚠️ setNativeUser 없음, 리로드');
-            setTimeout(() => window.location.reload(), 500);
-          }
-        }, { onlyOnce: true });
-      } catch(e) {
-        console.error('nativeLoginSuccess 에러:', e.code, e.message);
-        setTimeout(() => window.location.reload(), 500);
+   window.nativeLoginSuccess = async (idToken, email, uid) => {
+  console.log('nativeLoginSuccess 호출됨, uid:', uid);
+  try {
+    // [추가] Firebase 인증 상태를 웹 SDK와 동기화
+    // 네이티브에서 받은 idToken이 있다면 이를 사용하여 웹에서도 로그인 상태를 만듭니다.
+    if (idToken && window._auth) {
+      const credential = window._fa.GoogleAuthProvider.credential(idToken);
+      await window._fa.signInWithCredential(window._auth, credential);
+      console.log('✅ Firebase 웹 SDK 인증 완료');
+    }
+
+    const userRef = window._fa.ref(window._db, `users/${uid}/profile`);
+    
+    // 데이터 가져오기
+    window._fa.get(userRef).then(async (snap) => {
+      if (!snap.exists()) {
+        console.log('🆕 신규 사용자 프로필 생성');
+        await window._fa.set(userRef, {
+          email: email || '',
+          childName: '아이',
+          createdAt: new Date().toISOString()
+        });
       }
-    };
-  }, []);
+
+      // React 상태 업데이트
+      if (window.__setNativeUser) {
+        console.log('✅ setNativeUser 호출');
+        window.__setNativeUser({ uid, email });
+      } else {
+        // [수정] reload() 대신, 함수가 준비될 때까지 잠시 기다렸다가 재시도하거나 
+        // 직접 상태를 변경하는 로직을 강화합니다.
+        console.log('⚠️ setNativeUser 준비 대기 중...');
+        let retryCount = 0;
+        const retryInterval = setInterval(() => {
+          if (window.__setNativeUser) {
+            window.__setNativeUser({ uid, email });
+            clearInterval(retryInterval);
+          } else if (retryCount > 10) {
+            clearInterval(retryInterval);
+            // 최후의 수단으로만 리로드
+            window.location.reload();
+          }
+          retryCount++;
+        }, 100);
+      }
+    });
+  } catch(e) {
+    console.error('nativeLoginSuccess 에러:', e.code, e.message);
+    // 에러 발생 시 무조건 리로드하기보다 에러 메시지를 확인하는 것이 좋습니다.
+  }
+};
 
   useEffect(() => {
     if (!user) return;
