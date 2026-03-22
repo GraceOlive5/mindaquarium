@@ -278,55 +278,9 @@
   window._fa = { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInWithPopup, signInWithRedirect, getRedirectResult, ref, set, onValue };
   window._GoogleAuthProvider = GoogleAuthProvider;
   window._OAuthProvider = OAuthProvider;
-//---여기부터
+</script>
 
-  window.nativeLoginSuccess = async (uid, email) => {
-    // 1. 앱으로부터 신호가 왔는지 확인하는 알림 (성공하면 이게 폰에 뜹니다)
-    alert("환영합니다! 정보를 확인 중입니다.");
-    console.log("📱 앱 데이터 수신:", uid, email);
-    
-    try {
-        // 2. 브라우저 세션에 즉시 저장
-        sessionStorage.setItem('isLoggedIn', 'true');
-        sessionStorage.setItem('userEmail', email);
-        sessionStorage.setItem('userUid', uid);
-
-        // 3. Firebase 데이터 처리
-        const userRef = window._fa.ref(window._db, `users/${uid}/profile`);
-        
-        // 데이터 한 번만 읽고 처리 (onValue 대신 get 사용이 좋으나 기존 스타일 유지)
-        window._fa.onValue(userRef, (snapshot) => {
-            const profile = snapshot.val();
-            if (!profile) {
-                window._fa.set(userRef, {
-                    email: email,
-                    childName: "우리 아이",
-                    createdAt: new Date().toISOString()
-                });
-            }
-            
-            console.log("✅ Firebase 저장 완료 -> 화면 갱신");
-            
-            // 4. 모든 처리가 끝났으니 웹이 스스로 새로고침!
-            setTimeout(() => {
-                window.location.reload();
-            }, 500);
-        }, { onlyOnce: true });
-
-    } catch (e) {
-        console.error("❌ 처리 에러:", e);
-        alert("로그인 처리 중 오류: " + e.message);
-        window.location.reload(); // 에러 나도 일단 시도
-    }
-};
-
-
-  ///여기까지
-
-
-
-
-  
+<script type="text/babel">
 const { useState, useEffect, useRef } = React;
 const fa = () => window._fa;
 const db = () => window._db;
