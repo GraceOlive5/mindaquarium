@@ -1598,6 +1598,10 @@ function App() {
           });
         }
       } catch(e) { console.error('nativeLoginSuccess error:', e); }
+      finally {
+        // 페이지 리로드로 onAuthStateChanged 재트리거
+        setTimeout(() => window.location.reload(), 300);
+      }
     };
   }, []);
 
