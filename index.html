@@ -1646,13 +1646,16 @@ function App() {
   }
 };
 
-  useEffect(() => {
+useEffect(() => {
     if (!user) return;
     setFirebaseConnected(true);
+
+    // 1. 데이터를 실시간으로 감시하는 도구 (기존 기능 유지)
     const listen = (path, cb) => fa().onValue(fa().ref(db(), `users/${user.uid}/${path}`), snap => {
       const d = snap.val();
       if (d !== null && d !== undefined) cb(d);
     });
+
     listen('messages', d => setMessages(Array.isArray(d) ? d.filter(m=>m&&m.id) : Object.values(d).filter(m=>m&&m.id)));
     listen('feedingHistory', setFeedingHistory);
     listen('goalCount', setGoalCount);
@@ -1665,25 +1668,43 @@ function App() {
     listen('customFishNames', setCustomFishNames);
     listen('lastAdminVisitCount', v => setLastAdminVisitCount(v || 0));
 
-    // 관리자 세팅 + 튜토리얼 완료 여부 확인 후 mode 결정
-    Promise.all([
-      new Promise(r => fa().onValue(fa().ref(db(), `users/${user.uid}/adminSetupDone`), s => r(s.val()), { onlyOnce: true })),
-      new Promise(r => fa().onValue(fa().ref(db(), `users/${user.uid}/tutorialDone`),   s => r(s.val()), { onlyOnce: true })),
-    ]).then(([adminDone, tutDone]) => {
-      setAdminSetupDone(!!adminDone);
-      setTutorialDone(!!tutDone);
-      if (!adminDone) setMode('adminOnboarding');
-      else if (!tutDone) setMode('tutorial');
-      else setMode('intro');
-    });
+    // 2. [수정됨] 설정 데이터가 다 올 때까지 확실히 기다린 후 화면 전환
+    const checkSettingsAndGo = async () => {
+      try {
+        // 관리자 설정과 튜토리얼 완료 여부를 서버에서 가져옵니다.
+        const [adminSnap, tutSnap] = await Promise.all([
+          new Promise(r => fa().onValue(fa().ref(db(), `users/${user.uid}/adminSetupDone`), s => r(s), { onlyOnce: true })),
+          new Promise(r => fa().onValue(fa().ref(db(), `users/${user.uid}/tutorialDone`), s => r(s), { onlyOnce: true }))
+        ]);
 
-    // ── 마이그레이션: 구버전 kingLetter → 새 구조로 한 번만 실행 ──
+        const adminDone = !!adminSnap.val();
+        const tutDone = !!tutSnap.val();
+
+        setAdminSetupDone(adminDone);
+        setTutorialDone(tutDone);
+
+        // 데이터가 확인된 후에만 화면을 바꿉니다 (로그인 화면으로 튕기는 현상 방지)
+        if (!adminDone) {
+          setMode('adminOnboarding');
+        } else if (!tutDone) {
+          setMode('tutorial');
+        } else {
+          setMode('intro');
+        }
+      } catch (e) {
+        console.error("데이터 로드 중 오류:", e);
+      }
+    };
+
+    checkSettingsAndGo();
+
+    // 3. 구버전 데이터 마이그레이션 (기존 기능 유지)
     fa().onValue(fa().ref(db(), `users/${user.uid}/v2migrated`), snap => {
       if (snap.val()) return;
       const uid = user.uid;
       Promise.all([
-        new Promise(r => fa().onValue(fa().ref(db(), `users/${uid}/kingLetter`),         s => r(s.val()), { onlyOnce:true })),
-        new Promise(r => fa().onValue(fa().ref(db(), `users/${uid}/hasReadKingLetter`),  s => r(s.val()), { onlyOnce:true })),
+        new Promise(r => fa().onValue(fa().ref(db(), `users/${uid}/kingLetter`), s => r(s.val()), { onlyOnce:true })),
+        new Promise(r => fa().onValue(fa().ref(db(), `users/${uid}/hasReadKingLetter`), s => r(s.val()), { onlyOnce:true })),
       ]).then(([oldKingLetter, hasRead]) => {
         const updates = { v2migrated: true };
         if (oldKingLetter) {
@@ -1700,8 +1721,8 @@ function App() {
         if (updates['pendingKingLetter'] !== undefined) setPendingKingLetter(updates['pendingKingLetter']);
       });
     }, { onlyOnce: true });
-  }, [user]);
 
+  }, [user]);
   const saveToFirebase = async (path, data) => {
     if (!user) return;
     setSaving(true);
