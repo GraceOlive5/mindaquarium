@@ -609,12 +609,15 @@ function AuthScreen({ onSuccess }) {
     setBusy(true);
     const provider = new window._GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
-    console.log('Google popup 로그인 시작');
-    await fa().signInWithPopup(auth(), provider);
+    sessionStorage.setItem('oauthInProgress', '1');
+    sessionStorage.setItem('oauthProvider', 'Google');
+    console.log('Google redirect 로그인 시작');
+    await fa().signInWithRedirect(auth(), provider);
   } catch (e) {
-    console.error('Google popup 로그인 실패:', e);
+    console.error('Google redirect 로그인 실패:', e);
+    sessionStorage.removeItem('oauthInProgress');
+    sessionStorage.removeItem('oauthProvider');
     alert('Google 로그인 실패: ' + (e.message || '다시 시도해주세요.'));
-  } finally {
     setBusy(false);
   }
 };
