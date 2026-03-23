@@ -604,12 +604,20 @@ function AuthScreen({ onSuccess }) {
     }
   };
 
-  const googleSignIn = async () => {
+ const googleSignIn = async () => {
+  try {
     setBusy(true);
     const provider = new window._GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
-    await startRedirectSignIn(provider, 'Google');
-  };
+    console.log('Google popup 로그인 시작');
+    await fa().signInWithPopup(auth(), provider);
+  } catch (e) {
+    console.error('Google popup 로그인 실패:', e);
+    alert('Google 로그인 실패: ' + (e.message || '다시 시도해주세요.'));
+  } finally {
+    setBusy(false);
+  }
+};
 
   const appleSignIn = async () => {
     setBusy(true);
