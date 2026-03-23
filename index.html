@@ -589,62 +589,34 @@ function AuthScreen({ onSuccess }) {
   };
 
   // 웹 Firebase 소셜 로그인
+  // WKWebView에서는 popup보다 redirect가 훨씬 안정적입니다.
+  const startRedirectSignIn = async (provider, providerName) => {
+    try {
+      sessionStorage.setItem('oauthInProgress', '1');
+      sessionStorage.setItem('oauthProvider', providerName);
+      console.log(`${providerName} redirect 로그인 시작`);
+      await fa().signInWithRedirect(auth(), provider);
+    } catch (e) {
+      console.error(`${providerName} redirect 로그인 실패:`, e);
+      sessionStorage.removeItem('oauthInProgress');
+      sessionStorage.removeItem('oauthProvider');
+      alert(`${providerName} 로그인 실패: ` + (e.message || '다시 시도해주세요.'));
+    }
+  };
+
   const googleSignIn = async () => {
     setBusy(true);
-    try {
-      const provider = new window._GoogleAuthProvider();
-      provider.setCustomParameters({ prompt: 'select_account' });
-      const result = await fa().signInWithPopup(auth(), provider);
-      console.log('Google 웹 로그인 성공:', result?.user?.uid);
-    } catch (e) {
-      console.error('Google 웹 로그인 실패:', e);
-      const code = e?.code || '';
-      if (code.includes('popup-blocked') || code.includes('popup-closed-by-user') || code.includes('cancelled-popup-request')) {
-        try {
-          const provider = new window._GoogleAuthProvider();
-          provider.setCustomParameters({ prompt: 'select_account' });
-          await fa().signInWithRedirect(auth(), provider);
-          return;
-        } catch (redirectError) {
-          console.error('Google redirect 로그인 실패:', redirectError);
-          alert('Google 로그인 실패: ' + (redirectError.message || '다시 시도해주세요.'));
-        }
-      } else {
-        alert('Google 로그인 실패: ' + (e.message || '다시 시도해주세요.'));
-      }
-    } finally {
-      setBusy(false);
-    }
+    const provider = new window._GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+    await startRedirectSignIn(provider, 'Google');
   };
 
   const appleSignIn = async () => {
     setBusy(true);
-    try {
-      const provider = new window._OAuthProvider('apple.com');
-      provider.addScope('email');
-      provider.addScope('name');
-      const result = await fa().signInWithPopup(auth(), provider);
-      console.log('Apple 웹 로그인 성공:', result?.user?.uid);
-    } catch (e) {
-      console.error('Apple 웹 로그인 실패:', e);
-      const code = e?.code || '';
-      if (code.includes('popup-blocked') || code.includes('popup-closed-by-user') || code.includes('cancelled-popup-request')) {
-        try {
-          const provider = new window._OAuthProvider('apple.com');
-          provider.addScope('email');
-          provider.addScope('name');
-          await fa().signInWithRedirect(auth(), provider);
-          return;
-        } catch (redirectError) {
-          console.error('Apple redirect 로그인 실패:', redirectError);
-          alert('Apple 로그인 실패: ' + (redirectError.message || '다시 시도해주세요.'));
-        }
-      } else {
-        alert('Apple 로그인 실패: ' + (e.message || '다시 시도해주세요.'));
-      }
-    } finally {
-      setBusy(false);
-    }
+    const provider = new window._OAuthProvider('apple.com');
+    provider.addScope('email');
+    provider.addScope('name');
+    await startRedirectSignIn(provider, 'Apple');
   };
 
   return (
@@ -1625,22 +1597,53 @@ function App() {
 
   useEffect(() => {
     let isMounted = true;
+    let authResolved = false;
+    const oauthInProgress = sessionStorage.getItem('oauthInProgress') === '1';
+
+    if (oauthInProgress) {
+      console.log('OAuth 리다이렉트 복귀 감지');
+      setBusy(true);
+    }
 
     fa().getRedirectResult(auth()).then((result) => {
+      if (!isMounted) return;
+      authResolved = true;
+      sessionStorage.removeItem('oauthInProgress');
+      sessionStorage.removeItem('oauthProvider');
       if (result?.user) {
         console.log('소셜 리다이렉트 로그인 성공:', result.user.uid);
+        setUser(result.user);
+      } else {
+        console.log('리다이렉트 결과 없음');
       }
+      setBusy(false);
     }).catch((e) => {
+      if (!isMounted) return;
+      authResolved = true;
       console.error('getRedirectResult 실패:', e);
+      sessionStorage.removeItem('oauthInProgress');
+      sessionStorage.removeItem('oauthProvider');
+      setBusy(false);
+      alert('소셜 로그인 처리 실패: ' + (e.message || '다시 시도해주세요.'));
     });
 
     const unsubscribe = fa().onAuthStateChanged(auth(), u => {
       if (!isMounted) return;
       console.log('onAuthStateChanged:', u ? u.uid : null);
       setUser(u);
-      if (!u) {
-        setMode('auth');
+      if (u) {
+        sessionStorage.removeItem('oauthInProgress');
+        sessionStorage.removeItem('oauthProvider');
+        setBusy(false);
+        return;
       }
+      // 리다이렉트 처리 직후에는 잠시 대기
+      if (sessionStorage.getItem('oauthInProgress') === '1' && !authResolved) {
+        console.log('OAuth 처리 중이므로 auth 화면 전환 보류');
+        return;
+      }
+      setMode('auth');
+      setBusy(false);
     });
 
     // 기존 iOS 브리지와 충돌하지 않도록 함수명은 유지하되 사용하지 않음
