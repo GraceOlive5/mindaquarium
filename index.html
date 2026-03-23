@@ -1581,46 +1581,149 @@ function App() {
   })).filter(f => f.alwaysShow || f.name.trim() !== '');
 
   useEffect(() => {
-    fa().onAuthStateChanged(auth(), u => {
-      setUser(u);
-      if (!u) setMode('auth');
+    let authResolved = false;
+
+    const readNativeSession = () => {
+      try {
+        const nativeUid = localStorage.getItem('nativeUid') || '';
+        const nativeEmail = localStorage.getItem('nativeEmail') || '';
+        const nativeToken = localStorage.getItem('nativeToken') || '';
+        const loginType = localStorage.getItem('loginType') || '';
+        if (!nativeUid) return null;
+        return { uid: nativeUid, email: nativeEmail, idToken: nativeToken, loginType };
+      } catch (e) {
+        console.error('네이티브 세션 읽기 실패:', e);
+        return null;
+      }
+    };
+
+    const writeNativeSession = ({ uid, email, idToken }) => {
+      try {
+        localStorage.setItem('nativeUid', uid || '');
+        localStorage.setItem('nativeEmail', email || '');
+        localStorage.setItem('nativeToken', idToken || '');
+        localStorage.setItem('loginType', 'native');
+        console.log('네이티브 세션 저장 완료:', uid);
+      } catch (e) {
+        console.error('네이티브 세션 저장 실패:', e);
+      }
+    };
+
+    const clearNativeSession = () => {
+      try {
+        localStorage.removeItem('nativeUid');
+        localStorage.removeItem('nativeEmail');
+        localStorage.removeItem('nativeToken');
+        localStorage.removeItem('loginType');
+        console.log('네이티브 세션 제거 완료');
+      } catch (e) {
+        console.error('네이티브 세션 제거 실패:', e);
+      }
+    };
+
+    const applyNativeUser = (nativeUser) => {
+      if (!nativeUser?.uid) {
+        console.warn('applyNativeUser 무시: uid 없음');
+        return;
+      }
+      console.log('applyNativeUser 실행:', nativeUser.uid);
+      const fakeUser = {
+        uid: nativeUser.uid,
+        email: nativeUser.email || '',
+        isNative: true,
+      };
+      setUser(fakeUser);
+      setMode(prev => prev === 'auth' ? 'loading' : prev);
+    };
+
+    window.__clearNativeSession = clearNativeSession;
+
+    const existingNativeSession = readNativeSession();
+    if (existingNativeSession) {
+      console.log('초기 네이티브 세션 복원:', existingNativeSession.uid);
+      applyNativeUser(existingNativeSession);
+    }
+
+    const unsubscribe = fa().onAuthStateChanged(auth(), u => {
+      authResolved = true;
+      console.log('onAuthStateChanged:', u ? u.uid : null);
+
+      if (u) {
+        clearNativeSession();
+        setUser(u);
+        return;
+      }
+
+      const nativeSession = readNativeSession();
+      if (nativeSession?.uid) {
+        console.log('웹 Firebase 미로그인, 네이티브 세션 유지:', nativeSession.uid);
+        applyNativeUser(nativeSession);
+        return;
+      }
+
+      setUser(null);
+      setMode('auth');
     });
 
     // 네이티브 로그인 직접 주입
     window.__setNativeUser = (nativeUser) => {
-      console.log('__setNativeUser 실행:', nativeUser.uid);
-      const fakeUser = { uid: nativeUser.uid, email: nativeUser.email };
-      setUser(fakeUser);
-      setMode('loading');
+      console.log('__setNativeUser 실행:', nativeUser?.uid);
+      writeNativeSession(nativeUser || {});
+      applyNativeUser(nativeUser || {});
     };
 
     // 네이티브 브릿지 로그인 성공 콜백
     window.nativeLoginSuccess = async (idToken, email, uid) => {
       console.log('nativeLoginSuccess 호출됨, uid:', uid);
+
+      if (!uid) {
+        console.error('nativeLoginSuccess 중단: uid 없음');
+        return;
+      }
+
       try {
+        writeNativeSession({ uid, email, idToken });
+
         // 프로필 확인 및 저장
         const userRef = window._fa.ref(window._db, `users/${uid}/profile`);
         window._fa.onValue(userRef, async (snap) => {
-          if (!snap.val()) {
-            await window._fa.set(userRef, {
-              email: email || '',
-              childName: '아이',
-              createdAt: new Date().toISOString()
-            });
-          }
-          // React App에 직접 uid 주입
-          if (window.__setNativeUser) {
-            console.log('✅ setNativeUser 호출');
-            window.__setNativeUser({ uid, email });
-          } else {
-            console.log('⚠️ setNativeUser 없음, 리로드');
-            setTimeout(() => window.location.reload(), 500);
+          try {
+            if (!snap.val()) {
+              await window._fa.set(userRef, {
+                email: email || '',
+                childName: '아이',
+                createdAt: new Date().toISOString()
+              });
+              console.log('기본 프로필 생성 완료:', uid);
+            } else {
+              console.log('기존 프로필 확인 완료:', uid);
+            }
+
+            if (window.__setNativeUser) {
+              console.log('✅ __setNativeUser 호출');
+              window.__setNativeUser({ uid, email, idToken });
+            } else {
+              console.warn('⚠️ __setNativeUser 없음, 직접 반영');
+              applyNativeUser({ uid, email, idToken });
+            }
+          } catch (innerError) {
+            console.error('nativeLoginSuccess 내부 처리 에러:', innerError);
+            applyNativeUser({ uid, email, idToken });
           }
         }, { onlyOnce: true });
       } catch(e) {
-        console.error('nativeLoginSuccess 에러:', e.code, e.message);
-        setTimeout(() => window.location.reload(), 500);
+        console.error('nativeLoginSuccess 에러:', e);
+        applyNativeUser({ uid, email, idToken });
       }
+    };
+
+    return () => {
+      if (typeof unsubscribe === 'function') unsubscribe();
+      try {
+        delete window.__setNativeUser;
+        delete window.nativeLoginSuccess;
+        delete window.__clearNativeSession;
+      } catch (e) {}
     };
   }, []);
 
@@ -1692,9 +1795,24 @@ function App() {
 
   const signOut = async () => {
     if (!confirm('로그아웃 하시겠습니까?')) return;
-    await fa().signOut(auth());
-    setMessages([]); setFeedingHistory({});
-    setPendingKingLetter(''); setKingLetterHistory([]);
+
+    try {
+      await fa().signOut(auth());
+    } catch (e) {
+      console.log('웹 Firebase signOut 경고:', e?.message || e);
+    }
+
+    try {
+      if (window.__clearNativeSession) window.__clearNativeSession();
+    } catch (e) {
+      console.log('네이티브 세션 삭제 경고:', e?.message || e);
+    }
+
+    setUser(null);
+    setMessages([]);
+    setFeedingHistory({});
+    setPendingKingLetter('');
+    setKingLetterHistory([]);
     setCustomFishNames(null);
     setMode('auth');
   };
