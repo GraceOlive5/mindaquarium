@@ -1571,6 +1571,29 @@ function App() {
   const [adminSetupDone, setAdminSetupDone] = useState(null);
   const [lastAdminVisitCount, setLastAdminVisitCount] = useState(0);
 
+  const loadingFallbackRef = useRef(null);
+
+  const clearLoadingFallback = () => {
+    if (loadingFallbackRef.current) {
+      clearTimeout(loadingFallbackRef.current);
+      loadingFallbackRef.current = null;
+    }
+  };
+
+  const scheduleLoadingFallback = (nextMode = 'intro', delay = 3000, reason = '') => {
+    clearLoadingFallback();
+    loadingFallbackRef.current = setTimeout(() => {
+      setMode(prev => {
+        if (prev === 'loading') {
+          console.log(`loading fallback 실행 (${reason}) -> ${nextMode}`);
+          return nextMode;
+        }
+        console.log('loading fallback 취소, 현재 mode:', prev);
+        return prev;
+      });
+    }, delay);
+  };
+
   // cycleCount: 발송된 편지 수 * goalCount 이후 나머지로 계산
   const sentCount = kingLetterHistory.length;
   const cycleCount = messages.length - (sentCount * goalCount);
@@ -1588,6 +1611,7 @@ function App() {
       const nativeEmail = localStorage.getItem('nativeEmail');
 
       if (u) {
+        clearLoadingFallback();
         setUser(u);
         return;
       }
@@ -1597,9 +1621,11 @@ function App() {
         console.log('네이티브 세션 복원:', nativeUid);
         setUser({ uid: nativeUid, email: nativeEmail || '' });
         setMode('loading');
+        scheduleLoadingFallback('intro', 3000, 'native-session-restore');
         return;
       }
 
+      clearLoadingFallback();
       setUser(null);
       setMode('auth');
     });
@@ -1615,6 +1641,7 @@ function App() {
       const fakeUser = { uid: nativeUser.uid, email: nativeUser.email || '' };
       setUser(fakeUser);
       setMode('loading');
+      scheduleLoadingFallback('intro', 3000, '__setNativeUser');
 
       console.log('__setNativeUser 완료 - mode=loading');
     };
@@ -1687,15 +1714,32 @@ function App() {
     listen('lastAdminVisitCount', v => setLastAdminVisitCount(v || 0));
 
     // 관리자 세팅 + 튜토리얼 완료 여부 확인 후 mode 결정
-    Promise.all([
-      new Promise(r => fa().onValue(fa().ref(db(), `users/${user.uid}/adminSetupDone`), s => r(s.val()), { onlyOnce: true })),
-      new Promise(r => fa().onValue(fa().ref(db(), `users/${user.uid}/tutorialDone`),   s => r(s.val()), { onlyOnce: true })),
-    ]).then(([adminDone, tutDone]) => {
+    Promise.race([
+      Promise.all([
+        new Promise(r => fa().onValue(fa().ref(db(), `users/${user.uid}/adminSetupDone`), s => r(s.val()), { onlyOnce: true })),
+        new Promise(r => fa().onValue(fa().ref(db(), `users/${user.uid}/tutorialDone`),   s => r(s.val()), { onlyOnce: true })),
+      ]).then(([adminDone, tutDone]) => ({ timedOut: false, adminDone, tutDone })),
+      new Promise(r => setTimeout(() => r({ timedOut: true }), 3000))
+    ]).then(result => {
+      if (result.timedOut) {
+        console.log('loading timeout - intro로 fallback');
+        setAdminSetupDone(true);
+        setTutorialDone(true);
+        setMode('intro');
+        return;
+      }
+
+      const { adminDone, tutDone } = result;
+      clearLoadingFallback();
+      console.log('loading resolved:', { adminDone, tutDone });
       setAdminSetupDone(!!adminDone);
       setTutorialDone(!!tutDone);
       if (!adminDone) setMode('adminOnboarding');
       else if (!tutDone) setMode('tutorial');
       else setMode('intro');
+    }).catch(error => {
+      console.error('loading mode resolve 실패:', error);
+      setMode('intro');
     });
 
     // ── 마이그레이션: 구버전 kingLetter → 새 구조로 한 번만 실행 ──
