@@ -278,7 +278,6 @@
   window._fa = { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInWithPopup, signInWithRedirect, getRedirectResult, ref, set, onValue };
   window._GoogleAuthProvider = GoogleAuthProvider;
   window._OAuthProvider = OAuthProvider;
-  window._OAuthProvider = OAuthProvider;
 </script>
 
 <script type="text/babel">
@@ -604,23 +603,12 @@ function AuthScreen({ onSuccess }) {
     }
   };
 
- const googleSignIn = async () => {
-  try {
+  const googleSignIn = async () => {
     setBusy(true);
     const provider = new window._GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
-    sessionStorage.setItem('oauthInProgress', '1');
-    sessionStorage.setItem('oauthProvider', 'Google');
-    console.log('Google redirect 로그인 시작');
-    await fa().signInWithRedirect(auth(), provider);
-  } catch (e) {
-    console.error('Google redirect 로그인 실패:', e);
-    sessionStorage.removeItem('oauthInProgress');
-    sessionStorage.removeItem('oauthProvider');
-    alert('Google 로그인 실패: ' + (e.message || '다시 시도해주세요.'));
-    setBusy(false);
-  }
-};
+    await startRedirectSignIn(provider, 'Google');
+  };
 
   const appleSignIn = async () => {
     setBusy(true);
@@ -1578,6 +1566,7 @@ function AdminOnboardingScreen({ onComplete }) {
 /* ══════════════════════════════════════
    앱 루트: mode state + Firebase만 관리
 ══════════════════════════════════════ */
+
 function App() {
   const [mode, setMode] = useState('loading');
   const [user, setUser] = useState(null);
@@ -1861,61 +1850,6 @@ function App() {
   return (
     <>
       {(saving || busy) && <SavingOverlay />}
-      {mode === 'auth'            && <AuthScreen onSuccess={() => setMode('loading')} />}
-      {mode === 'adminOnboarding' && <AdminOnboardingScreen onComplete={completeAdminOnboarding} />}
-      {mode === 'tutorial'        && (
-        <TutorialScreen
-          shyFish={fishes.find(f => f.id === 'shy')}
-          onComplete={completeTutorial}
-          onSendLetter={sendTutorialLetter}
-        />
-      )}
-      {mode === 'intro'      && <IntroScreen userEmail={user?.email} onStart={() => setMode('aquarium')} onAdmin={() => setMode('adminLogin')} onSignOut={signOut} />}
-      {mode === 'adminLogin' && <AdminLoginScreen onSuccess={handleAdminLogin} onBack={() => setMode('intro')} onResetPw={async () => {
-        if (confirm('비밀번호를 0000으로 초기화할까요?\n본인 확인을 위해 재로그인이 필요해요.')) {
-          await saveToFirebase('adminPassword', '0000');
-          setAdminPassword('0000');
-          alert('비밀번호가 0000으로 초기화되었습니다.');
-        }
-      }} />}
-      {mode === 'admin'      && (
-        <AdminScreen
-          messages={messages}
-          goalCount={goalCount}
-          cycleCount={cycleCount}
-          pendingKingLetter={pendingKingLetter}
-          kingLetterHistory={kingLetterHistory}
-          adminPassword={adminPassword}
-          customFishNames={customFishNames}
-          firebaseConnected={firebaseConnected}
-          onSave={saveToFirebase}
-          onExit={() => setMode('intro')}
-        />
-      )}
-      {mode === 'letter'     && selectedFish && <LetterScreen fish={selectedFish} onSend={feedFish} onCancel={() => setMode('aquarium')} />}
-      {mode === 'kingLetter' && <KingLetterScreen content={kingLetterToShow} goalCount={goalCount} onBack={() => setMode('aquarium')} />}
-      {mode === 'aquarium'   && (
-        <AquariumScreen
-          fishes={fishes}
-          messages={messages}
-          cycleCount={cycleCount}
-          goalCount={goalCount}
-          pendingKingLetter={pendingKingLetter}
-          lastAdminVisitCount={lastAdminVisitCount}
-          onFishClick={fish => { setSelectedFish(fish); setMode('letter'); }}
-          onReadKingLetter={readKingLetter}
-          onBack={() => setMode('intro')}
-        />
-      )}
-    </>
-  );
-}
-
-  if (mode === 'loading') return <LoadingScreen />;
-
-  return (
-    <>
-      {saving && <SavingOverlay />}
       {mode === 'auth'            && <AuthScreen onSuccess={() => setMode('loading')} />}
       {mode === 'adminOnboarding' && <AdminOnboardingScreen onComplete={completeAdminOnboarding} />}
       {mode === 'tutorial'        && (
