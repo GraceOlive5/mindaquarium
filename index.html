@@ -1707,17 +1707,31 @@ function App() {
     listen('customFishNames', setCustomFishNames);
     listen('lastAdminVisitCount', v => setLastAdminVisitCount(v || 0));
 
-    Promise.all([
-      new Promise(r => fa().onValue(fa().ref(db(), `users/${user.uid}/adminSetupDone`), s => r(s.val()), { onlyOnce: true })),
-      new Promise(r => fa().onValue(fa().ref(db(), `users/${user.uid}/tutorialDone`), s => r(s.val()), { onlyOnce: true })),
-    ]).then(([adminDone, tutDone]) => {
-      setAdminSetupDone(!!adminDone);
-      setTutorialDone(!!tutDone);
+    Promise.race([
+  Promise.all([
+    new Promise(r => fa().onValue(fa().ref(db(), `users/${user.uid}/adminSetupDone`), s => r(s.val()), { onlyOnce: true })),
+    new Promise(r => fa().onValue(fa().ref(db(), `users/${user.uid}/tutorialDone`), s => r(s.val()), { onlyOnce: true })),
+  ]),
+  new Promise(r => setTimeout(() => r(['__timeout__', '__timeout__']), 2500))
+]).then(([adminDone, tutDone]) => {
+  console.log('🧪 loading 분기:', adminDone, tutDone);
 
-      if (!adminDone) setMode('adminOnboarding');
-      else if (!tutDone) setMode('tutorial');
-      else setMode('intro');
-    });
+  if (adminDone === '__timeout__') {
+    console.log('⚠️ loading timeout -> intro');
+    setMode('intro');
+    return;
+  }
+
+  setAdminSetupDone(!!adminDone);
+  setTutorialDone(!!tutDone);
+
+  if (!adminDone) setMode('adminOnboarding');
+  else if (!tutDone) setMode('tutorial');
+  else setMode('intro');
+}).catch((e) => {
+  console.error('❌ loading 분기 실패:', e);
+  setMode('intro');
+});
 
     fa().onValue(fa().ref(db(), `users/${user.uid}/v2migrated`), snap => {
       if (snap.val()) return;
