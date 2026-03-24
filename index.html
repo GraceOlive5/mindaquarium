@@ -261,7 +261,7 @@
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
   import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, OAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithCredential }
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, OAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithCredential, signInWithCustomToken }
     from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
   const app = initializeApp({
@@ -275,7 +275,7 @@
   });
   window._db  = getDatabase(app);
   window._auth = getAuth(app);
-  window._fa = { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithCredential, ref, set, onValue };
+  window._fa = { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithCredential, signInWithCustomToken, ref, set, onValue };
   window._GoogleAuthProvider = GoogleAuthProvider;
   window._OAuthProvider = OAuthProvider;
 </script>
@@ -601,18 +601,11 @@ function AuthScreen({ onSuccess }) {
 
   // 2. Swift가 로그인 성공 후 토큰 전달
   useEffect(() => {
-    window.nativeLoginSuccess = async (idToken, accessToken, provider, nonce) => {
-  console.log('nativeLoginSuccess 호출됨, provider:', provider);
+window.nativeLoginSuccess = async (customToken) => {
+  console.log('nativeLoginSuccess 호출됨');
   try {
-    let credential;
-    if (provider === 'apple') {
-      const appleProvider = new window._OAuthProvider('apple.com');
-      credential = appleProvider.credential({ idToken, rawNonce: nonce }); // ← nonce 추가
-    } else {
-      credential = window._GoogleAuthProvider.credential(idToken, accessToken);
-    }
-    const result = await window._fa.signInWithCredential(window._auth, credential);
-    console.log('✅ signInWithCredential 성공:', result.user.uid);
+    const result = await window._fa.signInWithCustomToken(window._auth, customToken);
+    console.log('✅ signInWithCustomToken 성공:', result.user.uid);
     setBusy(false);
   } catch(e) {
     console.error('❌ nativeLoginSuccess 에러:', e.code, e.message);
