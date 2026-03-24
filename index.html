@@ -601,13 +601,13 @@ function AuthScreen({ onSuccess }) {
 
   // 2. Swift가 로그인 성공 후 토큰 전달
   useEffect(() => {
-    window.nativeLoginSuccess = async (idToken, accessToken, provider) => {
+    window.nativeLoginSuccess = async (idToken, accessToken, provider, nonce) => {
   console.log('nativeLoginSuccess 호출됨, provider:', provider);
   try {
     let credential;
     if (provider === 'apple') {
       const appleProvider = new window._OAuthProvider('apple.com');
-      credential = appleProvider.credential({ idToken });
+      credential = appleProvider.credential({ idToken, rawNonce: nonce }); // ← nonce 추가
     } else {
       credential = window._GoogleAuthProvider.credential(idToken, accessToken);
     }
