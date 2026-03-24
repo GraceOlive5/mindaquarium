@@ -587,29 +587,11 @@ function AuthScreen({ onSuccess }) {
     } finally { setBusy(false); }
   };
 
-  // 웹 Firebase 소셜 로그인
-  // WKWebView에서는 popup보다 redirect가 훨씬 안정적입니다.
-  const startRedirectSignIn = async (provider, providerName) => {
-    try {
-      sessionStorage.setItem('oauthInProgress', '1');
-      sessionStorage.setItem('oauthProvider', providerName);
-      console.log(`${providerName} redirect 로그인 시작`);
-      await fa().signInWithRedirect(auth(), provider);
-    } catch (e) {
-      console.error(`${providerName} redirect 로그인 실패:`, e);
-      sessionStorage.removeItem('oauthInProgress');
-      sessionStorage.removeItem('oauthProvider');
-      alert(`${providerName} 로그인 실패: ` + (e.message || '다시 시도해주세요.'));
-    }
-  };
-
-// 1. 네이티브 앱에 로그인 창을 띄워달라고 요청하는 함수
+  // 1. 네이티브 앱에 로그인 창 요청
   const startNativeSignIn = (providerName) => {
     setBusy(true);
-    if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.loginBridge) {
-      // 어떤 로그인을 시도했는지 기억해둠
+    if (window.webkit?.messageHandlers?.loginBridge) {
       sessionStorage.setItem('pendingProvider', providerName);
-      // iOS 네이티브(Swift)에게 신호를 보냄
       window.webkit.messageHandlers.loginBridge.postMessage(providerName);
     } else {
       setBusy(false);
@@ -617,31 +599,29 @@ function AuthScreen({ onSuccess }) {
     }
   };
 
-  // 2. 네이티브(Swift)가 로그인을 성공시킨 후 '토큰'을 가지고 이 함수를 호출함
+  // 2. Swift가 로그인 성공 후 토큰 전달
   useEffect(() => {
-    window.nativeLoginSuccess = async (idToken) => {
-      const providerName = sessionStorage.getItem('pendingProvider');
+    window.nativeLoginSuccess = async (idToken, accessToken) => {
+      const providerName = sessionStorage.getItem('pendingProvider') || 'google';
+      console.log('nativeLoginSuccess 호출됨, provider:', providerName);
       try {
+        const { signInWithCredential, GoogleAuthProvider, OAuthProvider } =
+          await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js');
         let credential;
         if (providerName === 'apple') {
-          // 애플 열쇠(Credential) 만들기 - 무료
-          credential = window._fa.OAuthProvider.credential({
-            providerId: 'apple.com',
-            idToken: idToken,
-          });
+          const provider = new OAuthProvider('apple.com');
+          credential = provider.credential({ idToken });
         } else {
-          // 구글 열쇠(Credential) 만들기 - 무료
-          credential = window._fa.GoogleAuthProvider.credential(idToken);
+          credential = GoogleAuthProvider.credential(idToken, accessToken);
         }
-        
-        // 만들어진 열쇠로 Firebase 웹 세션 로그인
-        await window._fa.signInWithCredential(window._auth, credential);
-        onSuccess(); // 로그인 성공 시 어항 화면으로 이동
-      } catch (e) {
-        alert("로그인 연동 중 오류가 발생했습니다.");
-        console.error(e);
-      } finally {
+        const result = await signInWithCredential(window._auth, credential);
+        console.log('✅ signInWithCredential 성공:', result.user.uid);
+        sessionStorage.removeItem('pendingProvider');
         setBusy(false);
+      } catch(e) {
+        console.error('❌ nativeLoginSuccess 에러:', e.code, e.message);
+        setBusy(false);
+        alert('로그인 연동 중 오류: ' + e.message);
       }
     };
   }, []);
@@ -1594,12 +1574,10 @@ function AdminOnboardingScreen({ onComplete }) {
 /* ══════════════════════════════════════
    앱 루트: mode state + Firebase만 관리
 ══════════════════════════════════════ */
-
 function App() {
   const [mode, setMode] = useState('loading');
   const [user, setUser] = useState(null);
   const [saving, setSaving] = useState(false);
-  const [busy, setBusy] = useState(false);
   const [firebaseConnected, setFirebaseConnected] = useState(false);
 
   const [messages, setMessages] = useState([]);
@@ -1615,6 +1593,7 @@ function App() {
   const [adminSetupDone, setAdminSetupDone] = useState(null);
   const [lastAdminVisitCount, setLastAdminVisitCount] = useState(0);
 
+  // cycleCount: 발송된 편지 수 * goalCount 이후 나머지로 계산
   const sentCount = kingLetterHistory.length;
   const cycleCount = messages.length - (sentCount * goalCount);
 
@@ -1623,118 +1602,27 @@ function App() {
     name: customFishNames?.[f.id] !== undefined ? customFishNames[f.id] : f.defaultName
   })).filter(f => f.alwaysShow || f.name.trim() !== '');
 
-useEffect(() => {
-  if (mode !== 'loading') return;
-
-  const t = setTimeout(() => {
-    console.log('⚠️ loading fallback 실행');
-    const currentUser = auth().currentUser;
-
-    if (currentUser) {
-      console.log('✅ currentUser 있음 -> intro');
-      setUser(currentUser);
-      setMode('intro');
-    } else {
-      console.log('⚠️ currentUser 없음 -> auth');
-      setMode('auth');
-    }
-  }, 2500);
-
-  return () => clearTimeout(t);
-}, [mode]);
-  
   useEffect(() => {
-    let isMounted = true;
-    let authResolved = false;
-    const oauthInProgress = sessionStorage.getItem('oauthInProgress') === '1';
-
-    if (oauthInProgress) {
-      console.log('OAuth 리다이렉트 복귀 감지');
-      setBusy(true);
-    }
-
-    fa().getRedirectResult(auth()).then((result) => {
-      if (!isMounted) return;
-      authResolved = true;
-
-      console.log('🧪 getRedirectResult 실행됨');
-      console.log('🧪 result:', result);
-      console.log('🧪 result.user:', result?.user ? result.user.uid : null);
-
-      sessionStorage.removeItem('oauthInProgress');
-      sessionStorage.removeItem('oauthProvider');
-
-      if (result?.user) {
-        console.log('✅ 소셜 리다이렉트 로그인 성공:', result.user.uid);
-        setUser(result.user);
-      } else {
-        console.log('⚠️ 리다이렉트 결과 없음');
-      }
-
-      setBusy(false);
-    }).catch((e) => {
-      if (!isMounted) return;
-      authResolved = true;
-      console.error('❌ getRedirectResult 실패:', e);
-      sessionStorage.removeItem('oauthInProgress');
-      sessionStorage.removeItem('oauthProvider');
-      setBusy(false);
-      alert('소셜 로그인 처리 실패: ' + (e.message || '다시 시도해주세요.'));
-    });
-
     const unsubscribe = fa().onAuthStateChanged(auth(), u => {
       console.log('🧪 onAuthStateChanged:', u ? u.uid : null);
-      if (!isMounted) return;
-
       setUser(u);
-
-      if (u) {
-        sessionStorage.removeItem('oauthInProgress');
-        sessionStorage.removeItem('oauthProvider');
-        setBusy(false);
-        return;
-      }
-
-      if (sessionStorage.getItem('oauthInProgress') === '1' && !authResolved) {
-        console.log('OAuth 처리 중이므로 auth 화면 전환 보류');
-        return;
-      }
-
-      setMode('auth');
-      setBusy(false);
+      if (!u) setMode('auth');
     });
-
-    window.__setNativeUser = (nativeUser) => {
-      console.log('__setNativeUser 호출됨(호환용):', nativeUser?.uid);
-    };
-
-    window.nativeLoginSuccess = async (_idToken, _email, _uid) => {
-      console.log('nativeLoginSuccess 호출됨(호환용): 웹 로그인 구조에서는 사용하지 않음');
-    };
-
-    return () => {
-      isMounted = false;
-      if (typeof unsubscribe === 'function') unsubscribe();
-    };
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
     if (!user) return;
     setFirebaseConnected(true);
 
+    // 프로필 없으면 자동 생성 (소셜 로그인 신규 유저 대응)
     fa().onValue(fa().ref(db(), `users/${user.uid}/profile`), async snap => {
-      try {
-        if (!snap.val()) {
-          await fa().set(fa().ref(db(), `users/${user.uid}/profile`), {
-            email: user.email || '',
-            childName: '아이',
-            createdAt: new Date().toISOString(),
-            loginType: (user.providerData && user.providerData[0]?.providerId) || 'password'
-          });
-          console.log('기본 프로필 생성 완료:', user.uid);
-        }
-      } catch (e) {
-        console.error('기본 프로필 생성 실패:', e);
+      if (!snap.val()) {
+        await fa().set(fa().ref(db(), `users/${user.uid}/profile`), {
+          email: user.email || '',
+          childName: '아이',
+          createdAt: new Date().toISOString()
+        });
       }
     }, { onlyOnce: true });
 
@@ -1742,8 +1630,7 @@ useEffect(() => {
       const d = snap.val();
       if (d !== null && d !== undefined) cb(d);
     });
-
-    listen('messages', d => setMessages(Array.isArray(d) ? d.filter(m => m && m.id) : Object.values(d).filter(m => m && m.id)));
+    listen('messages', d => setMessages(Array.isArray(d) ? d.filter(m=>m&&m.id) : Object.values(d).filter(m=>m&&m.id)));
     listen('feedingHistory', setFeedingHistory);
     listen('goalCount', setGoalCount);
     listen('pendingKingLetter', setPendingKingLetter);
@@ -1755,38 +1642,25 @@ useEffect(() => {
     listen('customFishNames', setCustomFishNames);
     listen('lastAdminVisitCount', v => setLastAdminVisitCount(v || 0));
 
-    Promise.race([
-  Promise.all([
-    new Promise(r => fa().onValue(fa().ref(db(), `users/${user.uid}/adminSetupDone`), s => r(s.val()), { onlyOnce: true })),
-    new Promise(r => fa().onValue(fa().ref(db(), `users/${user.uid}/tutorialDone`), s => r(s.val()), { onlyOnce: true })),
-  ]),
-  new Promise(r => setTimeout(() => r(['__timeout__', '__timeout__']), 2500))
-]).then(([adminDone, tutDone]) => {
-  console.log('🧪 loading 분기:', adminDone, tutDone);
+    // 관리자 세팅 + 튜토리얼 완료 여부 확인 후 mode 결정
+    Promise.all([
+      new Promise(r => fa().onValue(fa().ref(db(), `users/${user.uid}/adminSetupDone`), s => r(s.val()), { onlyOnce: true })),
+      new Promise(r => fa().onValue(fa().ref(db(), `users/${user.uid}/tutorialDone`),   s => r(s.val()), { onlyOnce: true })),
+    ]).then(([adminDone, tutDone]) => {
+      setAdminSetupDone(!!adminDone);
+      setTutorialDone(!!tutDone);
+      if (!adminDone) setMode('adminOnboarding');
+      else if (!tutDone) setMode('tutorial');
+      else setMode('intro');
+    });
 
-  if (adminDone === '__timeout__') {
-    console.log('⚠️ loading timeout -> intro');
-    setMode('intro');
-    return;
-  }
-
-  setAdminSetupDone(!!adminDone);
-  setTutorialDone(!!tutDone);
-
-  if (!adminDone) setMode('adminOnboarding');
-  else if (!tutDone) setMode('tutorial');
-  else setMode('intro');
-}).catch((e) => {
-  console.error('❌ loading 분기 실패:', e);
-  setMode('intro');
-});
-
+    // ── 마이그레이션: 구버전 kingLetter → 새 구조로 한 번만 실행 ──
     fa().onValue(fa().ref(db(), `users/${user.uid}/v2migrated`), snap => {
       if (snap.val()) return;
       const uid = user.uid;
       Promise.all([
-        new Promise(r => fa().onValue(fa().ref(db(), `users/${uid}/kingLetter`), s => r(s.val()), { onlyOnce: true })),
-        new Promise(r => fa().onValue(fa().ref(db(), `users/${uid}/hasReadKingLetter`), s => r(s.val()), { onlyOnce: true })),
+        new Promise(r => fa().onValue(fa().ref(db(), `users/${uid}/kingLetter`),         s => r(s.val()), { onlyOnce:true })),
+        new Promise(r => fa().onValue(fa().ref(db(), `users/${uid}/hasReadKingLetter`),  s => r(s.val()), { onlyOnce:true })),
       ]).then(([oldKingLetter, hasRead]) => {
         const updates = { v2migrated: true };
         if (oldKingLetter) {
@@ -1811,25 +1685,15 @@ useEffect(() => {
     try {
       await fa().set(fa().ref(db(), `users/${user.uid}/${path}`), data);
       await new Promise(r => setTimeout(r, 200));
-    } catch (e) {
-      alert('저장 실패: ' + e.message);
-    } finally {
-      setSaving(false);
-    }
+    } catch(e) { alert('저장 실패: '+e.message); }
+    finally { setSaving(false); }
   };
 
   const signOut = async () => {
     if (!confirm('로그아웃 하시겠습니까?')) return;
-    try {
-      await fa().signOut(auth());
-    } catch (e) {
-      console.error('로그아웃 실패:', e);
-    }
-    setUser(null);
-    setMessages([]);
-    setFeedingHistory({});
-    setPendingKingLetter('');
-    setKingLetterHistory([]);
+    await fa().signOut(auth());
+    setMessages([]); setFeedingHistory({});
+    setPendingKingLetter(''); setKingLetterHistory([]);
     setCustomFishNames(null);
     setMode('auth');
   };
@@ -1839,6 +1703,7 @@ useEffect(() => {
     await saveToFirebase('adminSetupDone', true);
     setAdminSetupDone(true);
     setAdminPassword(pw);
+    // 세팅 완료 후 튜토리얼로
     setMode('tutorial');
   };
 
@@ -1865,6 +1730,7 @@ useEffect(() => {
 
   const handleAdminLogin = async (pw) => {
     if (pw === adminPassword) {
+      // 관리센터 출근 — 현재 편지 수 저장 (어항 정화)
       await saveToFirebase('lastAdminVisitCount', messages.length);
       setLastAdminVisitCount(messages.length);
       setMode('admin');
@@ -1874,12 +1740,7 @@ useEffect(() => {
   };
 
   const feedFish = async (text) => {
-    const updated = [...messages, {
-      id: Date.now(),
-      fish: selectedFish.name,
-      content: text,
-      date: new Date().toLocaleString('ko-KR')
-    }];
+    const updated = [...messages, { id:Date.now(), fish:selectedFish.name, content:text, date:new Date().toLocaleString('ko-KR') }];
     const today = new Date().toISOString().split('T')[0];
     const updatedHistory = { ...feedingHistory, [today]: true };
 
@@ -1890,6 +1751,7 @@ useEffect(() => {
     setMode('aquarium');
   };
 
+  // 왕의 편지 읽기: 발송 처리 + 기록 저장
   const readKingLetter = async () => {
     const sentLetter = pendingKingLetter;
     setKingLetterToShow(sentLetter);
@@ -1911,7 +1773,7 @@ useEffect(() => {
 
   return (
     <>
-      {(saving || busy) && <SavingOverlay />}
+      {saving && <SavingOverlay />}
       {mode === 'auth'            && <AuthScreen onSuccess={() => setMode('loading')} />}
       {mode === 'adminOnboarding' && <AdminOnboardingScreen onComplete={completeAdminOnboarding} />}
       {mode === 'tutorial'        && (
