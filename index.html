@@ -601,27 +601,25 @@ function AuthScreen({ onSuccess }) {
 
   // 2. Swift가 로그인 성공 후 토큰 전달
   useEffect(() => {
-    window.nativeLoginSuccess = async (idToken, accessToken) => {
-      const providerName = sessionStorage.getItem('pendingProvider') || 'google';
-      console.log('nativeLoginSuccess 호출됨, provider:', providerName);
-      try {
-        let credential;
-        if (providerName === 'apple') {
-          const provider = new window._OAuthProvider('apple.com');
-          credential = provider.credential({ idToken });
-        } else {
-          credential = window._GoogleAuthProvider.credential(idToken, accessToken);
-        }
-        const result = await window._fa.signInWithCredential(window._auth, credential);
-        console.log('✅ signInWithCredential 성공:', result.user.uid);
-        sessionStorage.removeItem('pendingProvider');
-        setBusy(false);
-      } catch(e) {
-        console.error('❌ nativeLoginSuccess 에러:', e.code, e.message);
-        setBusy(false);
-        alert('로그인 연동 중 오류: ' + e.message);
-      }
-    };
+    window.nativeLoginSuccess = async (idToken, accessToken, provider) => {
+  console.log('nativeLoginSuccess 호출됨, provider:', provider);
+  try {
+    let credential;
+    if (provider === 'apple') {
+      const appleProvider = new window._OAuthProvider('apple.com');
+      credential = appleProvider.credential({ idToken });
+    } else {
+      credential = window._GoogleAuthProvider.credential(idToken, accessToken);
+    }
+    const result = await window._fa.signInWithCredential(window._auth, credential);
+    console.log('✅ signInWithCredential 성공:', result.user.uid);
+    setBusy(false);
+  } catch(e) {
+    console.error('❌ nativeLoginSuccess 에러:', e.code, e.message);
+    setBusy(false);
+    alert('로그인 연동 중 오류: ' + e.message);
+  }
+};
   }, []);
 
   return (
