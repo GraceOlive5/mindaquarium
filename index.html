@@ -1595,6 +1595,26 @@ function App() {
     name: customFishNames?.[f.id] !== undefined ? customFishNames[f.id] : f.defaultName
   })).filter(f => f.alwaysShow || f.name.trim() !== '');
 
+useEffect(() => {
+  if (mode !== 'loading') return;
+
+  const t = setTimeout(() => {
+    console.log('⚠️ loading fallback 실행');
+    const currentUser = auth().currentUser;
+
+    if (currentUser) {
+      console.log('✅ currentUser 있음 -> intro');
+      setUser(currentUser);
+      setMode('intro');
+    } else {
+      console.log('⚠️ currentUser 없음 -> auth');
+      setMode('auth');
+    }
+  }, 2500);
+
+  return () => clearTimeout(t);
+}, [mode]);
+  
   useEffect(() => {
     let isMounted = true;
     let authResolved = false;
