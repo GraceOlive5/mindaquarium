@@ -261,7 +261,7 @@
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
   import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, OAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult }
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, OAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithCredential }
     from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
   const app = initializeApp({
@@ -275,7 +275,7 @@
   });
   window._db  = getDatabase(app);
   window._auth = getAuth(app);
-  window._fa = { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInWithPopup, signInWithRedirect, getRedirectResult, ref, set, onValue };
+  window._fa = { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithCredential, ref, set, onValue };
   window._GoogleAuthProvider = GoogleAuthProvider;
   window._OAuthProvider = OAuthProvider;
 </script>
@@ -605,16 +605,14 @@ function AuthScreen({ onSuccess }) {
       const providerName = sessionStorage.getItem('pendingProvider') || 'google';
       console.log('nativeLoginSuccess 호출됨, provider:', providerName);
       try {
-        const { signInWithCredential, GoogleAuthProvider, OAuthProvider } =
-          await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js');
         let credential;
         if (providerName === 'apple') {
-          const provider = new OAuthProvider('apple.com');
+          const provider = new window._OAuthProvider('apple.com');
           credential = provider.credential({ idToken });
         } else {
-          credential = GoogleAuthProvider.credential(idToken, accessToken);
+          credential = window._GoogleAuthProvider.credential(idToken, accessToken);
         }
-        const result = await signInWithCredential(window._auth, credential);
+        const result = await window._fa.signInWithCredential(window._auth, credential);
         console.log('✅ signInWithCredential 성공:', result.user.uid);
         sessionStorage.removeItem('pendingProvider');
         setBusy(false);
