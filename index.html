@@ -1602,13 +1602,19 @@ function App() {
   })).filter(f => f.alwaysShow || f.name.trim() !== '');
 
   useEffect(() => {
-    const unsubscribe = fa().onAuthStateChanged(auth(), u => {
-      console.log('🧪 onAuthStateChanged:', u ? u.uid : null);
-      setUser(u);
-      if (!u) setMode('auth');
-    });
-    return () => unsubscribe();
-  }, []);
+  const timeout = setTimeout(() => {
+    setMode(prev => prev === 'loading' ? 'auth' : prev);
+  }, 8000); // 8초 후에도 응답 없으면 로그인 화면으로
+
+  const unsubscribe = fa().onAuthStateChanged(auth(), u => {
+    clearTimeout(timeout);
+    console.log('🧪 onAuthStateChanged:', u ? u.uid : null);
+    setUser(u);
+    if (!u) setMode('auth');
+  });
+  return () => { unsubscribe(); clearTimeout(timeout); };
+}, []);
+
 
   useEffect(() => {
     if (!user) return;
