@@ -623,6 +623,15 @@ window.nativeLoginSuccess = async (customToken) => {
     alert('로그인 연동 중 오류: ' + e.message);
   }
 };
+window.nativeLoginCancelled = () => {
+  setBusy(false);
+};
+
+window.nativeLoginFailed = (errorMsg) => {
+  setBusy(false);
+  alert('로그인 실패: ' + errorMsg);
+};
+    
   }, []);
 
   return (
