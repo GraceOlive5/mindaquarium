@@ -329,7 +329,7 @@ function SwimmingFish({ fish, onClick, index }) {
     x: initPositions[index].x,
     y: initPositions[index].y,
     vx: index % 2 === 0 ? speeds[index] : -speeds[index],
-    vy: (Math.random() - 0.5) * 0.3,
+    vy: (Math.random() - 0.5) * 0.1,
   });
   const [renderPos, setRenderPos] = useState({ x: pos.current.x, y: pos.current.y });
   const [dir, setDir] = useState(index % 2 === 0 ? 1 : -1);
@@ -364,15 +364,17 @@ function SwimmingFish({ fish, onClick, index }) {
       // 상하 경계 (저작권 표기 위까지만)
       if (p.y <= 0.10) {
         p.y = 0.10;
-        p.vy = Math.abs(p.vy) * 0.8 + 0.05;
+        p.vy = Math.abs(p.vy) * 0.5 + 0.01;
       } else if (p.y >= SCREEN_BOTTOM_LIMIT - fishH) {
         p.y = SCREEN_BOTTOM_LIMIT - fishH;
-        p.vy = -(Math.abs(p.vy) * 0.8 + 0.05);
+        p.vy = -(Math.abs(p.vy) * 0.5 + 0.01);
       }
 
       // 가끔 방향 살짝 바꿈
       if (Math.random() < 0.005) p.vy += (Math.random() - 0.5) * 0.1;
-      p.vy = Math.max(-0.15, Math.min(0.15, p.vy));
+  const aspectRatio = window.innerWidth / window.innerHeight;
+  const vyMax = 0.15 * Math.min(aspectRatio, 1);
+  p.vy = Math.max(-vyMax, Math.min(vyMax, p.vy));
 
       setRenderPos({ x: p.x, y: p.y });
       animRef.current = requestAnimationFrame(tick);
