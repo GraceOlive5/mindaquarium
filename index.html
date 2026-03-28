@@ -288,15 +288,15 @@ const auth = () => window._auth;
 
 const DEFAULT_FISHES = [
   // 기본 분양 4마리 (항상 어항에 있음)
-  { id:'happy',  defaultName:'행복',    color:'하얀색', image:'mindaquarium_fish_1.png',  alwaysShow: true },
-  { id:'sad',    defaultName:'슬픔',    color:'파란색', image:'mindaquarium_fish_2.png',   alwaysShow: true },
-  { id:'anger',  defaultName:'화남',    color:'빨간색', image:'mindaquarium_fish_3.png',  alwaysShow: true },
-  { id:'shy',    defaultName:'부끄러움',color:'핑크색', image:'mindaquarium_fish_4.png',    alwaysShow: true },
+  { id:'happy',  defaultName:'행복',    color:'하얀색', image:'mindaquarium_happy.png',  alwaysShow: true },
+  { id:'sad',    defaultName:'슬픔',    color:'파란색', image:'mindaquarium_fear.png',   alwaysShow: true },
+  { id:'anger',  defaultName:'화남',    color:'빨간색', image:'mindaquarium_angry.png',  alwaysShow: true },
+  { id:'shy',    defaultName:'부끄러움',color:'핑크색', image:'mindaquarium_shy.png',    alwaysShow: true },
   // 추가 분양 4마리 (이름 입력 시에만 어항에 나옴)
-  { id:'fun',    defaultName:'',        color:'초록색', image:'mindaquarium_fish_5.png',    alwaysShow: false },
-  { id:'secret', defaultName:'',        color:'보라색', image:'mindaquarium_fish_6.png', alwaysShow: false },
-  { id:'worry',  defaultName:'',        color:'노란색', image:'mindaquarium_fish_7.png',  alwaysShow: false },
-  { id:'love',   defaultName:'',        color:'주황색', image:'mindaquarium_fish_8.png',   alwaysShow: false },
+  { id:'fun',    defaultName:'',        color:'초록색', image:'mindaquarium_fun.png',    alwaysShow: false },
+  { id:'secret', defaultName:'',        color:'보라색', image:'mindaquarium_secret.png', alwaysShow: false },
+  { id:'worry',  defaultName:'',        color:'노란색', image:'mindaquarium_worry.png',  alwaysShow: false },
+  { id:'love',   defaultName:'',        color:'주황색', image:'mindaquarium_new.png',   alwaysShow: false },
 ];
 
 /* ── 공통 컴포넌트 ── */
@@ -318,7 +318,7 @@ function Bubbles({ n=25 }) {
 
 function SwimmingFish({ fish, onClick, index }) {
   const SCREEN_BOTTOM_LIMIT = 0.62; // 화면 68% 아래로 내려가지 않음
-  const speeds = [0.08, 0.07, 0.03, 0.03, 0.02, 0.06, 0.04, 0.01];
+  const speeds = [0.18, 0.22, 0.16, 0.20, 0.24, 0.17, 0.19, 0.15];
   const initPositions = [
     {x:0.10, y:0.15}, {x:0.80, y:0.18}, {x:0.50, y:0.30},
     {x:0.15, y:0.45}, {x:0.70, y:0.45}, {x:0.35, y:0.60},
@@ -329,7 +329,7 @@ function SwimmingFish({ fish, onClick, index }) {
     x: initPositions[index].x,
     y: initPositions[index].y,
     vx: index % 2 === 0 ? speeds[index] : -speeds[index],
-    vy: (Math.random() - 0.5) * 0.1,
+    vy: (Math.random() - 0.5) * 0.3,
   });
   const [renderPos, setRenderPos] = useState({ x: pos.current.x, y: pos.current.y });
   const [dir, setDir] = useState(index % 2 === 0 ? 1 : -1);
@@ -364,17 +364,15 @@ function SwimmingFish({ fish, onClick, index }) {
       // 상하 경계 (저작권 표기 위까지만)
       if (p.y <= 0.10) {
         p.y = 0.10;
-        p.vy = Math.abs(p.vy) * 0.5 + 0.01;
+        p.vy = Math.abs(p.vy) * 0.8 + 0.05;
       } else if (p.y >= SCREEN_BOTTOM_LIMIT - fishH) {
         p.y = SCREEN_BOTTOM_LIMIT - fishH;
-        p.vy = -(Math.abs(p.vy) * 0.5 + 0.01);
+        p.vy = -(Math.abs(p.vy) * 0.8 + 0.05);
       }
 
       // 가끔 방향 살짝 바꿈
       if (Math.random() < 0.005) p.vy += (Math.random() - 0.5) * 0.1;
-  const aspectRatio = window.innerWidth / window.innerHeight;
-  const vyMax = 0.15 * Math.min(aspectRatio, 1);
-  p.vy = Math.max(-vyMax, Math.min(vyMax, p.vy));
+      p.vy = Math.max(-0.15, Math.min(0.15, p.vy));
 
       setRenderPos({ x: p.x, y: p.y });
       animRef.current = requestAnimationFrame(tick);
@@ -625,15 +623,6 @@ window.nativeLoginSuccess = async (customToken) => {
     alert('로그인 연동 중 오류: ' + e.message);
   }
 };
-window.nativeLoginCancelled = () => {
-  setBusy(false);
-};
-
-window.nativeLoginFailed = (errorMsg) => {
-  setBusy(false);
-  alert('로그인 실패: ' + errorMsg);
-};
-    
   }, []);
 
   return (
@@ -707,7 +696,7 @@ window.nativeLoginFailed = (errorMsg) => {
 function IntroScreen({ userEmail, onStart, onAdmin, onSignOut }) {
   return (
     <div className="relative min-h-screen overflow-hidden"
-      style={{ backgroundImage:'url(mindaquarium_bg2.png)', backgroundSize:'cover', backgroundPosition:'center bottom' }}>
+      style={{ backgroundImage:'url(mindaquarium_bg.png)', backgroundSize:'cover', backgroundPosition:'center bottom' }}>
       <Bubbles n={30} />
 
       <div className="relative flex flex-col items-center px-4" style={{ paddingTop: '12vh', paddingBottom: '80px' }}>
@@ -1166,7 +1155,7 @@ function TutorialScreen({ shyFish, onComplete, onSendLetter }) {
 
   return (
     <div className="fixed inset-0 overflow-hidden"
-      style={{ backgroundImage:'url(mindaquarium_bg2.png)', backgroundSize:'cover', backgroundPosition:'center bottom' }}>
+      style={{ backgroundImage:'url(mindaquarium_bg.png)', backgroundSize:'cover', backgroundPosition:'center bottom' }}>
       <Bubbles n={20} />
 
       <div className="relative z-10 h-full flex flex-col items-center justify-center px-4">
@@ -1330,7 +1319,7 @@ function AquariumScreen({ fishes, cycleCount, goalCount, pendingKingLetter, mess
 
   return (
     <div className="relative overflow-hidden" 
-      style={{ backgroundImage:'url(mindaquarium_bg2.png)', backgroundSize:'cover', backgroundPosition:'center bottom', height:'100vh', width:'100vw', position:'fixed', inset:0 }}>
+      style={{ backgroundImage:'url(mindaquarium_bg.png)', backgroundSize:'cover', backgroundPosition:'center bottom', height:'100vh', width:'100vw', position:'fixed', inset:0 }}>
       <Bubbles n={25} />
 
       {/* 왕의 편지 팝업 */}
