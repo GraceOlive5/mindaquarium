@@ -1800,12 +1800,13 @@ function App() {
   };
 
   const sendTutorialLetter = async (text, fishName) => {
-    const updated = [...messages, {
-      id: Date.now(),
-      fish: fishName,
-      content: text,
-      date: new Date().toLocaleString('ko-KR')
-    }];
+    cconst updated = [...messages, {
+  id: Date.now(),
+  fish: fishName,
+  content: text,
+  date: new Date().toLocaleString('ko-KR'),
+  timestamp: Date.now()
+}];
     const today = new Date().toISOString().split('T')[0];
     const updatedHistory = { ...feedingHistory, [today]: true };
     await saveToFirebase('messages', updated);
@@ -1826,7 +1827,7 @@ function App() {
   };
 
   const feedFish = async (text) => {
-    const updated = [...messages, { id:Date.now(), fish:selectedFish.name, content:text, date:new Date().toLocaleString('ko-KR') }];
+   const updated = [...messages, { id:Date.now(), fish:selectedFish.name, content:text, date:new Date().toLocaleString('ko-KR'), timestamp:Date.now() }];
     const today = new Date().toISOString().split('T')[0];
     const updatedHistory = { ...feedingHistory, [today]: true };
 
