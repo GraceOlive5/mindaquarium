@@ -263,7 +263,8 @@
   import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
   import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, OAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithCredential, signInWithCustomToken }
     from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-
+import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js';
+  
   const app = initializeApp({
     apiKey:"AIzaSyCQLxHoTcKvS1X7ausB1slF27tZoFvh99o",
     authDomain:"mind-aquarium.firebaseapp.com",
@@ -275,7 +276,8 @@
   });
   window._db  = getDatabase(app);
   window._auth = getAuth(app);
-  window._fa = { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithCredential, signInWithCustomToken, ref, set, onValue };
+ const functions = getFunctions(app, 'asia-northeast3');
+window._fa = { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithCredential, signInWithCustomToken, ref, set, onValue, httpsCallable, functions };
   window._GoogleAuthProvider = GoogleAuthProvider;
   window._OAuthProvider = OAuthProvider;
 </script>
@@ -938,12 +940,17 @@ function AdminScreen({ messages, goalCount, cycleCount, pendingKingLetter, kingL
         <div style={{ display:'flex', gap:'8px' }}>
           <input type="text" value={promoCode} onChange={e=>setPromoCode(e.target.value.toUpperCase())}
             placeholder="코드 입력" className="a-input" style={{ flex:1, letterSpacing:'2px' }} />
-          <button onClick={async () => {
-            if (!promoCode.trim()) return;
-            // TODO: Cloud Functions 연동
-            setPromoMsg('✓ 코드가 확인되었어요! 곧 잠금이 해제됩니다.');
-            setPromoCode('');
-          }} className="a-btn btn-blue">확인</button>
+       <button onClick={async () => {
+  if (!promoCode.trim()) return;
+  try {
+    const redeemPromoCode = fa().httpsCallable(fa().functions, 'redeemPromoCode');
+    const result = await redeemPromoCode({ code: promoCode });
+    setPromoMsg(result.data.message);
+    setPromoCode('');
+  } catch(e) {
+    setPromoMsg('❌ ' + (e.message || '유효하지 않은 코드예요.'));
+  }
+}} className="a-btn btn-blue">확인</button>
         </div>
         {promoMsg && <p style={{ color:'#86efac', fontSize:'12px', marginTop:'8px' }}>{promoMsg}</p>}
       </div>
