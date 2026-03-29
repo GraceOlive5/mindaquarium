@@ -276,7 +276,7 @@ import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/
   });
   window._db  = getDatabase(app);
   window._auth = getAuth(app);
- const functions = getFunctions(app, 'asia-northeast3');
+const functions = getFunctions(app, 'us-central1');
 window._fa = { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithCredential, signInWithCustomToken, ref, set, onValue, httpsCallable, functions };
   window._GoogleAuthProvider = GoogleAuthProvider;
   window._OAuthProvider = OAuthProvider;
