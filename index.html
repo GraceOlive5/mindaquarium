@@ -435,7 +435,7 @@ function AdminSection({ title, badge, children, defaultOpen=true }) {
 }
 
 /* ── FishNameEditor: 독립 컴포넌트 ── */
-function FishNameEditor({ customFishNames, onSave }) {
+function FishNameEditor({ customFishNames, isPaid, onSave }) {
   const [names, setNames] = useState({});
   useEffect(() => { if (customFishNames) setNames(customFishNames); }, [customFishNames]);
   const change = (id, v) => { if (v.length <= 4) setNames(n => ({...n, [id]:v})); };
@@ -819,7 +819,7 @@ function AdminLoginScreen({ onSuccess, onBack, onResetPw }) {
 }
 
 /* ── 관리자 메인 (탭 + 토글) ── */
-function AdminScreen({ messages, goalCount, cycleCount, pendingKingLetter, kingLetterHistory, adminPassword, customFishNames, firebaseConnected, onSave, onExit }) {
+function AdminScreen({ messages, goalCount, cycleCount, pendingKingLetter, kingLetterHistory, adminPassword, customFishNames, firebaseConnected, isPaid, onSave, onExit }) {
   const [tab, setTab] = useState('mail');
   const [showSettings, setShowSettings] = useState(false);
   const [promoCode, setPromoCode] = useState('');
@@ -988,14 +988,15 @@ function AdminScreen({ messages, goalCount, cycleCount, pendingKingLetter, kingL
           )}
 
           {/* 🐟 이름 설정 */}
-          {tab === 'fish' && (
-            <AdminSection title="우리 어항의 물고기들">
-              <FishNameEditor
-                customFishNames={customFishNames}
-                onSave={async (names) => { await onSave('customFishNames', names); alert('저장되었습니다!'); }}
-              />
-            </AdminSection>
-          )}
+       {tab === 'fish' && (
+  <AdminSection title="우리 어항의 물고기들">
+    <FishNameEditor
+      customFishNames={customFishNames}
+      isPaid={isPaid}
+      onSave={async (names) => { await onSave('customFishNames', names); alert('저장되었습니다!'); }}
+    />
+  </AdminSection>
+)}
 
           {/* 👑 왕의 편지 */}
           {tab === 'king' && (<>
