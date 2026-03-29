@@ -1669,6 +1669,7 @@ function App() {
   const [tutorialDone, setTutorialDone] = useState(null);
   const [adminSetupDone, setAdminSetupDone] = useState(null);
   const [lastAdminVisitCount, setLastAdminVisitCount] = useState(0);
+  const [isPaid, setIsPaid] = useState(false);
 
   // cycleCount: 발송된 편지 수 * goalCount 이후 나머지로 계산
   const sentCount = kingLetterHistory.length;
@@ -1724,6 +1725,7 @@ function App() {
     listen('adminPassword', setAdminPassword);
     listen('customFishNames', setCustomFishNames);
     listen('lastAdminVisitCount', v => setLastAdminVisitCount(v || 0));
+    listen('isPaid', v => setIsPaid(!!v));
 
     // 관리자 세팅 + 튜토리얼 완료 여부 확인 후 mode 결정
     Promise.all([
@@ -1885,6 +1887,7 @@ function App() {
           customFishNames={customFishNames}
           firebaseConnected={firebaseConnected}
           onSave={saveToFirebase}
+          isPaid={isPaid}
           onExit={() => setMode('intro')}
         />
       )}
