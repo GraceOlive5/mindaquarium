@@ -1157,7 +1157,7 @@ function AdminLoginScreen({ onSuccess, onBack, onResetPw }) {
 }
 
 /* ── 관리자 메인 (탭 + 토글) ── */
-function AdminScreen({ messages, goalCount, cycleCount, pendingKingLetter, kingLetterHistory, adminPassword, customFishNames, firebaseConnected, isPaid, onSave, onExit }) {
+function AdminScreen({ messages, goalCount, cycleCount, pendingKingLetter, kingLetterHistory, adminPassword, customFishNames, emotionFishConfig, firebaseConnected, isPaid, onSave, onExit }) {  
   const [tab, setTab] = useState('mail');
   const [showSettings, setShowSettings] = useState(false);
   const [promoCode, setPromoCode] = useState('');
@@ -1330,7 +1330,7 @@ function AdminScreen({ messages, goalCount, cycleCount, pendingKingLetter, kingL
   <AdminSection title="우리 어항의 물고기들">
     <EmotionFishMatrix
       isPaid={isPaid}
-      onSave={saveToFirebase}
+      onSave={onSave}
       emotionFishConfig={emotionFishConfig}
     />
   </AdminSection>
@@ -2230,6 +2230,7 @@ const [emotionFishConfig, setEmotionFishConfig] = useState(null);
           firebaseConnected={firebaseConnected}
           onSave={saveToFirebase}
           isPaid={isPaid}
+          emotionFishConfig={emotionFishConfig}
           onExit={() => setMode('intro')}
         />
       )}
