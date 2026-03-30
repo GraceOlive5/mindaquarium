@@ -560,6 +560,7 @@ function EmotionFishMatrix({ isPaid, onSave, emotionFishConfig }) {
   }, [emotionFishConfig]);
 
 
+
   const saveConfig = async (nextSet) => {
     const activeNames = EMOTIONS_LIST
       .filter(e => nextSet.has(e.id))
