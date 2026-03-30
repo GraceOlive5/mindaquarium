@@ -539,10 +539,10 @@ function EmotionFishMatrix({ isPaid, onSave, emotionFishConfig }) {
   const totalSlots = isPaid ? 8 : 4;
 
   const [active, setActive] = useState(() => {
-    if (emotionFishConfig?.active) {
+    if (emotionFishConfig?.initialized) {
       return new Set(
         EMOTIONS_LIST
-          .filter(e => emotionFishConfig.active.includes(e.name))
+          .filter(e => (emotionFishConfig.active || []).includes(e.name))
           .map(e => e.id)
       );
     }
@@ -550,21 +550,23 @@ function EmotionFishMatrix({ isPaid, onSave, emotionFishConfig }) {
   });
 
   useEffect(() => {
-    if (emotionFishConfig?.active) {
+    if (emotionFishConfig?.initialized) {
       setActive(new Set(
         EMOTIONS_LIST
-          .filter(e => emotionFishConfig.active.includes(e.name))
+          .filter(e => (emotionFishConfig.active || []).includes(e.name))
           .map(e => e.id)
       ));
     }
   }, [emotionFishConfig]);
 
+
   const saveConfig = async (nextSet) => {
     const activeNames = EMOTIONS_LIST
       .filter(e => nextSet.has(e.id))
       .map(e => e.name);
-    await onSave('emotionFishConfig', { active: activeNames });
+    await onSave('emotionFishConfig', { active: activeNames, initialized: true });
   };
+
 
   const toggle = (id) => {
     const next = new Set(active);
