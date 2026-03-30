@@ -586,93 +586,147 @@ function EmotionFishMatrix({ isPaid, onSave, emotionFishConfig }) {
 
   const activeEmotions = EMOTIONS_LIST.filter(e => active.has(e.id));
 
-  return (
+return (
     <div>
       <style>{`
-        .ecard { transition:all 0.15s; cursor:pointer; user-select:none; }
-        .ecard:hover { transform:translateY(-2px); box-shadow:0 5px 16px rgba(0,0,0,0.13) !important; }
+        .ecard { transition:all 0.18s cubic-bezier(.34,1.2,.64,1); cursor:pointer; user-select:none; }
+        .ecard:hover:not(.is-disabled) { transform:translateY(-2px) scale(1.02); }
         .ecard.is-active { transform:translateY(-1px); }
-        .ecard.is-disabled { opacity:0.38; cursor:not-allowed; }
+        .ecard.is-disabled { opacity:0.35; cursor:not-allowed; }
         @keyframes efSwim { 0%,100%{transform:translateX(0)} 50%{transform:translateX(4px)} }
         .ef-sw { animation:efSwim 2.4s ease-in-out infinite; display:inline-block; }
-        @keyframes efFloatIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
-        .ef-fin { animation:efFloatIn 0.22s ease; }
-        @keyframes efPulse { 0%,100%{opacity:0.5} 50%{opacity:0.9} }
+        @keyframes efFloatIn { from{opacity:0;transform:translateY(6px) scale(0.95)} to{opacity:1;transform:translateY(0) scale(1)} }
+        .ef-fin { animation:efFloatIn 0.25s ease; }
+        @keyframes efPulse { 0%,100%{opacity:0.6} 50%{opacity:1} }
         .ef-secret { animation:efPulse 3s ease-in-out infinite; }
-        .ef-reset-btn { background:none; border:1px solid #aac8dc; color:#5a8faa; border-radius:8px; padding:5px 14px; font-size:0.78rem; cursor:pointer; }
-        .ef-reset-btn:hover { background:#e8f4fb; }
+        .ef-reset-btn {
+          background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.25);
+          color:rgba(255,255,255,0.8); border-radius:8px; padding:5px 14px;
+          font-size:0.75rem; cursor:pointer; backdrop-filter:blur(8px);
+          transition: all 0.15s;
+        }
+        .ef-reset-btn:hover { background:rgba(255,255,255,0.2); color:#fff; }
+        .tank-slot {
+          background: linear-gradient(180deg, rgba(214,238,248,0.9) 0%, rgba(184,223,240,0.9) 50%, rgba(158,207,232,0.9) 100%);
+          border-radius: 12px;
+          border: 1.5px solid rgba(255,255,255,0.7);
+          box-shadow: inset 0 1px 3px rgba(255,255,255,0.8), inset 0 -2px 4px rgba(100,170,210,0.3), 0 2px 8px rgba(0,80,150,0.1);
+        }
+        .tank-slot-empty {
+          background: linear-gradient(180deg, rgba(214,238,248,0.35) 0%, rgba(184,223,240,0.35) 100%);
+          border-radius: 12px;
+          border: 1.5px dashed rgba(255,255,255,0.3);
+        }
+        .premium-divider {
+          display: flex; align-items: center; gap: 8px;
+          margin: 8px 0 6px;
+        }
+        .premium-divider::before, .premium-divider::after {
+          content: ''; flex: 1;
+          height: 1px; background: rgba(255,255,255,0.15);
+        }
       `}</style>
 
       {/* 헤더 */}
-      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"12px" }}>
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"14px" }}>
         <div>
-          <h3 style={{ color:"#1a4f72", fontSize:"1rem", fontWeight:"700", margin:0 }}>감정 물고기 도감</h3>
-          <p style={{ color:"#3a6a8a", fontSize:"0.72rem", margin:"2px 0 0", fontWeight:"500" }}>Robert Plutchik 감정 모델 기반</p>
+          <h3 style={{ color:"rgba(255,255,255,0.95)", fontSize:"1rem", fontWeight:"700", margin:0, textShadow:"0 1px 3px rgba(0,0,0,0.2)" }}>감정 물고기 도감</h3>
+          <p style={{ color:"rgba(255,255,255,0.55)", fontSize:"0.72rem", margin:"2px 0 0", fontWeight:"400" }}>Robert Plutchik 감정 모델 기반</p>
         </div>
         <button className="ef-reset-btn" onClick={reset}>기본값으로</button>
       </div>
 
       {/* 어항 상태 표시줄 */}
-      <div style={{ background:"white", borderRadius:"16px", padding:"14px 16px", boxShadow:"0 2px 12px rgba(0,80,150,0.08)", border:"1px solid rgba(100,170,220,0.2)", marginBottom:"12px" }}>
+      <div style={{
+        background:"rgba(255,255,255,0.08)", backdropFilter:"blur(12px)",
+        borderRadius:"16px", padding:"14px 16px",
+        border:"1px solid rgba(255,255,255,0.15)",
+        marginBottom:"14px"
+      }}>
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"10px" }}>
-          <span style={{ color:"#1a4f72", fontSize:"0.85rem", fontWeight:"600" }}>우리 어항의 물고기들</span>
-          <span style={{ fontSize:"0.72rem", color: active.size >= maxFish ? "#27ae60" : "#5a8faa", fontWeight:"500" }}>
-            {active.size + 1}/{isPaid ? 9 : 5}마리{active.size >= maxFish ? " ✓ 완성" : ""}
+          <span style={{ color:"rgba(255,255,255,0.9)", fontSize:"0.82rem", fontWeight:"600" }}>우리 어항의 물고기들</span>
+          <span style={{ fontSize:"0.7rem", color: active.size >= maxFish ? "#86efac" : "rgba(255,255,255,0.5)", fontWeight:"500" }}>
+            {active.size}/{isPaid ? 8 : 4}마리{active.size >= maxFish ? " ✓" : ""}
           </span>
         </div>
 
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(9,1fr)", gap:"6px" }}>
-          {/* 비밀 물고기 고정 */}
-          <div className="ef-secret" style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:"3px", ...TANK_SLOT, minHeight:"62px" }}>
-            <img src="fish_25.png" alt="비밀" style={{ width:"36px", height:"auto", objectFit:"contain" }}
-              onError={e => { e.target.style.display='none'; }} />
-            <span style={{ fontSize:"0.5rem", color:"#7a9ab0", fontWeight:"500" }}>비밀</span>
-          </div>
-
-          {/* 활성 감정 물고기 */}
-          {activeEmotions.map(e => (
-            <div key={e.id} className="ef-fin" style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:"3px", ...TANK_SLOT, minHeight:"62px" }}>
-              <div className="ef-sw">
-                <img src={e.image} alt={e.name} style={{ width:"36px", height:"auto", objectFit:"contain" }}
-                  onError={ev => { ev.target.style.display='none'; }} />
+        {/* 무료 슬롯 */}
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:"6px", marginBottom:"2px" }}>
+          {Array.from({length: 4}).map((_, i) => {
+            const e = activeEmotions[i];
+            return e ? (
+              <div key={e.id} className={`ef-fin tank-slot`} style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:"3px", minHeight:"58px", padding:"5px 2px" }}>
+                <div className="ef-sw">
+                  <img src={e.image} alt={e.name} style={{ width:"32px", height:"auto", objectFit:"contain" }}
+                    onError={ev => { ev.target.style.display='none'; }} />
+                </div>
+                <span style={{ fontSize:"0.48rem", color:"#1a5070", fontWeight:"600", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", maxWidth:"90%", textAlign:"center" }}>{e.name}</span>
               </div>
-              <span style={{ fontSize:"0.5rem", color:"#4a7a9b", fontWeight:"500", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", maxWidth:"90%", textAlign:"center" }}>{e.name}</span>
-            </div>
-          ))}
+            ) : (
+              <div key={i} className="tank-slot-empty" style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"58px" }}>
+                <span style={{ color:"rgba(255,255,255,0.25)", fontSize:"1.2rem", fontWeight:"300" }}>·</span>
+              </div>
+            );
+          })}
+        </div>
 
-          {/* 빈 슬롯 */}
-          {Array.from({ length: totalSlots - active.size }).map((_, i) => (
-            <div key={i} style={{ display:"flex", alignItems:"center", justifyContent:"center", ...TANK_SLOT, minHeight:"62px", opacity:0.5 }}>
-              <span style={{ color:"rgba(100,160,210,0.5)", fontSize:"1.4rem", fontWeight:"300" }}>·</span>
-            </div>
-          ))}
+        {/* 프리미엄 구분선 */}
+        <div className="premium-divider">
+          <span style={{ fontSize:"0.62rem", color: isPaid ? "#fbbf24" : "rgba(255,255,255,0.35)", fontWeight:"600", whiteSpace:"nowrap", letterSpacing:"0.5px" }}>
+            {isPaid ? "💎 프리미엄" : "🔒 프리미엄"}
+          </span>
+        </div>
+
+        {/* 유료 슬롯 */}
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:"6px" }}>
+          {Array.from({length: 4}).map((_, i) => {
+            const e = isPaid ? activeEmotions[4 + i] : null;
+            return e ? (
+              <div key={e.id} className={`ef-fin tank-slot`} style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:"3px", minHeight:"58px", padding:"5px 2px" }}>
+                <div className="ef-sw">
+                  <img src={e.image} alt={e.name} style={{ width:"32px", height:"auto", objectFit:"contain" }}
+                    onError={ev => { ev.target.style.display='none'; }} />
+                </div>
+                <span style={{ fontSize:"0.48rem", color:"#1a5070", fontWeight:"600", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", maxWidth:"90%", textAlign:"center" }}>{e.name}</span>
+              </div>
+            ) : (
+              <div key={i} className="tank-slot-empty" style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"58px", position:"relative" }}>
+                {!isPaid && (
+                  <span style={{ fontSize:"0.7rem", opacity:0.3 }}>🔒</span>
+                )}
+                {isPaid && (
+                  <span style={{ color:"rgba(255,255,255,0.2)", fontSize:"1.2rem", fontWeight:"300" }}>·</span>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         {/* 유료 안내 */}
         {!isPaid && (
-          <div style={{ marginTop:"10px", padding:"7px 12px", borderRadius:"10px", background:"linear-gradient(90deg,#eaf4fb,#f0f8ff)", border:"1px solid #c8dcea", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-            <span style={{ fontSize:"0.72rem", color:"#5a8faa" }}>
-              💎 유료 버전 구매 시 감정 물고기 <strong>8마리 + 비밀 물고기</strong>, 총 <strong>9마리</strong>까지 분양 가능해요
+          <div style={{ marginTop:"10px", padding:"8px 12px", borderRadius:"10px", background:"rgba(251,191,36,0.1)", border:"1px solid rgba(251,191,36,0.2)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <span style={{ fontSize:"0.7rem", color:"rgba(255,255,255,0.6)" }}>
+              💎 유료 버전 구매 시 <strong style={{color:"#fbbf24"}}>8마리</strong>까지 분양 가능해요
             </span>
-            <span style={{ fontSize:"0.68rem", color:"#aac8dc" }}>+4마리 잠금</span>
+            <span style={{ fontSize:"0.65rem", color:"rgba(255,255,255,0.3)" }}>+4마리 잠금</span>
           </div>
         )}
       </div>
 
       {/* 범례 */}
-      <div style={{ display:"flex", gap:"12px", alignItems:"center", marginBottom:"8px" }}>
+      <div style={{ display:"flex", gap:"12px", alignItems:"center", marginBottom:"10px" }}>
         <div style={{ display:"flex", alignItems:"center", gap:"4px" }}>
-          <div style={{ width:"9px", height:"9px", borderRadius:"2px", background:"white", border:"2px solid #4A90D9" }} />
-          <span style={{ color:"#5a8faa", fontSize:"0.7rem" }}>Plutchik 기본 8감정</span>
+          <div style={{ width:"8px", height:"8px", borderRadius:"2px", background:"rgba(255,255,255,0.9)", border:"1.5px solid rgba(255,255,255,0.4)" }} />
+          <span style={{ color:"rgba(255,255,255,0.55)", fontSize:"0.68rem" }}>기본 8감정</span>
         </div>
         <div style={{ display:"flex", alignItems:"center", gap:"4px" }}>
-          <div style={{ width:"9px", height:"9px", borderRadius:"2px", background:"rgba(100,160,200,0.12)", border:"1px solid #b8d4e8" }} />
-          <span style={{ color:"#5a8faa", fontSize:"0.7rem" }}>혼합 감정 16개</span>
+          <div style={{ width:"8px", height:"8px", borderRadius:"2px", background:"rgba(255,255,255,0.2)", border:"1px solid rgba(255,255,255,0.2)" }} />
+          <span style={{ color:"rgba(255,255,255,0.55)", fontSize:"0.68rem" }}>혼합 감정 16개</span>
         </div>
-        <span style={{ color:"#aac8dc", fontSize:"0.68rem", marginLeft:"auto" }}>카드 클릭으로 배치</span>
+        <span style={{ color:"rgba(255,255,255,0.3)", fontSize:"0.65rem", marginLeft:"auto" }}>클릭으로 배치</span>
       </div>
 
- {/* 4×6 감정 매트릭스 */}
+      {/* 4×6 감정 매트릭스 */}
       <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:"8px" }}>
         {EMOTIONS_LIST.map(e => {
           const isPrimary = e.type === "기본";
@@ -686,111 +740,105 @@ function EmotionFishMatrix({ isPaid, onSave, emotionFishConfig }) {
               className={`ecard${isActive?" is-active":""}${isFull?" is-disabled":""}`}
               onClick={() => !isFull && toggle(e.id)}
               style={{
-                borderRadius:"14px",
+                borderRadius:"13px",
                 padding:"10px 6px 9px",
                 textAlign:"center",
                 display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:"5px",
-                minHeight:"68px",
+                minHeight:"66px",
                 position:"relative",
                 overflow:"hidden",
                 background: isActive
                   ? getEmotionGradient(e.name)
                   : isPrimary
-                    ? `linear-gradient(145deg, #ffffff 0%, #f0f7ff 100%)`
-                    : `linear-gradient(145deg, rgba(255,255,255,0.55) 0%, rgba(${parseInt(c1.slice(1,3),16)},${parseInt(c1.slice(3,5),16)},${parseInt(c1.slice(5,7),16)},0.08) 100%)`,
+                    ? `rgba(255,255,255,0.14)`
+                    : `rgba(255,255,255,0.07)`,
+                backdropFilter: isActive ? "none" : "blur(6px)",
                 border: isActive
-                  ? `1.5px solid ${alphaColor(e.color, 0.5)}`
+                  ? `1.5px solid ${alphaColor(e.color, 0.6)}`
                   : isPrimary
-                    ? `1.5px solid rgba(180,210,240,0.5)`
-                    : `1px solid rgba(180,210,240,0.25)`,
+                    ? `1px solid rgba(255,255,255,0.25)`
+                    : `1px solid rgba(255,255,255,0.12)`,
                 boxShadow: isActive
-                  ? `0 6px 20px ${alphaColor(e.color, 0.35)}, inset 0 1px 0 rgba(255,255,255,0.3)`
+                  ? `0 6px 20px ${alphaColor(e.color, 0.4)}, inset 0 1px 0 rgba(255,255,255,0.3)`
                   : isPrimary
-                    ? `0 2px 8px rgba(0,80,160,0.08), inset 0 1px 0 rgba(255,255,255,0.9)`
-                    : `0 1px 4px rgba(0,80,160,0.05)`,
+                    ? `0 2px 8px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.15)`
+                    : `0 1px 4px rgba(0,0,0,0.1)`,
               }}
             >
-              {/* 비활성 기본감정: 컬러 배경 글로우 */}
-              {!isActive && isPrimary && (
+              {/* 비활성 기본감정: 컬러 글로우 */}
+              {!isActive && (
                 <div style={{
-                  position:"absolute", bottom:0, left:0, right:0, height:"40%",
-                  background:`linear-gradient(to top, ${alphaColor(e.color, 0.07)}, transparent)`,
-                  borderRadius:"0 0 14px 14px",
+                  position:"absolute", inset:0,
+                  background:`radial-gradient(ellipse at 50% 120%, ${alphaColor(c1, isPrimary ? 0.18 : 0.1)} 0%, transparent 70%)`,
                   pointerEvents:"none",
                 }} />
               )}
 
-              {/* 비활성 혼합감정: 왼쪽 컬러 라인 */}
-              {!isActive && !isPrimary && (
+              {/* 비활성: 왼쪽 컬러 라인 */}
+              {!isActive && (
                 <div style={{
-                  position:"absolute", left:0, top:"20%", bottom:"20%", width:"3px",
+                  position:"absolute", left:0, top:"15%", bottom:"15%", width:"2.5px",
                   background:`linear-gradient(to bottom, ${c1}, ${c2})`,
                   borderRadius:"0 2px 2px 0",
-                  opacity:0.5,
+                  opacity: isPrimary ? 0.7 : 0.45,
                 }} />
               )}
 
-              {/* 감정 이름 */}
               <div style={{
-                color: isActive ? "white" : isPrimary ? "#1a4f72" : "#3a6a8a",
-                fontSize: isPrimary ? "0.88rem" : "0.78rem",
-                fontWeight: isPrimary ? "800" : "600",
+                color: isActive ? "white" : "rgba(255,255,255,0.9)",
+                fontSize: isPrimary ? "0.86rem" : "0.76rem",
+                fontWeight: isPrimary ? "700" : "600",
                 lineHeight:1.2,
-                letterSpacing: isPrimary ? "-0.3px" : "0",
-                textShadow: isActive ? "0 1px 3px rgba(0,0,0,0.2)" : "none",
+                textShadow: isActive ? "0 1px 4px rgba(0,0,0,0.25)" : "0 1px 2px rgba(0,0,0,0.3)",
               }}>
                 {e.name}
               </div>
 
-              {/* 혼합 태그 */}
               {e.bases.length > 1 && (
                 <div style={{ display:"flex", gap:"2px", flexWrap:"wrap", justifyContent:"center" }}>
                   {e.bases.map((b, i) => (
                     <span key={i} style={{
-                      fontSize:"0.48rem", padding:"1px 4px", borderRadius:"4px",
-                      background: isActive ? "rgba(255,255,255,0.22)" : "rgba(100,160,220,0.12)",
-                      color: isActive ? "rgba(255,255,255,0.95)" : "#5a8aaa",
+                      fontSize:"0.46rem", padding:"1px 4px", borderRadius:"4px",
+                      background: isActive ? "rgba(255,255,255,0.22)" : "rgba(255,255,255,0.12)",
+                      color: isActive ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.6)",
                       fontWeight:"600",
-                      letterSpacing:"0.2px",
                     }}>{b}</span>
                   ))}
                 </div>
               )}
 
-              {/* 기본감정 하단 컬러 바 */}
               {isPrimary && (
                 <div style={{
-                  position:"absolute", bottom:0, left:"20%", right:"20%", height:"3px",
-                  background: isActive ? "rgba(255,255,255,0.7)" : `linear-gradient(90deg, ${c1}, ${c2})`,
+                  position:"absolute", bottom:0, left:"20%", right:"20%", height:"2.5px",
+                  background: isActive ? "rgba(255,255,255,0.6)" : `linear-gradient(90deg, ${c1}, ${c2})`,
                   borderRadius:"2px 2px 0 0",
-                  opacity: isActive ? 1 : 0.7,
+                  opacity: isActive ? 1 : 0.6,
                 }} />
               )}
 
-              {/* 활성 체크 */}
               {isActive && (
                 <div style={{
                   position:"absolute", top:"6px", right:"6px",
-                  width:"16px", height:"16px", borderRadius:"50%",
-                  background:"rgba(255,255,255,0.35)",
+                  width:"15px", height:"15px", borderRadius:"50%",
+                  background:"rgba(255,255,255,0.3)",
                   display:"flex", alignItems:"center", justifyContent:"center",
-                  fontSize:"0.6rem", color:"white", fontWeight:"bold",
-                  boxShadow:"0 1px 3px rgba(0,0,0,0.15)",
+                  fontSize:"0.55rem", color:"white", fontWeight:"bold",
                 }}>✓</div>
               )}
             </div>
           );
         })}
       </div>
+
       {/* 비밀 물고기 안내 */}
-      <div style={{ marginTop:"10px", padding:"9px 14px", borderRadius:"12px", background:"rgba(255,255,255,0.6)", border:"1.5px dashed #c8dcea", display:"flex", alignItems:"center", gap:"10px" }}>
+      <div style={{ marginTop:"12px", padding:"10px 14px", borderRadius:"12px", background:"rgba(255,255,255,0.07)", border:"1px dashed rgba(255,255,255,0.2)", display:"flex", alignItems:"center", gap:"10px" }}>
         <img src="fish_25.png" alt="비밀" className="ef-secret" style={{ width:"28px", height:"auto" }}
           onError={e => { e.target.style.display='none'; }} />
         <div>
-          <span style={{ color:"#7a9ab0", fontSize:"0.78rem", fontWeight:"600" }}>비밀 물고기</span>
-          <span style={{ color:"#aac8dc", fontSize:"0.68rem", marginLeft:"8px" }}>항상 어항에 포함 · 감정 분석 별도 분류</span>
+          <span style={{ color:"rgba(255,255,255,0.7)", fontSize:"0.78rem", fontWeight:"600" }}>비밀 물고기</span>
+          <span style={{ color:"rgba(255,255,255,0.35)", fontSize:"0.66rem", marginLeft:"8px" }}>항상 어항에 포함 · 감정 분석 별도 분류</span>
         </div>
-        <div style={{ marginLeft:"auto", background:"#eaf4fb", borderRadius:"8px", padding:"2px 10px", color:"#7aaecc", fontSize:"0.68rem", border:"1px solid #c8dcea" }}>고정</div>
+        <div style={{ marginLeft:"auto", background:"rgba(255,255,255,0.1)", borderRadius:"8px", padding:"2px 10px", color:"rgba(255,255,255,0.5)", fontSize:"0.66rem", border:"1px solid rgba(255,255,255,0.15)" }}>고정</div>
       </div>
     </div>
   );
