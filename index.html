@@ -537,120 +537,232 @@ const EMOTIONS_LIST = EMOTIONS_DATA.map(e => ({
 
 const DEFAULT_ACTIVE_IDS = [1, 2, 3, 5];
 
-function EmotionFishMatrix({ isPaid, onSave, emotionFishConfig }) {
-  const maxFish = isPaid ? 8 : 4;
-  const totalSlots = isPaid ? 8 : 4;
+import { useState, useEffect } from "react";
 
-  const [active, setActive] = useState(() => {
-    if (emotionFishConfig?.active) {
-      // 이름 배열로 저장된 경우 id로 변환
-      return new Set(
-        EMOTIONS_LIST
-          .filter(e => emotionFishConfig.active.includes(e.name))
-          .map(e => e.id)
-      );
-    }
-    return new Set(DEFAULT_ACTIVE_IDS);
-  });
+// ── 감정별 그라디언트 색상 (시작색 → 끝색) ──
+const EMOTION_GRADIENT = {
+  기쁨:     ["#FFD233", "#FFB800"],
+  슬픔:     ["#3B82F6", "#1D4ED8"],
+  화남:     ["#FF3B30", "#DC2626"],
+  싫음:     ["#8E44FF", "#6D28D9"],
+  무서움:   ["#1F7A3A", "#14532D"],
+  놀람:     ["#00CAE6", "#0284C7"],
+  기대:     ["#FF8A1F", "#F97316"],
+  믿음직함: ["#22C55E", "#16A34A"],
+  뿌듯함:   ["#FFD233", "#22C55E"],
+  신남:     ["#FFD233", "#00CAE6"],
+  사랑:     ["#FFD233", "#4ADE80"],
+  호기심:   ["#22C55E", "#00CAE6"],
+  속상함:   ["#3B82F6", "#FF8A1F"],
+  외로움:   ["#3B82F6", "#1F7A3A"],
+  토라짐:   ["#3B82F6", "#FF3B30"],
+  후회:     ["#3B82F6", "#8E44FF"],
+  짜증:     ["#FF3B30", "#FF8A1F"],
+  억울함:   ["#8E44FF", "#FF3B30"],
+  미움:     ["#8E44FF", "#DC2626"],
+  부끄러움: ["#1F7A3A", "#8E44FF"],
+  걱정:     ["#1F7A3A", "#00CAE6", "#FF8A1F"],
+  긴장:     ["#1F7A3A", "#00CAE6", "#3B82F6"],
+  당황:     ["#00CAE6", "#FF3B30", "#1F7A3A"],
+  신기함:   ["#00CAE6", "#FFD233", "#22C55E"],
+  비밀:     ["#FFFFFF", "#E5E7EB"],
+};
 
-  // emotionFishConfig 외부 변경 반영
+// 그라디언트 첫 번째 색을 대표색으로 사용
+const EMOTION_COLORS = Object.fromEntries(
+  Object.entries(EMOTION_GRADIENT).map(([k, v]) => [k, v[0]])
+);
+
+// 그라디언트 CSS 문자열 생성
+function getGradient(name, deg = 135) {
+  const colors = EMOTION_GRADIENT[name] || ["#888", "#666"];
+  return `linear-gradient(${deg}deg, ${colors.join(", ")})`;
+}
+
+// 어항 슬롯 공통 스타일
+const TANK_SLOT = {
+  background: "linear-gradient(180deg, #d6eef8 0%, #b8dff0 50%, #9ecfe8 100%)",
+  borderRadius: "10px",
+  padding: "6px 2px 5px",
+  border: "1.5px solid rgba(255,255,255,0.6)",
+  boxShadow: "inset 0 1px 3px rgba(255,255,255,0.7), inset 0 -2px 4px rgba(100,170,210,0.3)",
+};
+
+// PC는 기본 감정 대표색 (하위 호환)
+const PC = {
+  기쁨:     "#FFD233",
+  믿음직함: "#22C55E",
+  기대:     "#FF8A1F",
+  놀람:     "#00CAE6",
+  슬픔:     "#3B82F6",
+  화남:     "#FF3B30",
+  싫음:     "#8E44FF",
+  무서움:   "#1F7A3A",
+};
+
+function alpha(hex, a) {
+  const h = hex.replace("#","");
+  const [r,g,b] = [0,2,4].map(i => parseInt(h.slice(i,i+2),16));
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+function lighten(hex, amt) {
+  const h = hex.replace("#","");
+  const [r,g,b] = [0,2,4].map(i => Math.min(255, parseInt(h.slice(i,i+2),16) + amt));
+  return "#" + [r,g,b].map(v => v.toString(16).padStart(2,"0")).join("");
+}
+
+const EMOTIONS_RAW = [
+  { id:1,  name:"기쁨",     type:"기본", bases:["기쁨"] },
+  { id:8,  name:"믿음직함", type:"기본", bases:["믿음직함"] },
+  { id:7,  name:"기대",     type:"기본", bases:["기대"] },
+  { id:6,  name:"놀람",     type:"기본", bases:["놀람"] },
+  { id:2,  name:"슬픔",     type:"기본", bases:["슬픔"] },
+  { id:3,  name:"화남",     type:"기본", bases:["화남"] },
+  { id:4,  name:"싫음",     type:"기본", bases:["싫음"] },
+  { id:5,  name:"무서움",   type:"기본", bases:["무서움"] },
+  { id:11, name:"사랑",     type:"혼합", bases:["기쁨","믿음직함"] },
+  { id:9,  name:"뿌듯함",   type:"혼합", bases:["기쁨","화남"] },
+  { id:10, name:"신남",     type:"혼합", bases:["기쁨","놀람"] },
+  { id:12, name:"호기심",   type:"혼합", bases:["믿음직함","놀람"] },
+  { id:24, name:"신기함",   type:"혼합", bases:["놀람","기대"] },
+  { id:13, name:"속상함",   type:"혼합", bases:["슬픔","기대"] },
+  { id:21, name:"걱정",     type:"혼합", bases:["무서움","기대"] },
+  { id:22, name:"긴장",     type:"혼합", bases:["무서움","놀람","기대"] },
+  { id:14, name:"외로움",   type:"혼합", bases:["슬픔","무서움"] },
+  { id:15, name:"토라짐",   type:"혼합", bases:["슬픔","화남"] },
+  { id:16, name:"후회",     type:"혼합", bases:["슬픔","싫음"] },
+  { id:23, name:"당황",     type:"혼합", bases:["놀람","무서움"] },
+  { id:17, name:"짜증",     type:"혼합", bases:["화남","기대"] },
+  { id:19, name:"미움",     type:"혼합", bases:["싫음","화남"] },
+  { id:20, name:"부끄러움", type:"혼합", bases:["무서움","싫음"] },
+  { id:18, name:"억울함",   type:"혼합", bases:["싫음","화남","슬픔"] },
+];
+
+const DEFAULT_ACTIVE = new Set([1, 2, 3, 5]);
+
+const EMOTIONS = EMOTIONS_RAW.map(e => ({
+  ...e,
+  color: EMOTION_COLORS[e.name],
+}));
+
+function FishSVG({ color, size = 38 }) {
+  const light = lighten(color, 55);
+  return (
+    <svg width={size} height={Math.round(size * 0.62)} viewBox="0 0 60 37" style={{ display:"block" }}>
+      <polygon points="1,4 15,18 1,33" fill={color} opacity="0.75" />
+      <ellipse cx="35" cy="18" rx="22" ry="13" fill={color} />
+      <ellipse cx="35" cy="22" rx="15" ry="7" fill="white" opacity="0.2" />
+      <circle cx="51" cy="13" r="3.2" fill="white" />
+      <circle cx="52" cy="13" r="1.6" fill="#1a3050" />
+      <polygon points="29,5 40,5 34,12" fill={light} opacity="0.55" />
+    </svg>
+  );
+}
+
+const isPaid = false;
+const maxFish = isPaid ? 8 : 4; // 비밀 제외: 무료 4+비밀1=5, 유료 8+비밀1=9
+
+export default function EmotionFishMatrix() {
+  const [active, setActive] = useState(new Set(DEFAULT_ACTIVE));
+  const [loaded, setLoaded] = useState(false);
+
   useEffect(() => {
-    if (emotionFishConfig?.active) {
-      setActive(new Set(
-        EMOTIONS_LIST
-          .filter(e => emotionFishConfig.active.includes(e.name))
-          .map(e => e.id)
-      ));
-    }
-  }, [emotionFishConfig]);
+    (async () => {
+      try {
+        const r = await window.storage.get("emotion-active-v5");
+        if (r) setActive(new Set(JSON.parse(r.value)));
+        else setActive(new Set(DEFAULT_ACTIVE));
+      } catch {}
+      setLoaded(true);
+    })();
+  }, []);
 
-  const saveConfig = async (nextSet) => {
-    const activeNames = EMOTIONS_LIST
-      .filter(e => nextSet.has(e.id))
-      .map(e => e.name);
-    await onSave('emotionFishConfig', { active: activeNames });
+  const save = async (next) => {
+    try { await window.storage.set("emotion-active-v5", JSON.stringify([...next])); } catch {}
   };
 
   const toggle = (id) => {
     const next = new Set(active);
-    if (next.has(id)) {
-      next.delete(id);
-    } else {
-      if (next.size >= maxFish) return;
-      next.add(id);
-    }
-    setActive(next);
-    saveConfig(next);
+    if (next.has(id)) { next.delete(id); }
+    else { if (next.size >= maxFish) return; next.add(id); }
+    setActive(next); save(next);
   };
 
-  const reset = () => {
-    const def = new Set(DEFAULT_ACTIVE_IDS);
-    setActive(def);
-    saveConfig(def);
-  };
+  const reset = () => { setActive(new Set(DEFAULT_ACTIVE)); save(DEFAULT_ACTIVE); };
 
-  const activeEmotions = EMOTIONS_LIST.filter(e => active.has(e.id));
+  const activeEmotions = EMOTIONS.filter(e => active.has(e.id));
+  const totalSlots = isPaid ? 8 : 4;
+
+  if (!loaded) return (
+    <div style={{ display:"flex", alignItems:"center", justifyContent:"center", height:"100vh", background:"#d6eaf8", color:"#2471a3", fontFamily:"sans-serif" }}>
+      불러오는 중...
+    </div>
+  );
 
   return (
-    <div style={{ fontFamily:"-apple-system,sans-serif" }}>
+    <div style={{ minHeight:"100vh", background:"linear-gradient(160deg,#d6eaf8 0%,#c8e4f5 50%,#d0ecf4 100%)", fontFamily:"'Apple SD Gothic Neo','Noto Sans KR',sans-serif", padding:"20px 16px" }}>
       <style>{`
         .ecard { transition:all 0.15s; cursor:pointer; user-select:none; }
         .ecard:hover { transform:translateY(-2px); box-shadow:0 5px 16px rgba(0,0,0,0.13) !important; }
         .ecard.is-active { transform:translateY(-1px); }
         .ecard.is-disabled { opacity:0.38; cursor:not-allowed; }
-        @keyframes fishSwim { 0%,100%{transform:translateX(0)} 50%{transform:translateX(4px)} }
-        .fish-sw { animation:fishSwim 2.4s ease-in-out infinite; display:inline-block; }
-        @keyframes floatIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
-        .fish-in { animation:floatIn 0.22s ease; }
-        @keyframes secretPulse { 0%,100%{opacity:0.5} 50%{opacity:0.9} }
-        .secret-fish { animation:secretPulse 3s ease-in-out infinite; }
-        .ef-reset-btn { background:none; border:1px solid #aac8dc; color:#5a8faa; border-radius:8px; padding:5px 14px; font-size:0.78rem; cursor:pointer; }
-        .ef-reset-btn:hover { background:#e8f4fb; }
+        @keyframes swim { 0%,100%{transform:translateX(0)} 50%{transform:translateX(5px)} }
+        .sw { animation:swim 2.4s ease-in-out infinite; display:inline-block; }
+        @keyframes floatIn { from{opacity:0;transform:translateY(5px) scale(0.95)} to{opacity:1;transform:translateY(0) scale(1)} }
+        .fin { animation:floatIn 0.22s ease; }
+        @keyframes pulse { 0%,100%{opacity:0.4} 50%{opacity:0.75} }
+        .secret-pulse { animation:pulse 3s ease-in-out infinite; }
+        .reset-btn { background:none; border:1px solid #aac8dc; color:#5a8faa; border-radius:8px; padding:5px 14px; font-size:0.78rem; cursor:pointer; transition:all 0.15s; }
+        .reset-btn:hover { background:#e8f4fb; }
       `}</style>
 
       {/* 헤더 */}
-      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"12px" }}>
+      <div style={{ maxWidth:"660px", margin:"0 auto 12px", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
         <div>
-          <h3 style={{ color:"#1a4f72", fontSize:"1rem", fontWeight:"600", margin:0 }}>감정 물고기 도감</h3>
-          <p style={{ color:"#5a8faa", fontSize:"0.72rem", margin:"2px 0 0" }}>Robert Plutchik 감정 모델 기반</p>
+          <h2 style={{ color:"#1a4f72", fontSize:"1.1rem", fontWeight:"700", margin:0 }}>감정 물고기 도감</h2>
+          <p style={{ color:"#3a6a8a", fontSize:"0.72rem", margin:"2px 0 0", fontWeight:"500" }}>
+            Robert Plutchik 감정 모델 기반
+          </p>
         </div>
-        <button className="ef-reset-btn" onClick={reset}>기본값으로</button>
+        <button className="reset-btn" onClick={reset}>기본값으로</button>
       </div>
 
-      {/* 어항 상태 표시줄 */}
-      <div style={{ background:"white", borderRadius:"16px", padding:"14px 16px", boxShadow:"0 2px 12px rgba(0,80,150,0.08)", border:"1px solid rgba(100,170,220,0.2)", marginBottom:"12px" }}>
+      {/* ── 어항 상태 표시줄 ── */}
+      <div style={{ maxWidth:"660px", margin:"0 auto 12px", background:"white", borderRadius:"16px", padding:"14px 16px", boxShadow:"0 2px 12px rgba(0,80,150,0.08)", border:"1px solid rgba(100,170,220,0.2)" }}>
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"10px" }}>
           <span style={{ color:"#1a4f72", fontSize:"0.85rem", fontWeight:"600" }}>
-            기본 물고기 (필수 {isPaid ? 9 : 5}마리)
+            우리 어항의 물고기들
           </span>
           <span style={{ fontSize:"0.72rem", color: active.size >= maxFish ? "#27ae60" : "#5a8faa", fontWeight:"500" }}>
             {active.size + 1}/{isPaid ? 9 : 5}마리{active.size >= maxFish ? " ✓ 완성" : ""}
           </span>
         </div>
 
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(9,1fr)", gap:"6px" }}>
-          {/* 비밀 물고기 고정 */}
-          <div className="secret-fish" style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:"3px", ...TANK_SLOT }}>
-            <img src="fish_25.png" alt="비밀" style={{ width:"30px", height:"auto", objectFit:"contain" }}
+        {/* 물고기 슬롯 — 8칸 고정 가로 배열 */}
+        <div style={{ display:"grid", gridTemplateColumns:'repeat(9, 1fr)', gap:"6px" }}>
+          {/* 비밀 물고기 고정 슬롯 */}
+          <div className="secret-pulse" style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:"3px", ...TANK_SLOT, minHeight:"62px" }}>
+            <img src="fish_25.png" alt="비밀" style={{ width:"36px", height:"auto", objectFit:"contain" }}
               onError={e => { e.target.style.display='none'; }} />
-            <span style={{ fontSize:"0.55rem", color:"#7a9ab0", fontWeight:"500" }}>비밀</span>
+            <span style={{ fontSize:"0.5rem", color:"#7a9ab0", fontWeight:"500" }}>비밀</span>
           </div>
 
           {/* 활성 감정 물고기 */}
           {activeEmotions.map(e => (
-            <div key={e.id} className="fish-in" style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:"3px", ...TANK_SLOT }}>
-              <div className="fish-sw">
-                <img src={e.image} alt={e.name} style={{ width:"30px", height:"auto", objectFit:"contain" }}
+            <div key={e.id} className="fin" style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:"3px", ...TANK_SLOT, minHeight:"62px" }}>
+              <div className="sw" style={{ fontSize:"1.6rem", lineHeight:1 }}>
+                <img src={e.image} alt={e.name} style={{ width:"36px", height:"auto", objectFit:"contain" }}
                   onError={ev => { ev.target.style.display='none'; }} />
               </div>
-              <span style={{ fontSize:"0.55rem", color:"#1a5070", fontWeight:"700", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", maxWidth:"100%", textAlign:"center" }}>{e.name}</span>
+              <span style={{ fontSize:"0.5rem", color:"#4a7a9b", fontWeight:"500", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", maxWidth:"90%", textAlign:"center" }}>{e.name}</span>
             </div>
           ))}
 
           {/* 빈 슬롯 */}
           {Array.from({ length: totalSlots - active.size }).map((_, i) => (
-            <div key={i} style={{ display:"flex", alignItems:"center", justifyContent:"center", ...TANK_SLOT, minHeight:"52px" }}>
-              <span style={{ color:"rgba(100,160,210,0.6)", fontSize:"1rem" }}>+</span>
+            <div key={i} style={{ display:"flex", alignItems:"center", justifyContent:"center", ...TANK_SLOT, minHeight:"62px", opacity:0.5 }}>
+              <span style={{ color:"rgba(100,160,210,0.5)", fontSize:"1.4rem", fontWeight:"300" }}>·</span>
             </div>
           ))}
         </div>
@@ -667,7 +779,7 @@ function EmotionFishMatrix({ isPaid, onSave, emotionFishConfig }) {
       </div>
 
       {/* 범례 */}
-      <div style={{ display:"flex", gap:"12px", alignItems:"center", marginBottom:"8px" }}>
+      <div style={{ maxWidth:"660px", margin:"0 auto 8px", display:"flex", gap:"12px", alignItems:"center" }}>
         <div style={{ display:"flex", alignItems:"center", gap:"4px" }}>
           <div style={{ width:"9px", height:"9px", borderRadius:"2px", background:"white", border:"2px solid #4A90D9" }} />
           <span style={{ color:"#5a8faa", fontSize:"0.7rem" }}>Plutchik 기본 8감정</span>
@@ -679,9 +791,9 @@ function EmotionFishMatrix({ isPaid, onSave, emotionFishConfig }) {
         <span style={{ color:"#aac8dc", fontSize:"0.68rem", marginLeft:"auto" }}>카드 클릭으로 배치</span>
       </div>
 
-      {/* 4×6 감정 매트릭스 */}
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:"6px" }}>
-        {EMOTIONS_LIST.map(e => {
+      {/* ── 4×6 감정 매트릭스 ── */}
+      <div style={{ maxWidth:"660px", margin:"0 auto", display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:"6px" }}>
+        {EMOTIONS.map((e) => {
           const isPrimary = e.type === "기본";
           const isActive = active.has(e.id);
           const isFull = active.size >= maxFish && !isActive;
@@ -689,7 +801,7 @@ function EmotionFishMatrix({ isPaid, onSave, emotionFishConfig }) {
           return (
             <div
               key={e.id}
-              className={`ecard${isActive?" is-active":""}${isFull?" is-disabled":""}`}
+              className={`ecard${isActive ? " is-active" : ""}${isFull ? " is-disabled" : ""}`}
               onClick={() => !isFull && toggle(e.id)}
               style={{
                 borderRadius:"11px",
@@ -698,15 +810,15 @@ function EmotionFishMatrix({ isPaid, onSave, emotionFishConfig }) {
                 display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:"4px",
                 minHeight:"64px",
                 background: isActive
-                  ? getEmotionGradient(e.name)
+                  ? getGradient(e.name)
                   : isPrimary ? "white" : "rgba(255,255,255,0.65)",
                 border: isActive
-                  ? `2px solid ${alphaColor(e.color, 0.9)}`
+                  ? `2px solid ${alpha(e.color, 0.9)}`
                   : isPrimary
                     ? "1.5px solid rgba(100,160,210,0.3)"
                     : "1px solid rgba(100,160,210,0.15)",
                 boxShadow: isActive
-                  ? `0 4px 14px ${alphaColor(e.color, 0.4)}`
+                  ? `0 4px 14px ${alpha(e.color, 0.4)}`
                   : isPrimary
                     ? "0 2px 7px rgba(0,80,150,0.08)"
                     : "0 1px 4px rgba(0,80,150,0.05)",
@@ -715,9 +827,9 @@ function EmotionFishMatrix({ isPaid, onSave, emotionFishConfig }) {
             >
               {/* 감정 이름 */}
               <div style={{
-                color: isActive ? "white" : isPrimary ? "#2c6e9e" : "#7aaec8",
+                color: isActive ? "white" : isPrimary ? "#1a5070" : "#4a7a9b",
                 fontSize: isPrimary ? "0.84rem" : "0.76rem",
-                fontWeight: isPrimary ? "700" : "500",
+                fontWeight: isPrimary ? "700" : "600",
                 lineHeight:1.2,
               }}>
                 {e.name}
@@ -730,7 +842,7 @@ function EmotionFishMatrix({ isPaid, onSave, emotionFishConfig }) {
                     <span key={i} style={{
                       fontSize:"0.5rem", padding:"1px 3px", borderRadius:"3px",
                       background: isActive ? "rgba(255,255,255,0.2)" : "rgba(100,150,200,0.1)",
-                      color: isActive ? "rgba(255,255,255,0.9)" : "rgba(100,150,180,0.7)",
+                      color: isActive ? "rgba(255,255,255,0.9)" : "rgba(60,100,140,0.8)",
                       border: isActive ? "1px solid rgba(255,255,255,0.25)" : "1px solid rgba(100,150,200,0.2)",
                       fontWeight:"500",
                     }}>{b}</span>
@@ -743,7 +855,7 @@ function EmotionFishMatrix({ isPaid, onSave, emotionFishConfig }) {
                 <div style={{ position:"absolute", bottom:0, left:"25%", right:"25%", height:"3px", borderRadius:"2px", background: isActive ? "rgba(255,255,255,0.6)" : e.color, opacity:0.6 }} />
               )}
 
-              {/* 활성 체크 */}
+              {/* 활성 컬러 닷 */}
               {isActive && (
                 <div style={{
                   position:"absolute", top:"5px", right:"5px",
@@ -757,21 +869,22 @@ function EmotionFishMatrix({ isPaid, onSave, emotionFishConfig }) {
         })}
       </div>
 
-      {/* 비밀 물고기 안내 */}
-      <div style={{ marginTop:"10px", padding:"9px 14px", borderRadius:"12px", background:"rgba(255,255,255,0.6)", border:"1.5px dashed #c8dcea", display:"flex", alignItems:"center", gap:"10px" }}>
-        <img src="fish_25.png" alt="비밀" className="secret-fish" style={{ width:"28px", height:"auto" }}
-          onError={e => { e.target.style.display='none'; }} />
+      {/* 비밀 물고기 */}
+      <div style={{ maxWidth:"660px", margin:"10px auto 0", padding:"9px 14px", borderRadius:"12px", background:"rgba(255,255,255,0.6)", border:"1.5px dashed #c8dcea", display:"flex", alignItems:"center", gap:"10px" }}>
+        <div className="secret-pulse"><FishSVG color="#90a4ae" size={28} /></div>
         <div>
           <span style={{ color:"#7a9ab0", fontSize:"0.78rem", fontWeight:"600" }}>비밀 물고기</span>
           <span style={{ color:"#aac8dc", fontSize:"0.68rem", marginLeft:"8px" }}>항상 어항에 포함 · 감정 분석 별도 분류</span>
         </div>
         <div style={{ marginLeft:"auto", background:"#eaf4fb", borderRadius:"8px", padding:"2px 10px", color:"#7aaecc", fontSize:"0.68rem", border:"1px solid #c8dcea" }}>고정</div>
       </div>
+
+      <div style={{ textAlign:"center", marginTop:"12px", color:"#aac8dc", fontSize:"0.68rem" }}>
+        클릭으로 어항 추가/제거 · 자동 저장
+      </div>
     </div>
   );
 }
-
-  
 /* ── FishNameEditor: 독립 컴포넌트 ── */
 function FishNameEditor({ customFishNames, isPaid, onSave }) {
   const [names, setNames] = useState({});
