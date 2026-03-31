@@ -406,9 +406,8 @@ function SwimmingFish({ fish, onClick, index }) {
      <div style={{
         position:'absolute',
         top:'50%',
-...(dir === -1
-          ? { left:'60%', right:'auto' }
-          : { right:'60%', left:'auto' }),
+        left: dir === -1 ? '55%' : 'auto',
+        right: dir === 1 ? '55%' : 'auto',
         transform:'translateY(-50%)',
         pointerEvents:'none', whiteSpace:'nowrap'
       }}>
