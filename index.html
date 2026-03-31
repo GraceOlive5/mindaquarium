@@ -320,16 +320,17 @@ function Bubbles({ n=25 }) {
 
 function SwimmingFish({ fish, onClick, index }) {
   const SCREEN_BOTTOM_LIMIT = 0.62; // 화면 68% 아래로 내려가지 않음
-  const speeds = [0.18, 0.22, 0.16, 0.20, 0.24, 0.17, 0.19, 0.15];
+  const speeds = [0.18, 0.22, 0.16, 0.20, 0.24, 0.17, 0.19, 0.15, 0.21];
   const initPositions = [
     {x:0.10, y:0.15}, {x:0.80, y:0.18}, {x:0.50, y:0.30},
     {x:0.15, y:0.45}, {x:0.70, y:0.45}, {x:0.35, y:0.60},
-    {x:0.65, y:0.60}, {x:0.25, y:0.35}
+    {x:0.65, y:0.60}, {x:0.25, y:0.35}, {x:0.55, y:0.20}
   ];
 
+  const safeIndex = index % initPositions.length;
   const pos = useRef({
-    x: initPositions[index].x,
-    y: initPositions[index].y,
+    x: initPositions[safeIndex].x,
+    y: initPositions[safeIndex].y,
     vx: index % 2 === 0 ? speeds[index] : -speeds[index],
     vy: (Math.random() - 0.5) * 0.3,
   });
