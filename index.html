@@ -661,13 +661,11 @@ return (
           {Array.from({length: 4}).map((_, i) => {
             const e = activeEmotions[i];
            return e ? (
-  <div key={`free-filled-${e.id}`} className={`ef-fin tank-slot`}style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:"3px", minHeight:"58px", padding:"5px 2px" }}>
-                <div className="ef-sw">
-                  <img src={e.image} alt={e.name} style={{ width:"32px", height:"auto", objectFit:"contain" }}
-                    onError={ev => { ev.target.style.display='none'; }} />
-                </div>
-                <span style={{ fontSize:"0.48rem", color:"#1a5070", fontWeight:"600", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", maxWidth:"90%", textAlign:"center" }}>{e.name}</span>
-              </div>
+             
+            <div key={`free-filled-${e.id}`} className={`ef-fin tank-slot`} style={{ position:"relative", display:"flex", alignItems:"center", justifyContent:"center", minHeight:"58px", overflow:"hidden" }}>
+              <img src={e.image} alt={e.name} style={{ position:"absolute", width:"52px", height:"auto", objectFit:"contain", opacity:0.35, filter:"blur(1px)" }} onError={ev => { ev.target.style.display='none'; }} />
+              <span style={{ position:"relative", fontSize:"0.82rem", color:"#1a3d5c", fontWeight:"700", textAlign:"center", textShadow:"0 1px 2px rgba(255,255,255,0.8)", zIndex:1 }}>{e.name}</span>
+            </div>
             ) : (
              <div key={`free-empty-${i}`} className="tank-slot-empty" style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"58px" }}>
                 <span style={{ color:"rgba(255,255,255,0.25)", fontSize:"1.2rem", fontWeight:"300" }}>·</span>
@@ -688,11 +686,10 @@ return (
           {Array.from({length: 4}).map((_, i) => {
             const e = isPaid ? activeEmotions[4 + i] : null;
             return e ? (
-  <div key={`prem-filled-${e.id}`} className={`ef-fin tank-slot`} style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:"3px", minHeight:"58px", padding:"5px 2px" }}>
-                <div className="ef-sw">
-                  <img src={e.image} alt={e.name} style={{ width:"32px", height:"auto", objectFit:"contain" }}
-                    onError={ev => { ev.target.style.display='none'; }} />
-                </div>
+ <div key={`prem-filled-${e.id}`} className={`ef-fin tank-slot`} style={{ position:"relative", display:"flex", alignItems:"center", justifyContent:"center", minHeight:"58px", overflow:"hidden" }}>
+              <img src={e.image} alt={e.name} style={{ position:"absolute", width:"52px", height:"auto", objectFit:"contain", opacity:0.35, filter:"blur(1px)" }} onError={ev => { ev.target.style.display='none'; }} />
+              <span style={{ position:"relative", fontSize:"0.82rem", color:"#1a3d5c", fontWeight:"700", textAlign:"center", textShadow:"0 1px 2px rgba(255,255,255,0.8)", zIndex:1 }}>{e.name}</span>
+            </div>
                 <span style={{ fontSize:"0.48rem", color:"#1a5070", fontWeight:"600", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", maxWidth:"90%", textAlign:"center" }}>{e.name}</span>
               </div>
             ) : (
