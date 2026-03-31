@@ -1436,7 +1436,7 @@ function App() {
       {mode === 'adminOnboarding' && <AdminOnboardingScreen onComplete={completeAdminOnboarding} />}
       {mode === 'tutorial'        && (
         <TutorialScreen
-          shyFish={DEFAULT_FISHES.find(f => f.id === 'shy')}
+          shyFish={{ id:'shy', name:'부끄럼', image:'fish_20.png' }}
           onComplete={completeTutorial}
           onSendLetter={sendTutorialLetter}
         />
