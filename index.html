@@ -2089,10 +2089,24 @@ const [emotionFishConfig, setEmotionFishConfig] = useState(null);
   const sentCount = kingLetterHistory.length;
   const cycleCount = messages.length - (sentCount * goalCount);
 
-  const fishes = DEFAULT_FISHES.map(f => ({
-    ...f,
-    name: customFishNames?.[f.id] !== undefined ? customFishNames[f.id] : f.defaultName
-  })).filter(f => f.alwaysShow || f.name.trim() !== '');
+  const fishes = (() => {
+    // emotionFishConfig가 있으면 새 구조 사용
+    if (emotionFishConfig?.initialized) {
+      const activeNames = emotionFishConfig.active || [];
+      const emotionFishes = EMOTIONS_LIST
+        .filter(e => activeNames.includes(e.name))
+        .map(e => ({ id: e.name, name: e.name, image: e.image }));
+      // 비밀 물고기 항상 포함
+      const secretFish = { id: 'secret', name: '비밀', image: 'fish_25.png' };
+      return [secretFish, ...emotionFishes];
+    }
+    // 레거시: customFishNames 기반
+    return DEFAULT_FISHES.map(f => ({
+      ...f,
+      name: customFishNames?.[f.id] !== undefined ? customFishNames[f.id] : f.defaultName
+    })).filter(f => f.alwaysShow || f.name.trim() !== '');
+  })();
+  
 
   useEffect(() => {
   const timeout = setTimeout(() => {
