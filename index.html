@@ -690,8 +690,6 @@ return (
               <img src={e.image} alt={e.name} style={{ position:"absolute", width:"52px", height:"auto", objectFit:"contain", opacity:0.35, filter:"blur(1px)" }} onError={ev => { ev.target.style.display='none'; }} />
               <span style={{ position:"relative", fontSize:"0.82rem", color:"#1a3d5c", fontWeight:"700", textAlign:"center", textShadow:"0 1px 2px rgba(255,255,255,0.8)", zIndex:1 }}>{e.name}</span>
             </div>
-                <span style={{ fontSize:"0.48rem", color:"#1a5070", fontWeight:"600", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", maxWidth:"90%", textAlign:"center" }}>{e.name}</span>
-              </div>
             ) : (
             <div key={`prem-empty-${i}`} className="tank-slot-empty" style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"58px", position:"relative" }}>
                 {!isPaid && (
@@ -956,7 +954,19 @@ function LoadingScreen() {
   );
 }
 
-function SavingOverlay() {
+function SavingOverlay({ message }) {
+  if (message) return (
+    <div style={{
+      position:'fixed', bottom:'24px', left:'50%', transform:'translateX(-50%)',
+      background:'rgba(10,40,80,0.85)', backdropFilter:'blur(8px)',
+      color:'white', fontSize:'13px', fontWeight:600,
+      padding:'8px 20px', borderRadius:'99px',
+      boxShadow:'0 4px 16px rgba(0,0,0,0.3)',
+      zIndex:50, whiteSpace:'nowrap',
+    }}>
+      🐠 {message}
+    </div>
+  );
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-8 flex flex-col items-center">
@@ -966,6 +976,7 @@ function SavingOverlay() {
     </div>
   );
 }
+  
   function LoadingOverlay() {
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -2067,7 +2078,7 @@ function AdminOnboardingScreen({ onComplete }) {
 function App() {
   const [mode, setMode] = useState('loading');
   const [user, setUser] = useState(null);
-  const [saving, setSaving] = useState(false);
+  const [saving, setSaving] = useState('');
   const [firebaseConnected, setFirebaseConnected] = useState(false);
 
   const [messages, setMessages] = useState([]);
@@ -2195,12 +2206,12 @@ const [emotionFishConfig, setEmotionFishConfig] = useState(null);
 
   const saveToFirebase = async (path, data) => {
     if (!user) return;
-    setSaving(true);
+    setSaving(path === 'emotionFishConfig' ? '어항에 분양 중입니다' : '');
     try {
       await fa().set(fa().ref(db(), `users/${user.uid}/${path}`), data);
       await new Promise(r => setTimeout(r, 200));
     } catch(e) { alert('저장 실패: '+e.message); }
-    finally { setSaving(false); }
+    finally { setSaving(''); }
   };
 
   const signOut = async () => {
@@ -2288,7 +2299,7 @@ const [emotionFishConfig, setEmotionFishConfig] = useState(null);
 
   return (
     <>
-      {saving && <SavingOverlay />}
+      {saving && <SavingOverlay message={saving} />}
       {mode === 'auth'            && <AuthScreen onSuccess={() => setMode('loading')} />}
       {mode === 'adminOnboarding' && <AdminOnboardingScreen onComplete={completeAdminOnboarding} />}
       {mode === 'tutorial'        && (
