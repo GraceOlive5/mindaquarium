@@ -404,9 +404,10 @@ function SwimmingFish({ fish, onClick, index }) {
       </div>
       {/* 물고기 이름 - 몸통 중앙, 항상 정방향 */}
    <div style={{
-       position:'absolute', top:'50%', left: dir===1 ? '65%' : '35%',
-transform:'translate(-50%,-50%)',
-textAlign: dir===1 ? 'left' : 'right',
+       position:'absolute', top:'50%',
+...(dir===1
+  ? { right:'35%', transform:'translateY(-50%)', textAlign:'right' }
+  : { left:'35%', transform:'translateY(-50%)', textAlign:'left' }),
         pointerEvents:'none', whiteSpace:'nowrap'
       }}>
         <span style={{
