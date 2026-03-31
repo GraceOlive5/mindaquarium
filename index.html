@@ -293,7 +293,7 @@ const DEFAULT_FISHES = [
   { id:'happy',  defaultName:'행복',    color:'하얀색', image:'mindaquarium_happy.png',  alwaysShow: true },
   { id:'sad',    defaultName:'슬픔',    color:'파란색', image:'mindaquarium_fear.png',   alwaysShow: true },
   { id:'anger',  defaultName:'화남',    color:'빨간색', image:'mindaquarium_angry.png',  alwaysShow: true },
-  { id:'shy',    defaultName:'부끄러움',color:'핑크색', image:'mindaquarium_shy.png',    alwaysShow: true },
+  { id:'shy',    defaultName:'부끄럼',color:'핑크색', image:'mindaquarium_shy.png',    alwaysShow: true },
   // 추가 분양 4마리 (이름 입력 시에만 어항에 나옴)
   { id:'fun',    defaultName:'',        color:'초록색', image:'mindaquarium_fun.png',    alwaysShow: false },
   { id:'secret', defaultName:'',        color:'보라색', image:'mindaquarium_secret.png', alwaysShow: false },
@@ -459,7 +459,7 @@ const EMOTION_GRADIENT = {
   무서움:   ["#1F7A3A", "#14532D"],
   놀람:     ["#00CAE6", "#0284C7"],
   기대:     ["#FF8A1F", "#F97316"],
-  믿음직함: ["#22C55E", "#16A34A"],
+  믿음직: ["#22C55E", "#16A34A"],
   뿌듯함:   ["#FFD233", "#22C55E"],
   신남:     ["#FFD233", "#00CAE6"],
   사랑:     ["#FFD233", "#4ADE80"],
@@ -471,7 +471,7 @@ const EMOTION_GRADIENT = {
   짜증:     ["#FF3B30", "#FF8A1F"],
   억울함:   ["#8E44FF", "#FF3B30"],
   미움:     ["#8E44FF", "#DC2626"],
-  부끄러움: ["#1F7A3A", "#8E44FF"],
+  부끄럼: ["#1F7A3A", "#8E44FF"],
   걱정:     ["#1F7A3A", "#00CAE6", "#FF8A1F"],
   긴장:     ["#1F7A3A", "#00CAE6", "#3B82F6"],
   당황:     ["#00CAE6", "#FF3B30", "#1F7A3A"],
@@ -504,17 +504,17 @@ function alphaColor(hex, a) {
 
 const EMOTIONS_DATA = [
   { id:1,  name:"기쁨",     type:"기본", bases:["기쁨"] },
-  { id:8,  name:"믿음직함", type:"기본", bases:["믿음직함"] },
+  { id:8,  name:"믿음직", type:"기본", bases:["믿음직"] },
   { id:7,  name:"기대",     type:"기본", bases:["기대"] },
   { id:6,  name:"놀람",     type:"기본", bases:["놀람"] },
   { id:2,  name:"슬픔",     type:"기본", bases:["슬픔"] },
   { id:3,  name:"화남",     type:"기본", bases:["화남"] },
   { id:4,  name:"싫음",     type:"기본", bases:["싫음"] },
   { id:5,  name:"무서움",   type:"기본", bases:["무서움"] },
-  { id:11, name:"사랑",     type:"혼합", bases:["기쁨","믿음직함"] },
+  { id:11, name:"사랑",     type:"혼합", bases:["기쁨","믿음직"] },
   { id:9,  name:"뿌듯함",   type:"혼합", bases:["기쁨","화남"] },
   { id:10, name:"신남",     type:"혼합", bases:["기쁨","놀람"] },
-  { id:12, name:"호기심",   type:"혼합", bases:["믿음직함","놀람"] },
+  { id:12, name:"호기심",   type:"혼합", bases:["믿음직","놀람"] },
   { id:24, name:"신기함",   type:"혼합", bases:["놀람","기대"] },
   { id:13, name:"속상함",   type:"혼합", bases:["슬픔","기대"] },
   { id:21, name:"걱정",     type:"혼합", bases:["무서움","기대"] },
@@ -525,7 +525,7 @@ const EMOTIONS_DATA = [
   { id:23, name:"당황",     type:"혼합", bases:["놀람","무서움"] },
   { id:17, name:"짜증",     type:"혼합", bases:["화남","기대"] },
   { id:19, name:"미움",     type:"혼합", bases:["싫음","화남"] },
-  { id:20, name:"부끄러움", type:"혼합", bases:["무서움","싫음"] },
+  { id:20, name:"부끄럼", type:"혼합", bases:["무서움","싫음"] },
   { id:18, name:"억울함",   type:"혼합", bases:["싫음","화남","슬픔"] },
 ];
 
@@ -1631,7 +1631,7 @@ function TutorialScreen({ shyFish, onComplete, onSendLetter }) {
     },
     3: {
       msg: showBadge
-        ? `부끄러운 마음이 들었다면\n이렇게 '부끄러움'이라고\n써있는 나를 선택하는 거야!`
+        ? `부끄러운 마음이 들었다면\n이렇게 '부끄럼'이라고\n써있는 나를 선택하는 거야!`
         : '',
     },
     4: {
@@ -1660,9 +1660,9 @@ function TutorialScreen({ shyFish, onComplete, onSendLetter }) {
           {/* 물고기 컨테이너 */}
           <div style={{ position:'relative', width:'min(140px,32vw)', height:'min(140px,32vw)' }}>
 
-            {/* 메인 물고기 (부끄러움) */}
+            {/* 메인 물고기 (부끄럼) */}
             <div style={{ position:'relative', zIndex: 1, width:'100%', height:'100%' }}>
-              <img src={shyFish.image} alt="부끄러움 물고기"
+              <img src={shyFish.image} alt="부끄럼 물고기"
                 className={fishClass}
                 style={{ width:'100%', height:'100%', objectFit:'contain',
                   filter:'drop-shadow(0 8px 24px rgba(0,0,0,0.4))',
