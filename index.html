@@ -12,7 +12,7 @@
   <link rel="apple-touch-icon" href="icon-180.png">
   <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
   <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-19f2.png">
   <meta name="copyright" content="Copyright 2024 hhappyfamilydais. All rights reserved.">
   <meta name="author" content="hhappyfamilydais">
   <meta name="description" content="아이들의 감정 표현을 돕는 감정 어항 앱 - Mind Aquarium">
@@ -402,10 +402,12 @@ function SwimmingFish({ fish, onClick, index }) {
         <div className="fish-click-area" onClick={onClick} />
         <img src={fish.image} alt={fish.name} style={{userSelect:'none', width:'100%', height:'100%', objectFit:'contain'}} />
       </div>
-      {/* 이름 - 몸통 중앙, 항상 정방향 */}
+      {/* 물고기 이름 - 몸통 중앙, 항상 정방향 */}
    <div style={{
-       position:'absolute', top:'50%', left: dir===1 ? '65%' : '35%',
-transform:'translate(-50%,-50%)',
+       position:'absolute', top:'50%',
+        ...(dir===1
+          ? { left:'63%', transform:'translateY(-50%)' }
+          : { right:'63%', transform:'translateY(-50%)' }),
         pointerEvents:'none', whiteSpace:'nowrap'
       }}>
         <span style={{
