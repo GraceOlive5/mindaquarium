@@ -159,10 +159,10 @@ function Bubbles({ n=25 }) {
 function SwimmingFish({ fish, onClick, index }) {
   const SCREEN_BOTTOM_LIMIT = 0.62;
   const speeds = [0.08, 0.02, 0.01, 0.06, 0.03, 0.09, 0.10, 0.07, 0.04];
-  const initPositions = [
-    {x:0.10, y:0.15}, {x:0.80, y:0.18}, {x:0.50, y:0.30},
-    {x:0.15, y:0.45}, {x:0.70, y:0.45}, {x:0.35, y:0.60},
-    {x:0.65, y:0.60}, {x:0.25, y:0.35}, {x:0.55, y:0.20}
+ const initPositions = [
+    {x:0.10, y:0.12}, {x:0.80, y:0.22}, {x:0.50, y:0.32},
+    {x:0.15, y:0.42}, {x:0.70, y:0.18}, {x:0.35, y:0.52},
+    {x:0.65, y:0.38}, {x:0.25, y:0.28}, {x:0.55, y:0.48}
   ];
 
   const safeIndex = index % initPositions.length;
@@ -170,7 +170,7 @@ function SwimmingFish({ fish, onClick, index }) {
     x: initPositions[safeIndex].x,
     y: initPositions[safeIndex].y,
     vx: index % 2 === 0 ? speeds[safeIndex] : -speeds[safeIndex],
-    vy: (Math.random() - 0.5) * 0.3,
+    vy: (Math.random() - 0.5) * 0.06,
   });
   const [renderPos, setRenderPos] = useState({ x: pos.current.x, y: pos.current.y });
   const [dir, setDir] = useState(index % 2 === 0 ? 1 : -1);
@@ -193,7 +193,7 @@ function SwimmingFish({ fish, onClick, index }) {
       if (p.y <= 0.10) { p.y = 0.10; p.vy = Math.abs(p.vy) * 0.8 + 0.05; }
       else if (p.y >= SCREEN_BOTTOM_LIMIT - fishH) { p.y = SCREEN_BOTTOM_LIMIT - fishH; p.vy = -(Math.abs(p.vy) * 0.8 + 0.05); }
       if (Math.random() < 0.005) p.vy += (Math.random() - 0.5) * 0.1;
-      p.vy = Math.max(-0.15, Math.min(0.15, p.vy));
+      p.vy = Math.max(-0.05, Math.min(0.05, p.vy));
       setRenderPos({ x: p.x, y: p.y });
       animRef.current = requestAnimationFrame(tick);
     };
