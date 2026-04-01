@@ -720,11 +720,9 @@ function IntroScreen({ userEmail, onStart, onAdmin, onSignOut }) {
     <div className="relative min-h-screen overflow-hidden" style={{ backgroundImage:'url(mindaquarium_bg2.png)', backgroundSize:'cover', backgroundPosition:'center bottom' }}>
       <Bubbles n={30} />
       <div className="relative flex flex-col items-center px-4" style={{ paddingTop: '12vh', paddingBottom: '80px' }}>
-        <div className="relative flex flex-col items-center" style={{ marginBottom: '60px' }}>
-          <img src="mindaquarium_intro.png" alt="인트로" className="w-full max-w-xs md:max-w-md" style={{ objectFit:'contain', filter:'drop-shadow(0 10px 30px rgba(0,0,0,0.3))' }} />
-          <div className="absolute left-1/2 pointer-events-none" style={{ bottom:'-44px', transform:'translateX(-50%)', width:'100vw', display:'flex', justifyContent:'center' }}>
-            <img src="mindaquarium_logo.png" alt="로고" className="w-[65vw] max-w-[700px] md:w-[50vw]" />
-          </div>
+      <div className="relative flex flex-col items-center" style={{ marginBottom: '60px' }}>
+          <img src="mindaquarium_bg.png" alt="인트로" className="w-full max-w-xs md:max-w-md"
+            style={{ objectFit:'contain', filter:'drop-shadow(0 10px 30px rgba(0,0,0,0.3))' }} />
         </div>
         <div className="bg-blue-900/60 rounded-2xl px-6 py-3 mb-5 backdrop-blur-md border border-blue-400/30 w-full max-w-xs">
           <p className="text-white text-center text-base font-medium leading-relaxed">마음 속 감정을 마음 어항 속<br/>물고기 친구들에게 나누어주세요</p>
