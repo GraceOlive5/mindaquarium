@@ -1379,8 +1379,15 @@ function App() {
     setMode('tutorial');
   };
 
-  const completeTutorial = async () => {
+const completeTutorial = async () => {
     await saveToFirebase('tutorialDone', true);
+    // 신규 유저 기본 4마리 초기화
+    if (!emotionFishConfig?.initialized) {
+      const defaultNames = EMOTIONS_LIST
+        .filter(e => DEFAULT_ACTIVE_IDS.includes(e.id))
+        .map(e => e.name);
+      await saveToFirebase('emotionFishConfig', { active: defaultNames, initialized: true });
+    }
     setTutorialDone(true);
     setMode('intro');
   };
