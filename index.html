@@ -736,7 +736,7 @@ function IntroScreen({ userEmail, onStart, onAdmin, onSignOut }) {
           </button>
         </div>
       </div>
-      <div className="fixed bottom-0 left-0 right-0 z-30" style={{ background: 'rgba(0,0,0,0.85)', padding: '14px 24px', paddingBottom: 'calc(14px + env(safe-area-inset-bottom, 0px))', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="fixed bottom-0 left-0 right-0 z-30" style={{ background: 'rgba(0,0,0,0.85)', padding: '14px 24px', paddingBottom: 'calc(24px + env(safe-area-inset-bottom, 0px))', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: '13px', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', maxWidth:'65%' }}>{userEmail}</span>
         <button onClick={onSignOut} style={{ background: 'none', border: '1px solid rgba(255,255,255,0.4)', color: 'rgba(255,255,255,0.85)', borderRadius: '8px', padding: '8px 18px', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}>로그아웃</button>
       </div>
