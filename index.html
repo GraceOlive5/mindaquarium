@@ -762,6 +762,149 @@ function AdminLoginScreen({ onSuccess, onBack, onResetPw }) {
   );
 }
 
+  function EcosystemAnalysis({ messages }) {
+  const now = new Date();
+
+  // 감정별 빈도
+  const emotionCounts = {};
+  messages.forEach(m => {
+    if (m.fish) emotionCounts[m.fish] = (emotionCounts[m.fish] || 0) + 1;
+  });
+  const sorted = Object.entries(emotionCounts).sort((a, b) => b[1] - a[1]);
+  const maxCount = sorted.length > 0 ? sorted[0][1] : 1;
+
+  // 최근 7일
+  const last7 = Array.from({ length: 7 }).map((_, i) => {
+    const d = new Date(now);
+    d.setDate(d.getDate() - (6 - i));
+    const count = messages.filter(m => {
+      if (!m.timestamp) return false;
+      const md = new Date(m.timestamp);
+      return md.getFullYear() === d.getFullYear() && md.getMonth() === d.getMonth() && md.getDate() === d.getDate();
+    }).length;
+    const days = ['일','월','화','수','목','금','토'];
+    return { label: days[d.getDay()], count };
+  });
+  const maxDay = Math.max(...last7.map(d => d.count), 1);
+
+  // 이번 달 vs 지난 달
+  const thisMonth = messages.filter(m => {
+    if (!m.timestamp) return false;
+    const d = new Date(m.timestamp);
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  }).length;
+  const lastMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const lastMonth = messages.filter(m => {
+    if (!m.timestamp) return false;
+    const d = new Date(m.timestamp);
+    return d.getMonth() === lastMonthDate.getMonth() && d.getFullYear() === lastMonthDate.getFullYear();
+  }).length;
+
+  const diversity = Object.keys(emotionCounts).length;
+  const topEmotion = sorted[0]?.[0] || '-';
+  const leastUsed = sorted.length > 1 ? sorted[sorted.length - 1][0] : '-';
+
+  if (messages.length === 0) return (
+    <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+      <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px' }}>아직 마음 기록이 없어요.</p>
+      <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '12px', marginTop: '8px' }}>아이가 물고기에게 마음을 나눠주면 여기서 패턴을 볼 수 있어요.</p>
+    </div>
+  );
+
+  return (
+    <div>
+      {/* 요약 카드 3개 */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '8px', marginBottom: '14px' }}>
+        {[
+          { label: '총 마음 나눔', value: `${messages.length}번` },
+          { label: '감정 종류', value: `${diversity}가지` },
+          { label: '제일 많은 감정', value: topEmotion },
+        ].map((s, i) => (
+          <div key={i} style={{ background: 'rgba(255,255,255,0.1)', borderRadius: '12px', padding: '12px 8px', textAlign: 'center', border: '1px solid rgba(255,255,255,0.15)' }}>
+            <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: '10px', margin: '0 0 5px', lineHeight: 1.4 }}>{s.label}</p>
+            <p style={{ color: '#fff', fontSize: i === 2 ? '14px' : '20px', fontWeight: 800, margin: 0 }}>{s.value}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* 최근 7일 막대 */}
+      <div style={{ background: 'rgba(255,255,255,0.07)', borderRadius: '14px', padding: '14px 16px', marginBottom: '12px', border: '1px solid rgba(255,255,255,0.12)' }}>
+        <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '13px', fontWeight: 700, margin: '0 0 14px' }}>최근 7일 마음 나눔</p>
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: '6px', height: '64px' }}>
+          {last7.map((d, i) => (
+            <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', gap: '5px', height: '100%' }}>
+              <div style={{
+                width: '100%',
+                background: d.count > 0 ? 'linear-gradient(180deg, #38bdf8, #0284c7)' : 'rgba(255,255,255,0.08)',
+                borderRadius: '4px 4px 0 0',
+                height: `${Math.max((d.count / maxDay) * 44, d.count > 0 ? 6 : 2)}px`,
+                transition: 'height 0.4s ease',
+                boxShadow: d.count > 0 ? '0 2px 8px rgba(56,189,248,0.3)' : 'none',
+              }} />
+              <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '9px' }}>{d.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 감정 빈도 가로 바 */}
+      <div style={{ background: 'rgba(255,255,255,0.07)', borderRadius: '14px', padding: '14px 16px', marginBottom: '12px', border: '1px solid rgba(255,255,255,0.12)' }}>
+        <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '13px', fontWeight: 700, margin: '0 0 12px' }}>감정별 나눔 횟수</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          {sorted.slice(0, 8).map(([name, count]) => {
+            const color = EMOTION_COLORS[name] || '#38bdf8';
+            return (
+              <div key={name} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ color: 'rgba(255,255,255,0.75)', fontSize: '12px', fontWeight: 600, minWidth: '44px', textAlign: 'right' }}>{name}</span>
+                <div style={{ flex: 1, background: 'rgba(255,255,255,0.08)', borderRadius: '6px', overflow: 'hidden', height: '22px', position: 'relative' }}>
+                  <div style={{
+                    width: `${(count / maxCount) * 100}%`,
+                    height: '100%',
+                    background: `linear-gradient(90deg, ${color}99, ${color})`,
+                    borderRadius: '6px',
+                    transition: 'width 0.5s ease',
+                    display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: '7px',
+                  }}>
+                    <span style={{ color: 'white', fontSize: '10px', fontWeight: 700 }}>{count}</span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        {sorted.length > 0 && (
+          <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '11px', margin: '10px 0 0', textAlign: 'center' }}>
+            가장 적게 나눈 감정: <span style={{ color: 'rgba(255,255,255,0.55)', fontWeight: 600 }}>{leastUsed}</span>
+          </p>
+        )}
+      </div>
+
+      {/* 이번 달 vs 지난 달 */}
+      <div style={{ background: 'rgba(255,255,255,0.07)', borderRadius: '14px', padding: '14px 16px', border: '1px solid rgba(255,255,255,0.12)' }}>
+        <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '13px', fontWeight: 700, margin: '0 0 10px' }}>이번 달 vs 지난 달</p>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          {[
+            { label: '지난 달', count: lastMonth },
+            { label: '이번 달', count: thisMonth, highlight: true },
+          ].map((m, i) => (
+            <div key={i} style={{ flex: 1, background: m.highlight ? 'rgba(56,189,248,0.12)' : 'rgba(255,255,255,0.06)', borderRadius: '10px', padding: '14px 12px', textAlign: 'center', border: m.highlight ? '1px solid rgba(56,189,248,0.3)' : '1px solid rgba(255,255,255,0.08)' }}>
+              <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '11px', margin: '0 0 6px' }}>{m.label}</p>
+              <p style={{ color: m.highlight ? '#38bdf8' : 'rgba(255,255,255,0.6)', fontSize: '26px', fontWeight: 800, margin: 0 }}>
+                {m.count}<span style={{ fontSize: '12px', fontWeight: 400, marginLeft: '2px' }}>번</span>
+              </p>
+              {m.highlight && lastMonth > 0 && (
+                <p style={{ color: thisMonth >= lastMonth ? '#86efac' : '#fca5a5', fontSize: '11px', margin: '4px 0 0', fontWeight: 600 }}>
+                  {thisMonth > lastMonth ? `▲ ${thisMonth - lastMonth} 증가` : thisMonth < lastMonth ? `▼ ${lastMonth - thisMonth} 감소` : '지난 달과 동일'}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AdminScreen({ messages, goalCount, cycleCount, pendingKingLetter, kingLetterHistory, adminPassword, customFishNames, emotionFishConfig, firebaseConnected, isPaid, onSave, onDeleteAccount, onExit }) {
   const [tab, setTab] = useState('mail');
   const [showSettings, setShowSettings] = useState(false);
@@ -958,16 +1101,24 @@ function AdminScreen({ messages, goalCount, cycleCount, pendingKingLetter, kingL
             </AdminSection>
           </>)}
 
-          {tab === 'eco' && (
-            <div style={{ background:'rgba(255,255,255,0.08)', border:'1px solid rgba(255,255,255,0.15)', borderRadius:'16px', padding:'32px 20px', textAlign:'center' }}>
-              <p style={{ color:'#fff', fontSize:'16px', fontWeight:700, marginBottom:'8px' }}>감정 생태계 분석</p>
-              <p style={{ color:'rgba(255,255,255,0.6)', fontSize:'13px', lineHeight:'1.7', marginBottom:'20px' }}>아이의 감정 패턴 그래프, 추천 물고기,<br/>부모 감정 코칭 조언을 확인할 수 있어요.</p>
-              <div style={{ background:'linear-gradient(135deg, rgba(99,102,241,0.3), rgba(168,85,247,0.3))', border:'1px solid rgba(168,85,247,0.4)', borderRadius:'12px', padding:'14px' }}>
-                <p style={{ color:'#c4b5fd', fontSize:'13px', fontWeight:700, margin:'0 0 4px' }}>프리미엄 버전</p>
-                <p style={{ color:'rgba(255,255,255,0.6)', fontSize:'12px', margin:0 }}>프리미엄 버전에서 이용 가능합니다.</p>
-              </div>
-            </div>
-          )}
+         {tab === 'eco' && (
+  isPaid ? (
+    <AdminSection title="감정 생태계 분석">
+      <EcosystemAnalysis messages={messages} />
+    </AdminSection>
+  ) : (
+    <div style={{ background:'rgba(255,255,255,0.08)', border:'1px solid rgba(255,255,255,0.15)', borderRadius:'16px', padding:'32px 20px', textAlign:'center' }}>
+      <p style={{ color:'#fff', fontSize:'16px', fontWeight:700, marginBottom:'8px' }}>감정 생태계 분석</p>
+      <p style={{ color:'rgba(255,255,255,0.6)', fontSize:'13px', lineHeight:'1.7', marginBottom:'20px' }}>
+        아이의 감정 패턴 그래프와<br/>월별 감정 변화 추이를 확인할 수 있어요.
+      </p>
+      <div style={{ background:'linear-gradient(135deg, rgba(99,102,241,0.3), rgba(168,85,247,0.3))', border:'1px solid rgba(168,85,247,0.4)', borderRadius:'12px', padding:'14px' }}>
+        <p style={{ color:'#c4b5fd', fontSize:'13px', fontWeight:700, margin:'0 0 4px' }}>프리미엄 기능</p>
+        <p style={{ color:'rgba(255,255,255,0.6)', fontSize:'12px', margin:0 }}>프리미엄 버전에서 이용 가능합니다.</p>
+      </div>
+    </div>
+  )
+)}
 
           <p style={{ textAlign:'center', color:'#d1d5db', fontSize:'11px', marginTop:'2rem' }}>Copyright 2025-2026 hhappyfamilydais. All rights reserved.. All rights reserved. · 어항 관리센터 v1.0</p>
         </div>
