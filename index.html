@@ -762,16 +762,16 @@ function AdminLoginScreen({ onSuccess, onBack, onResetPw }) {
   );
 }
 
-  function EcosystemAnalysis({ messages }) {
+function EcosystemAnalysis({ messages }) {
   const now = new Date();
 
-  // 감정별 빈도
   const emotionCounts = {};
   messages.forEach(m => {
     if (m.fish) emotionCounts[m.fish] = (emotionCounts[m.fish] || 0) + 1;
   });
   const sorted = Object.entries(emotionCounts).sort((a, b) => b[1] - a[1]);
   const maxCount = sorted.length > 0 ? sorted[0][1] : 1;
+  const totalShown = Object.values(emotionCounts).reduce((a, b) => a + b, 0);
 
   // 최근 7일
   const last7 = Array.from({ length: 7 }).map((_, i) => {
@@ -804,6 +804,25 @@ function AdminLoginScreen({ onSuccess, onBack, onResetPw }) {
   const topEmotion = sorted[0]?.[0] || '-';
   const leastUsed = sorted.length > 1 ? sorted[sorted.length - 1][0] : '-';
 
+  // 연속 감정 (접속 순서 기준 3번 이상 연속)
+  const streakMap = {};
+  let curFish = null, curStreak = 0;
+  messages.forEach(m => {
+    if (!m.fish) return;
+    if (m.fish === curFish) { curStreak++; }
+    else { curFish = m.fish; curStreak = 1; }
+    if (curStreak >= 3) streakMap[curFish] = Math.max(streakMap[curFish] || 0, curStreak);
+  });
+  const streakEmotions = Object.entries(streakMap).sort((a, b) => b[1] - a[1]);
+
+  // 띄엄띄엄 감정 (총 2번 이하)
+  const sporadicEmotions = sorted.filter(([, count]) => count <= 2).map(([name]) => name);
+
+  const getFishColor = (name) => {
+    if (name === '비밀') return '#9ca3af';
+    return EMOTION_COLORS[name] || '#38bdf8';
+  };
+
   if (messages.length === 0) return (
     <div style={{ textAlign: 'center', padding: '40px 20px' }}>
       <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px' }}>아직 마음 기록이 없어요.</p>
@@ -813,70 +832,111 @@ function AdminLoginScreen({ onSuccess, onBack, onResetPw }) {
 
   return (
     <div>
-      {/* 요약 카드 3개 */}
+      {/* 요약 카드 */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '8px', marginBottom: '14px' }}>
         {[
-          { label: '총 마음 나눔', value: `${messages.length}번` },
+          { label: '총 마음 나눔', value: `${totalShown}번` },
           { label: '감정 종류', value: `${diversity}가지` },
           { label: '제일 많은 감정', value: topEmotion },
         ].map((s, i) => (
           <div key={i} style={{ background: 'rgba(255,255,255,0.1)', borderRadius: '12px', padding: '12px 8px', textAlign: 'center', border: '1px solid rgba(255,255,255,0.15)' }}>
             <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: '10px', margin: '0 0 5px', lineHeight: 1.4 }}>{s.label}</p>
-            <p style={{ color: '#fff', fontSize: i === 2 ? '14px' : '20px', fontWeight: 800, margin: 0 }}>{s.value}</p>
+            <p style={{ color: i === 2 ? (getFishColor(s.value)) : '#38bdf8', fontSize: i === 2 ? '14px' : '20px', fontWeight: 800, margin: 0 }}>{s.value}</p>
           </div>
         ))}
       </div>
 
-      {/* 최근 7일 막대 */}
+      {/* 최근 7일 */}
       <div style={{ background: 'rgba(255,255,255,0.07)', borderRadius: '14px', padding: '14px 16px', marginBottom: '12px', border: '1px solid rgba(255,255,255,0.12)' }}>
         <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '13px', fontWeight: 700, margin: '0 0 14px' }}>최근 7일 마음 나눔</p>
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: '6px', height: '64px' }}>
           {last7.map((d, i) => (
             <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', gap: '5px', height: '100%' }}>
-              <div style={{
-                width: '100%',
-                background: d.count > 0 ? 'linear-gradient(180deg, #38bdf8, #0284c7)' : 'rgba(255,255,255,0.08)',
-                borderRadius: '4px 4px 0 0',
-                height: `${Math.max((d.count / maxDay) * 44, d.count > 0 ? 6 : 2)}px`,
-                transition: 'height 0.4s ease',
-                boxShadow: d.count > 0 ? '0 2px 8px rgba(56,189,248,0.3)' : 'none',
-              }} />
+              <div style={{ width: '100%', background: d.count > 0 ? 'linear-gradient(180deg, #38bdf8, #0284c7)' : 'rgba(255,255,255,0.08)', borderRadius: '4px 4px 0 0', height: `${Math.max((d.count / maxDay) * 44, d.count > 0 ? 6 : 2)}px`, transition: 'height 0.4s ease' }} />
               <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '9px' }}>{d.label}</span>
             </div>
           ))}
         </div>
       </div>
 
-      {/* 감정 빈도 가로 바 */}
+      {/* 감정별 빈도 */}
       <div style={{ background: 'rgba(255,255,255,0.07)', borderRadius: '14px', padding: '14px 16px', marginBottom: '12px', border: '1px solid rgba(255,255,255,0.12)' }}>
         <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '13px', fontWeight: 700, margin: '0 0 12px' }}>감정별 나눔 횟수</p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {sorted.slice(0, 8).map(([name, count]) => {
-            const color = EMOTION_COLORS[name] || '#38bdf8';
+          {sorted.map(([name, count]) => {
+            const color = getFishColor(name);
             return (
               <div key={name} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{ color: 'rgba(255,255,255,0.75)', fontSize: '12px', fontWeight: 600, minWidth: '44px', textAlign: 'right' }}>{name}</span>
-                <div style={{ flex: 1, background: 'rgba(255,255,255,0.08)', borderRadius: '6px', overflow: 'hidden', height: '22px', position: 'relative' }}>
-                  <div style={{
-                    width: `${(count / maxCount) * 100}%`,
-                    height: '100%',
-                    background: `linear-gradient(90deg, ${color}99, ${color})`,
-                    borderRadius: '6px',
-                    transition: 'width 0.5s ease',
-                    display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: '7px',
-                  }}>
-                    <span style={{ color: 'white', fontSize: '10px', fontWeight: 700 }}>{count}</span>
+                <div style={{ flex: 1, background: 'rgba(255,255,255,0.08)', borderRadius: '6px', overflow: 'hidden', height: '22px' }}>
+                  <div style={{ width: `${(count / maxCount) * 100}%`, height: '100%', background: `linear-gradient(90deg, ${color}99, ${color})`, borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: '7px', transition: 'width 0.5s ease' }}>
+                    <span style={{ color: name === '비밀' ? '#1f2937' : 'white', fontSize: '10px', fontWeight: 700 }}>{count}</span>
                   </div>
                 </div>
               </div>
             );
           })}
         </div>
-        {sorted.length > 0 && (
-          <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '11px', margin: '10px 0 0', textAlign: 'center' }}>
-            가장 적게 나눈 감정: <span style={{ color: 'rgba(255,255,255,0.55)', fontWeight: 600 }}>{leastUsed}</span>
-          </p>
-        )}
+      </div>
+
+      {/* 감정 인사이트 */}
+      <div style={{ background: 'rgba(255,255,255,0.07)', borderRadius: '14px', padding: '14px 16px', marginBottom: '12px', border: '1px solid rgba(255,255,255,0.12)' }}>
+        <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '13px', fontWeight: 700, margin: '0 0 12px' }}>감정 패턴</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+
+          {/* 많이 나눈 감정 */}
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+            <span style={{ fontSize: '16px', minWidth: '24px' }}>🌊</span>
+            <div>
+              <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '11px' }}>가장 많이 나눈 감정</span>
+              <p style={{ color: '#fff', fontSize: '13px', fontWeight: 700, margin: '2px 0 0' }}>
+                {topEmotion} <span style={{ color: 'rgba(255,255,255,0.4)', fontWeight: 400 }}>({emotionCounts[topEmotion]}번)</span>
+              </p>
+            </div>
+          </div>
+
+          {/* 적게 나눈 감정 */}
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+            <span style={{ fontSize: '16px', minWidth: '24px' }}>🌱</span>
+            <div>
+              <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '11px' }}>가장 적게 나눈 감정</span>
+              <p style={{ color: '#fff', fontSize: '13px', fontWeight: 700, margin: '2px 0 0' }}>
+                {leastUsed} <span style={{ color: 'rgba(255,255,255,0.4)', fontWeight: 400 }}>({emotionCounts[leastUsed]}번)</span>
+              </p>
+            </div>
+          </div>
+
+          {/* 연속 감정 */}
+          {streakEmotions.length > 0 && (
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+              <span style={{ fontSize: '16px', minWidth: '24px' }}>🔥</span>
+              <div>
+                <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '11px' }}>연속으로 나누는 감정 <span style={{ color: 'rgba(255,255,255,0.3)' }}>· 연달아 3번 이상 같은 감정</span></span>
+                <p style={{ color: '#fff', fontSize: '13px', fontWeight: 700, margin: '2px 0 0' }}>
+                  {streakEmotions.slice(0, 2).map(([name, count]) => (
+                    <span key={name} style={{ marginRight: '8px' }}>
+                      {name} <span style={{ color: 'rgba(255,255,255,0.4)', fontWeight: 400 }}>({count}연속)</span>
+                    </span>
+                  ))}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* 띄엄띄엄 감정 */}
+          {sporadicEmotions.length > 0 && (
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+              <span style={{ fontSize: '16px', minWidth: '24px' }}>💧</span>
+              <div>
+                <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '11px' }}>띄엄띄엄 나누는 감정 <span style={{ color: 'rgba(255,255,255,0.3)' }}>· 총 2번 이하</span></span>
+                <p style={{ color: '#fff', fontSize: '13px', fontWeight: 700, margin: '2px 0 0' }}>
+                  {sporadicEmotions.slice(0, 3).join(', ')}
+                  {sporadicEmotions.length > 3 && <span style={{ color: 'rgba(255,255,255,0.4)', fontWeight: 400 }}> 외 {sporadicEmotions.length - 3}개</span>}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* 이번 달 vs 지난 달 */}
