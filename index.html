@@ -1550,16 +1550,21 @@ function App() {
     listen('isPaid', v => setIsPaid(!!v));
     listen('emotionFishConfig', setEmotionFishConfig);
 
-    Promise.all([
-      new Promise(r => fa().onValue(fa().ref(db(), `users/${user.uid}/adminSetupDone`), s => r(s.val()), { onlyOnce: true })),
-      new Promise(r => fa().onValue(fa().ref(db(), `users/${user.uid}/tutorialDone`),   s => r(s.val()), { onlyOnce: true })),
-    ]).then(([adminDone, tutDone]) => {
-      setAdminSetupDone(!!adminDone);
-      setTutorialDone(!!tutDone);
-      if (!adminDone) setMode('adminOnboarding');
-      else if (!tutDone) setMode('tutorial');
-      else setMode('intro');
-    });
+    const setupTimeout = setTimeout(() => {
+  setMode(prev => prev === 'loading' ? 'intro' : prev);
+}, 6000);
+
+Promise.all([
+  new Promise(r => fa().onValue(fa().ref(db(), `users/${user.uid}/adminSetupDone`), s => r(s.val()), { onlyOnce: true })),
+  new Promise(r => fa().onValue(fa().ref(db(), `users/${user.uid}/tutorialDone`),   s => r(s.val()), { onlyOnce: true })),
+]).then(([adminDone, tutDone]) => {
+  clearTimeout(setupTimeout);
+  setAdminSetupDone(!!adminDone);
+  setTutorialDone(!!tutDone);
+  if (!adminDone) setMode('adminOnboarding');
+  else if (!tutDone) setMode('tutorial');
+  else setMode('intro');
+});
 
     fa().onValue(fa().ref(db(), `users/${user.uid}/v2migrated`), snap => {
       if (snap.val()) return;
